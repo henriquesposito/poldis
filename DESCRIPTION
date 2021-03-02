@@ -1,7 +1,7 @@
 Package: poldis
 Type: Package
 Title: What the Package Does (Title Case)
-Version: 0.1.0
+Version: 0.0.1
 Author: person(given = "Henrique",
            family = "Sposito", 
            role = c("cre", "aut", "ctb"),
