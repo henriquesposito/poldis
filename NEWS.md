@@ -17,11 +17,10 @@
   * Added `ISSUE_TEMPLATE` folder
   * Added `bug_report` file
   * Added `feature_request` file
-  * Added `workflows` folder
-  * Added `prchecks` file
-  * Added `pushrelease` file
-  * Added `prcommands` file
   * Added `tests` folder
   * Added `testthat` folder
   * Added `testthat` file
-
+  * Added `inst` folder
+  * Added `data-raw` folder
+  * Added `data` folder
+* Added package logo
