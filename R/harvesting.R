@@ -1,5 +1,0 @@
-# Harvesting Introduction
-
-library(rvest)
-
-
