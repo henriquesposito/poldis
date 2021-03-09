@@ -1,5 +1,6 @@
 # US Presidential Debates
-
+# This dataset includes all presidential debates in US since 1960.
+# These range from party debates for nominations to run-off debates.
 # Source: https://www.presidency.ucsb.edu/
 
 library(rvest)

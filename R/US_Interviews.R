@@ -1,5 +1,6 @@
-# US President Interviews
-
+# US Presidents' Interviews
+# This dataset includes many presidential interviews in US since 1900.
+# These range from radio, newspaper to television and other interviews for presidents while in office.
 # Source: https://www.presidency.ucsb.edu/
 
 library(rvest)
