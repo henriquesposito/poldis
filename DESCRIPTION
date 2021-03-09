@@ -14,9 +14,9 @@ Encoding: UTF-8
 LazyData: true
 Suggests: 
     testthat (>= 3.0.0),
-    usethis
 Config/testthat/edition: 3
 Imports: 
     rvest,
-    dplyr
+    dplyr,
+    usethis
 RoxygenNote: 7.1.1

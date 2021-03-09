@@ -4,6 +4,7 @@
 
 library(rvest)
 library(dplyr)
+library(usethis)
 
 get_text <- function(source_link) {
   debate_page = read_html(source_link)
@@ -43,4 +44,4 @@ for (page_result in seq(from = 0, to = 17, by = 1)) {
 
 }
 
-usethis::use_data_raw(US_Debates)
+usethis::use_data(US_Debates)
