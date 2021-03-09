@@ -22,7 +22,7 @@ for (page_result in seq(from = 0, to = 95, by = 1)) {
 
   title <- page %>% html_nodes(".field-title a") %>% html_text()
   date <-  page %>% html_nodes(".date-display-single") %>% html_text()
-  speaker <- page %>% html_nodes(".margin-top a") %>% html_text()
+  president <- page %>% html_nodes(".margin-top a") %>% html_text()
   source_links <- page %>% html_nodes(".field-title a") %>% html_attr("href") %>% paste0("https://www.presidency.ucsb.edu", . , sep = "")
   text <- sapply(source_links, FUN = get_text, USE.NAMES = FALSE)
 
