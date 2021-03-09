@@ -16,7 +16,7 @@ get_text <- function(source_link) {
 US_Oral_Remarks = data.frame()
 
 for (page_result in seq(from = 0, to = 550, by = 1)) {
-  link = paste0("https://www.presidency.ucsb.edu/documents/app-categories/presidential/spoken-addresses-and-remarks?page=0",
+  link = paste0("https://www.presidency.ucsb.edu/documents/app-categories/presidential/spoken-addresses-and-remarks?page=",
                 page_result)
 
   page = read_html(link)
