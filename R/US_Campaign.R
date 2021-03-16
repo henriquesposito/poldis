@@ -11,9 +11,9 @@ get_text <- function(source_link) {
 
 US_Campaign = data.frame()
 
-for (page_result in seq(from = 0, to = 163, by = 1)) {
+for (page_result in seq(from = 0, to = 323, by = 1)) {
 
-  link = paste0("https://www.presidency.ucsb.edu/documents/app-categories/spoken-addresses-and-remarks/presidential/saturday-weekly-addresses-radio?page=", page_result)
+  link = paste0("https://www.presidency.ucsb.edu/documents/app-categories/elections-and-transitions/campaign-documents?page=", page_result)
   page = read_html(link)
 
   title <- page %>% html_nodes(".field-title a") %>% html_text()
@@ -30,4 +30,4 @@ for (page_result in seq(from = 0, to = 163, by = 1)) {
 
 usethis::use_data(US_Campaign, overwrite = TRUE)
 
-# There are several documents, as press releases which are not often delivered by candidates and, thus, will be cleaned in later stages.
+# There are several documents, as press releases which are not often delivered by candidates and, thus, might be cleaned in later stages.
