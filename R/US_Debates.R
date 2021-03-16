@@ -45,4 +45,7 @@ for (page_result in seq(from = 0, to = 17, by = 1)) {
 
 }
 
-usethis::use_data(US_Debates)
+usethis::use_data(US_Debates, overwrite = TRUE)
+
+# The debates include early on party nomination debates and these will likely be excluded for analysis and only
+# final party nomination debates and national debates will be used.

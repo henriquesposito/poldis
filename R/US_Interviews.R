@@ -32,4 +32,4 @@ for (page_result in seq(from = 0, to = 95, by = 1)) {
 
 }
 
-usethis::use_data(US_Interviews)
+usethis::use_data(US_Interviews, overwrite = TRUE)
