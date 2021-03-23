@@ -31,3 +31,4 @@ usethis::use_data(US_M_Remarks, overwrite = TRUE)
 
 # There is some overlap with the US_Oral_Remarks dataset and, for that reason, these are scrapped separetely
 # and will later be joined using dplyr::fuzzyjoin.
+# This data and script were then moved to data-raw folder.

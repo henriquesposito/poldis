@@ -49,3 +49,4 @@ usethis::use_data(US_Debates, overwrite = TRUE)
 
 # The debates include early on party nomination debates and these will likely be excluded for analysis and only
 # final party nomination debates and national debates will be used.
+# This data and script were then moved to data-raw folder.

@@ -35,3 +35,4 @@ for (page_result in seq(from = 0, to = 550, by = 1)) {
 usethis::use_data(US_Oral_Remarks, overwrite = TRUE)
 
 # The text data needs to be cleaned to include only remarks by presidents and vice-presidents.
+# This data and script were then moved to data-raw folder.

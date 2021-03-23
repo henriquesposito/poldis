@@ -34,3 +34,4 @@ for (page_result in seq(from = 0, to = 120, by = 1)) {
 usethis::use_data(US_News_Conferences, overwrite = TRUE)
 
 # These will be binded to interviews to get a more comprehensive dataset.
+# This data and script were then moved to data-raw folder.

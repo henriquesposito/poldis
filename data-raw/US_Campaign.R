@@ -31,3 +31,4 @@ for (page_result in seq(from = 0, to = 323, by = 1)) {
 usethis::use_data(US_Campaign, overwrite = TRUE)
 
 # There are several documents, as press releases which are not often delivered by candidates and, thus, might be cleaned in later stages.
+# This data and script were then moved to data-raw folder.

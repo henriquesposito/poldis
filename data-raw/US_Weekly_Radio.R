@@ -30,3 +30,4 @@ for (page_result in seq(from = 0, to = 163, by = 1)) {
 usethis::use_data(US_Weekly_Radio, overwrite = TRUE)
 
 # This will likely be aaded to a broader oral remarks dataset.
+# This data and script were then moved to data-raw folder.

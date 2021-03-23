@@ -33,3 +33,5 @@ for (page_result in seq(from = 0, to = 95, by = 1)) {
 }
 
 usethis::use_data(US_Interviews, overwrite = TRUE)
+
+# This data and script were then moved to data-raw folder.
