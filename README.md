@@ -12,7 +12,7 @@ issues](https://img.shields.io/github/issues-raw/henriquesposito/poldis)
 Text Data on Political Discourses in Brazil and the US in Time.
 
 For now this is a private project, but soon it is set to become a source
-of publicly available data on political discourses while offering
-several functions for text analysis.
+of publicly available data on political discourses and offer several
+helpful functions for political text analysis.
 
 Keep your eyes open for it\!
