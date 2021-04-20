@@ -1,11 +1,10 @@
 # Test Analysis Learning Curve
 # References: https://code.datasciencedojo.com/datasciencedojo/tutorials/tree/master/Introduction%20to%20Text%20Analytics%20with%20R
 
-install.packages(c("ggplot2", "e1071", "caret", "quanteda",
-                   "irlba", "randomForest"))
 library(tidyverse)
 library(lubridate)
 
+load("~/GitHub/Poldis/data-raw/US_Weekly_Radio.rda")
 radio <- US_Weekly_Radio %>% dplyr::select(-source_links)
 radio <- subset(radio, speaker != "Laura Bush")
 radio <- subset(radio, speaker != "Michelle Obama")

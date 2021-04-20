@@ -5,7 +5,9 @@ library(usethis)
 library(stringr)
 
 # Merging oral communication datasets with possible duplicates
+load("~/GitHub/Poldis/data-raw/US_Oral_Remarks.rda")
 remarks <- as.data.frame(US_Oral_Remarks)
+load("~/GitHub/Poldis/data-raw/US_M_Remarks.rda")
 mremarks <- as.data.frame(US_M_Remarks)
 
 # Join datasets
@@ -25,12 +27,14 @@ usethis::use_data(US_oral, overwrite = TRUE)
 # The data is scraped from the presidential library and covers all official presidential speeches
 # and remarks from January 1985 to July 2020.
 
+load("~/GitHub/Poldis/data/BR_oral.rda")
 summary(BR_oral)
 
 ### Todo: extract setting from title
 # This should also become a function later on
 
 # For news conferences, cleaning is required before merging.
+load("~/GitHub/Poldis/data-raw/US_News_Conferences.rda")
 conf <- as.data.frame(US_News_Conferences)
 
 # Identifying questions and extracting only the when the
@@ -83,6 +87,7 @@ summary(conf)
 ### todo: create a function based on the above for removing questions of dialogue text (remove_questions())
 
 # For interviews, cleaning is also required before merging.
+load("~/GitHub/Poldis/data-raw/US_Interviews.rda")
 inter <- as.data.frame(US_Interviews)
 inter <- inter %>% slice_head(n=20)
 x = inter$text
@@ -106,7 +111,7 @@ dialogue_intern <- function(x) {
   x
 }
 
-#tofix
+#tofix not working properly
 dialogue_inter <- function(x) {
   dat <-  unlist(strsplit(x, "\\?"))
   interviewer <-  sub("([a-z0-9][?!.]).*", "\\1", x)
@@ -137,4 +142,29 @@ for (i in 1:length(inter$text)) {
   print(paste("Row:", i))
 }
 
-inter <- cbind(conf, itext)
+inter <- cbind(inter, itext)
+summary(inter)
+
+# Join datasets
+interviews <- dplyr::full_join(inter, conf)
+
+# Remove title duplicates
+US_interviews <- dplyr::distinct(interviews, title, .keep_all = TRUE)
+
+# Get observations since 1980
+US_interviews$date <- lubridate::mdy(US_oral$date)
+
+US_interviews <- US_oral %>% dplyr::filter(date > "1979-12-31")
+
+usethis::use_data(US_interviews, overwrite = TRUE)
+
+# Campaign documents and debates also reuire some wrangling...
+# First, for debates we want to isolate all parts where certain candidate speaks into one observation for each candidate.
+# Second, we want to keep only discursive content and remove press conferences given by campaig staff as
+# well as statements simply read by campaign staff.
+# This entails removing observations that have "press release" or "campaign statement" in title.
+
+load("~/GitHub/Poldis/data-raw/US_Campaign.rda")
+camp <- as.data.frame(US_Campaign)
+
+### todo: create a function that removes undesired observations that contain certain words in title (remove_obs())

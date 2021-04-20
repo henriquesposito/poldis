@@ -9,10 +9,11 @@ date)](https://img.shields.io/github/v/release/henriquesposito/poldis)
 issues](https://img.shields.io/github/issues-raw/henriquesposito/poldis)
 <!-- badges: end -->
 
-Text Data on Political Discourses in Brazil and the US in Time.
+Text data and tools for analysing on political discourses in Brazil and
+the US across Time.
 
 For now this is a private project, but soon it is set to become a source
 of publicly available data on political discourses and offer several
-helpful functions for political text analysis.
+helpful functions for wrangling and analysing political text.
 
 Keep your eyes open for it\!
