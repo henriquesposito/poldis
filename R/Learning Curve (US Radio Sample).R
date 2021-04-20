@@ -1,4 +1,4 @@
-# Test Analysis First Attempt
+# Test Analysis Learning Curve
 # References: https://code.datasciencedojo.com/datasciencedojo/tutorials/tree/master/Introduction%20to%20Text%20Analytics%20with%20R
 
 install.packages(c("ggplot2", "e1071", "caret", "quanteda",
@@ -84,7 +84,6 @@ cv.folds <- caret::createMultiFolds(train$speaker, k = 10, times = 3)
 
 cv.cntrl <- caret::trainControl(method = "repeatedcv", number = 10,
                          repeats = 3, index = cv.folds)
-
 
 #dealing with large datasets more efficient
 library(doSNOW)
@@ -184,82 +183,35 @@ rpart.cv.2
 train.tokens <- quanteda::tokens_ngrams(train.tokens, n = 1:2)
 train.tokens[[357]]
 
-
 # Transform to dfm and then a matrix.
 train.tokens.dfm <- dfm(train.tokens, tolower = FALSE)
 train.tokens.matrix <- as.matrix(train.tokens.dfm)
 train.tokens.dfm
 
-
 # Normalize all documents via TF.
 train.tokens.df <- apply(train.tokens.matrix, 1, term.frequency)
 
-
 # Calculate the IDF vector that we will use for training and test data!
 train.tokens.idf <- apply(train.tokens.matrix, 2, inverse.doc.freq)
-
 
 # Calculate TF-IDF for our training corpus
 train.tokens.tfidf <-  apply(train.tokens.df, 2, tf.idf,
                              idf = train.tokens.idf)
 
-
 # Transpose the matrix
 train.tokens.tfidf <- t(train.tokens.tfidf)
-
 
 # Fix incomplete cases
 incomplete.cases <- which(!complete.cases(train.tokens.tfidf))
 train.tokens.tfidf[incomplete.cases,] <- rep(0.0, ncol(train.tokens.tfidf))
 
-
 # Make a clean data frame.
 train.tokens.tfidf.df <- cbind(Label = train$speaker, data.frame(train.tokens.tfidf))
 names(train.tokens.tfidf.df) <- make.names(names(train.tokens.tfidf.df))
 
-
 # Clean up unused objects in memory.
 gc()
 
-# NOTE - The following code requires the use of command-line R to execute
-#        due to the large number of features (i.e., columns) in the matrix.
-#        Please consult the following link for more details if you wish
-#        to run the code yourself:
-#
-#        https://stackoverflow.com/questions/28728774/how-to-set-max-ppsize-in-r
-#
-#        Also note that running the following code required approximately
-#        38GB of RAM and more than 4.5 hours to execute on a 10-core
-#        workstation!
-#
-
-
-# Time the code execution
-# start.time <- Sys.time()
-
-# Leverage single decision trees to evaluate if adding bigrams improves the
-# the effectiveness of the model.
-# rpart.cv.3 <- train(Label ~ ., data = train.tokens.tfidf.df, method = "rpart",
-#                     trControl = cv.cntrl, tuneLength = 7)
-
-# Total time of execution on workstation was
-# total.time <- Sys.time() - start.time
-# total.time
-
-# Check out our results.
-# rpart.cv.3
-
-#
-# The results of the above processing show a slight decline in rpart
-# effectiveness with a 10-fold CV repeated 3 times accuracy of 0.9457.
-# As we will discuss later, while the addition of bigrams appears to
-# negatively impact a single decision tree, it helps with the mighty
-# random forest!
-
-# We'll leverage the irlba package for our singular value
-# decomposition (SVD). The irlba package allows us to specify
-# the number of the most important singular vectors we wish to
-# calculate and retain for features.
 library(irlba)
 
 # Time the code execution
@@ -384,7 +336,6 @@ varImpPlot(rf.cv.1$finalModel)
 varImpPlot(rf.cv.2$finalModel)
 
 # Turns out that our TextLength feature is somewhat predictive.
-
 library(lsa)
 
 # calculate similarity scores
@@ -396,7 +347,6 @@ train.svd$SpamSimilarity <- rep(0.0, nrow(train.svd))
 for(i in 1:nrow(train.svd)) {
   train.svd$SpamSimilarity[i] <- mean(train.similarities[i, spam.indexes])
 }
-
 
 # As always, let's visualize our results using the mighty ggplot2
 ggplot(train.svd, aes(x = SpamSimilarity, fill = Label)) +
