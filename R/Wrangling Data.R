@@ -18,9 +18,9 @@ US_oral <- dplyr::distinct(oralc, title, .keep_all = TRUE)
 
 # Get observations since 1980
 US_oral$date <- lubridate::mdy(US_oral$date)
-
 US_oral <- US_oral %>% dplyr::filter(date > "1979-12-31")
 
+# Import cleaned dataset
 usethis::use_data(US_oral, overwrite = TRUE)
 
 # For Brazil, at the time being, Cesar 2020 dataset on oral remarks is being used.
@@ -36,6 +36,10 @@ summary(BR_oral)
 # For news conferences, cleaning is required before merging.
 load("~/GitHub/Poldis/data-raw/US_News_Conferences.rda")
 conf <- as.data.frame(US_News_Conferences)
+
+# Get observations since 1980
+conf$date <- lubridate::mdy(conf$date)
+conf <- conf %>% dplyr::filter(date > "1979-12-31")
 
 # Identifying questions and extracting only the when the
 # president speaks from news conferences transcripts. There are also other
@@ -89,8 +93,10 @@ summary(conf)
 # For interviews, cleaning is also required before merging.
 load("~/GitHub/Poldis/data-raw/US_Interviews.rda")
 inter <- as.data.frame(US_Interviews)
-inter <- inter %>% slice_head(n=20)
-x = inter$text
+
+# Get observations since 1980
+inter$date <- lubridate::mdy(inter$date)
+inter <- inter %>% dplyr::filter(date > "1979-12-31")
 
 #tofix: should the interviewer be identified from the text and then his sentences removed? Maybe if first sentence does not contain
 # "the president:" or the name of a president followed by ":"...
@@ -168,3 +174,15 @@ load("~/GitHub/Poldis/data-raw/US_Campaign.rda")
 camp <- as.data.frame(US_Campaign)
 
 ### todo: create a function that removes undesired observations that contain certain words in title (remove_obs())
+
+remove_obs<- function(arg){
+
+  arg <- lapply(camp$title, function(x) {
+    dplyr::if_else(str_detect(x, "press release"), str_replace(x, NA), x)
+    dplyr::if_else(str_detect(x, "campaign statement"), str_replace(x, NA), x)
+  })
+
+  unlist(arg)
+
+  arg <- dplyr::filter(arg != "NA")
+}
