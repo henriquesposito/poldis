@@ -1,7 +1,7 @@
 # Data Preparation for US discursive data
 # Henrique Sposito
 
-## Oral Remarks
+### Oral Remarks
 
 # Load some packages
 
@@ -36,7 +36,7 @@ US_oral <- data.frame(US_oral[grep("Joseph R. Biden|Donald J. Trump|Barack Obama
 # Import cleaned dataset
 usethis::use_data(US_oral, overwrite = TRUE)
 
-## Debates
+### Debates
 
 # For debates we want to isolate all parts where certain candidate speaks into one observation for each candidate.
 # But first, we need to get second round debates and not party primaries.
@@ -58,7 +58,6 @@ US_debates <- US_debates[-19,]
 US_debates[9,]
 US_debates <- US_debates[-9,]
 # This is a republican debate and should be removed
-
 
 # The scraping for participants showed an issue in naming participants and moderators for some observations
 US_debates$participants
@@ -108,139 +107,25 @@ US_debates$text[28] # ",ANDERSON:" (indepenedent candidate) and ",REAGAN:" (Shou
 # Now that we know names we still ned to separate debates by speaker for analysis.
 # However, because of uniqueness of how speakers at debates were coded in text,
 # we have to do it text by text.
-# The function was altered from:
-# https://stackoverflow.com/questions/41100482/split-speaker-and-dialogue-in-rstudio
-# Two versions are develop, one for the texts with ":" and the other for the debates without.
-# Colon
-splitText <- strsplit(US_debates$text[1], ",.")
-allSpeakers <- lapply(splitText, function(thisText){
-  grep(":", thisText, value = TRUE) %>%
-    gsub(":.*", "", .) %>%
-    gsub("\\(", "", .)
-}) %>%
-  unlist() %>%
-  unique()
+# We use the split_text() function here, see text_wrangling_functions sript for more info
 
-allSpeakers
+debate1 <- split_text(US_debates$text[1], ",.", ":")
+debate2 <- split_text(US_debates$text[2], ",.", ":")
 
-legitSpeakers <-
-  allSpeakers[-c(1,2,4,6,7)]
+# get all the 28 debates together properly
+# debates <- data.frame(Title = c(paste(US_debates$title[1]), paste(US_debates$title[1]),
+#                                 paste(US_debates$title[2]), paste(US_debates$title[2])
+#                                 ),
+#                       Date = c(paste(US_debates$date[1]), paste(US_debates$date[1]),
+#                                paste(US_debates$date[2]), paste(US_debates$date[2])
+#                                ),
+#                       Speaker = c("Biden", "Trump", "Biden", "Trump",
+#                                   ),
+#                       Text = c(paste(debate1$x[1]), paste(debate1$x[2]),
+#                                paste(debate2$x[1]), paste(debate2$x[2]),
+#                                ))
 
-speechText <- lapply(splitText, function(thisText){
-
-  # Remove applause and interjections (things in parentheses)
-  # along with any blank lines; though you could leave blanks if you want
-  cleanText <-
-    grep("(^\\(.*\\)$)|(^$)", thisText
-         , value = TRUE, invert = TRUE)
-
-  # Split each line by a semicolor
-  strsplit(cleanText, ":") %>%
-    lapply(function(x){
-      # Check if the first element is a legit speaker
-      if(x[1] %in% legitSpeakers){
-        # If so, set the speaker, and put the statement in a separate portion
-        # taking care to re-collapse any breaks caused by additional colons
-        out <- data.frame(speaker = x[1]
-                          , text = paste(x[-1], collapse = ":"))
-      } else{
-        # If not a legit speaker, set speaker to NA and reset text as above
-        out <- data.frame(speaker = NA
-                          , text = paste(x, collapse = ":"))
-      }
-      # Return whichever version we made above
-      return(out)
-    }) %>%
-    # Bind all of the rows together
-    bind_rows %>%
-    # Identify clusters of speech that go with a single speaker
-    mutate(speakingGroup = cumsum(!is.na(speaker))) %>%
-    # Group by those clusters
-    group_by(speakingGroup) %>%
-    # Collapse that speaking down into a single row
-    summarise(speaker = speaker[1]
-              , fullText = paste(text, collapse = "\n"))
-})
-
-sp <- as.data.frame(speechText)
-
-# Let's aggregate by speaker and see
-sp <- aggregate(sp$fullText, list(sp$speaker), paste, collapse =" ")
-sp$x
-
-# # No colon
-# splitText <- strsplit(US_debates$text[1], ",.")
-# allSpeakers <- lapply(splitText, function(thisText){
-#   grep(":", thisText, value = TRUE) %>%
-#     gsub("Thank.*", "", .) %>% # word before thank you
-#     gsub("\\(", "", .)
-# }) %>%
-#   unlist() %>%
-#   unique()
-#
-# allSpeakers
-#
-# legitSpeakers <-
-#   allSpeakers[-c(1,2,4,6,7)]
-#
-# speechText <- lapply(splitText, function(thisText){
-#
-#   # Remove applause and interjections (things in parentheses)
-#   # along with any blank lines; though you could leave blanks if you want
-#   cleanText <-
-#     grep("(^\\(.*\\)$)|(^$)", thisText
-#          , value = TRUE, invert = TRUE)
-#
-#   # Split each line by a semicolor
-#   strsplit(cleanText, ":") %>%
-#     lapply(function(x){
-#       # Check if the first element is a legit speaker
-#       if(x[1] %in% legitSpeakers){
-#         # If so, set the speaker, and put the statement in a separate portion
-#         # taking care to re-collapse any breaks caused by additional colons
-#         out <- data.frame(speaker = x[1]
-#                           , text = paste(x[-1], collapse = ":"))
-#       } else{
-#         # If not a legit speaker, set speaker to NA and reset text as above
-#         out <- data.frame(speaker = NA
-#                           , text = paste(x, collapse = ":"))
-#       }
-#       # Return whichever version we made above
-#       return(out)
-#     }) %>%
-#     # Bind all of the rows together
-#     bind_rows %>%
-#     # Identify clusters of speech that go with a single speaker
-#     mutate(speakingGroup = cumsum(!is.na(speaker))) %>%
-#     # Group by those clusters
-#     group_by(speakingGroup) %>%
-#     # Collapse that speaking down into a single row
-#     summarise(speaker = speaker[1]
-#               , fullText = paste(text, collapse = "\n"))
-# })
-
-# Transform output into dataframe for each pf the 28 debates agregating text by speaker
-sp1 <- as.data.frame(speechText)
-sp1 <- aggregate(sp1$fullText, list(sp1$speaker), paste, collapse =" ")
-sp1$x # "Biden first then Trump
-debate1 <- data.frame(Title = c(paste(US_debates$title[1]), paste(US_debates$title[1])),
-                      Date = c(paste(US_debates$date[1]), paste(US_debates$date[1])),
-                      Speaker = c("Biden", "Trump"),
-                      Text = c(paste(sp1$x[1]), paste(sp1$x[2])))
-
-# re-run above and move to next
-sp1 <- as.data.frame(speechText)
-sp1 <- aggregate(sp1$fullText, list(sp1$speaker), paste, collapse =" ")
-sp1$x # "Biden first then Trump
-debate1 <- data.frame(Title = c(paste(US_debates$title[1]), paste(US_debates$title[1])),
-                      Date = c(paste(US_debates$date[1]), paste(US_debates$date[1])),
-                      Speaker = c("Biden", "Trump"),
-                      Text = c(paste(sp1$x[1]), paste(sp1$x[2])))
-
-
-
-
-## Interviews
+### Interviews
 
 # For interviews, filtering is also required before merging.
 load("~/GitHub/Poldis/data-raw/US_Interviews.rda")
@@ -258,11 +143,13 @@ US_interviews <- dplyr::distinct(US_interviews, .keep_all = TRUE)
 unique(US_interviews$speaker)
 # For some reason, only Obama and Trump are listed as presidents in the first time around...
 # At this point data was re-scraped and issues of speakers was fixed (minor bug in code).
-
+# Note that no programatic cleaning is done for interviews for two reasons,
+# first intreviewers usually talk little and, second, doing so programatically risks losing
+# some importnat portions for interviewees.
 usethis::use_data(US_interviews, overwrite = TRUE)
 # exporting clean data to data folder
 
-## Campaign Remarks
+### Campaign Remarks
 
 # Campaign documents and debates also reuire some wrangling, besides filtering dates...
 # We want to keep only discursive content and remove press conferences given by campaig staff as
