@@ -27,7 +27,7 @@ split_text <- function(textvec, splitsign, makersign) {
     unlist() %>%
     unique()
 
-  # Check lengths and reduce sizes to avoid warnings
+  # Check lengths and reduce sizes of strings to avoid warnings
   allSpeakers <- ifelse(lengths(gregexpr("\\W+", allSpeakers)) > 5, substr(allSpeakers, 0, 20), allSpeakers)
 
   # initialize data frame
@@ -41,47 +41,52 @@ split_text <- function(textvec, splitsign, makersign) {
     }
   }
 
-  # tranform in numbers column
-  notlegit <- dplyr::rename(notlegit, num = X.1.)
-  # get the equivalent from allSpeakers vector
-  plist <- unique(notlegit$num)
-  lst <- setNames(vector("list", length(plist)), plist)
-  nn <- data.frame()
-  for (i in seq_along(plist)) {
-    n <- paste0(allSpeakers[i])
-    nn = rbind(nn, n)
+  # if all speakers are legit
+  if(nrow(notlegit) == 0) {
+    legitSpeakers <- allSpeakers
+  } else {
+    # tranform in numbers column
+    notlegit <- dplyr::rename(notlegit, num = X.1.)
+    # get the equivalent from allSpeakers vector
+    plist <- unique(notlegit$num)
+    lst <- setNames(vector("list", length(plist)), plist)
+    nn <- data.frame()
+    for (i in seq_along(plist)) {
+      n <- paste0(allSpeakers[i])
+      nn = rbind(nn, n)
+    }
+
+    # rename column and bind data frames
+    colnames(nn)[1] <- "speakers"
+    nn <- cbind(nn, notlegit)
+
+    # get the same dataset for all speakers
+    ss <- data.frame(speakers = allSpeakers, num = as.character(1:length(allSpeakers)))
+    # perform and anti_join
+    lspeakers <- dplyr::anti_join(ss, nn, by = 'num')
+    legitSpeakers <- lspeakers$speakers
   }
-
-  # rename column and bind data frames
-  colnames(nn)[1] <- "speakers"
-  nn <- cbind(nn, notlegit)
-
-  # get the same dataset for all speakers
-  ss <- data.frame(speakers = allSpeakers, num = as.character(1:length(allSpeakers)))
-  # perform and anti_join
-  lspeakers <- dplyr::anti_join(ss, nn, by = 'num')
-  legitSpeakers <- lspeakers$speakers
 
   # get text
   speechText <- lapply(splitText, function(thisText){
 
-    # Remove applause and interjections (things in parentheses)
-    cleanText <- grep("(^\\(.*\\)$)|(^$)", thisText, value = TRUE, invert = TRUE)
+  # Remove applause and interjections (things in parentheses)
+  cleanText <- grep("(^\\(.*\\)$)|(^$)", thisText, value = TRUE, invert = TRUE)
 
-    # Split each line by a semicolor
-    strsplit(cleanText, paste(makersign)) %>%
-      lapply(function(x){
-        # Check if the first element is a legit speaker
-        if(x[1] %in% legitSpeakers){
-          # If so, set the speaker, and put the statement in a separate portion
-          # taking care to re-collapse any breaks caused by additional colons
-          out <- data.frame(speaker = x[1], text = paste(x[-1], collapse = paste(makersign)))
-        } else{
-          # If not a legit speaker, set speaker to NA and reset text as above
-          out <- data.frame(speaker = NA, text = paste(x, collapse = ":"))
-        }
-        # Return whichever version we made above
-        return(out)
+  # Split each line by a semicolor
+  strsplit(cleanText, paste(makersign)) %>%
+    lapply(function(x){
+      # Check if the first element is a legit speaker
+      if(x[1] %in% legitSpeakers){
+        # If so, set the speaker, and put the statement in a separate portion
+        # taking care to re-collapse any breaks caused by additional colons
+         out <- data.frame(speaker = x[1], text = paste(x[-1], collapse = paste(makersign)))
+      } else{
+        # If not a legit speaker, set speaker to NA and reset text as above
+        out <- data.frame(speaker = NA, text = paste(x, collapse = ":"))
+      }
+      # Return whichever version we made above
+      return(out)
       }) %>%
       # Bind all of the rows together
       bind_rows %>%
