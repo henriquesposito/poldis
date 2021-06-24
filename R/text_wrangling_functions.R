@@ -20,12 +20,15 @@ split_text <- function(textvec, splitsign, makersign) {
 
   # get speakers by marker sign
   allSpeakers <- lapply(splitText, function(thisText){
-    grep(paste0(markersign), thisText, value = TRUE) %>%
-      gsub(paste0(markersign, ".*"), "", .) %>%
+    grep(paste0(makersign), thisText, value = TRUE) %>%
+      gsub(paste0(makersign, ".*"), "", .) %>%
       gsub("\\(", "", .)
   }) %>%
     unlist() %>%
     unique()
+
+  # Check lengths and reduce sizes to avoid warnings
+  allSpeakers <- ifelse(lengths(gregexpr("\\W+", allSpeakers)) > 5, substr(allSpeakers, 0, 20), allSpeakers)
 
   # initialize data frame
   notlegit <- data.frame()
@@ -63,23 +66,19 @@ split_text <- function(textvec, splitsign, makersign) {
   speechText <- lapply(splitText, function(thisText){
 
     # Remove applause and interjections (things in parentheses)
-    cleanText <-
-      grep("(^\\(.*\\)$)|(^$)", thisText
-           , value = TRUE, invert = TRUE)
+    cleanText <- grep("(^\\(.*\\)$)|(^$)", thisText, value = TRUE, invert = TRUE)
 
     # Split each line by a semicolor
-    strsplit(cleanText, paste(markersign)) %>%
+    strsplit(cleanText, paste(makersign)) %>%
       lapply(function(x){
         # Check if the first element is a legit speaker
         if(x[1] %in% legitSpeakers){
           # If so, set the speaker, and put the statement in a separate portion
           # taking care to re-collapse any breaks caused by additional colons
-          out <- data.frame(speaker = x[1]
-                            , text = paste(x[-1], collapse = paste(markersign)))
+          out <- data.frame(speaker = x[1], text = paste(x[-1], collapse = paste(makersign)))
         } else{
           # If not a legit speaker, set speaker to NA and reset text as above
-          out <- data.frame(speaker = NA
-                            , text = paste(x, collapse = ":"))
+          out <- data.frame(speaker = NA, text = paste(x, collapse = ":"))
         }
         # Return whichever version we made above
         return(out)
@@ -91,17 +90,14 @@ split_text <- function(textvec, splitsign, makersign) {
       # Group by those clusters
       group_by(speakingGroup) %>%
       # Collapse that speaking down into a single row
-      summarise(speaker = speaker[1]
-                , fullText = paste(text, collapse = "\n"))
+      summarise(speaker = speaker[1], fullText = paste(text, collapse = "\n"))
   })
-
   # Get into data frame
   sp <- as.data.frame(speechText)
   # Aggregate by speaker and see
   ss <- aggregate(sp$fullText, list(sp$speaker), paste, collapse =" ")
   # return data frame without punctuations but aphostrophe
   ss
-
 }
 
 #' #' Remove Questions from dialogues
