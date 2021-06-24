@@ -4,7 +4,7 @@
 #' @param splitsign sign or string used to split text vector.
 #' Often these are line spaces ("\n") but depending on text different
 #' or even string can be chosen (i.e. ",.")
-#' @param makersign speaker marker sign.
+#' @param speakermark speaker marker sign.
 #' Often these are colon (":") but depending on text different
 #' or even string can be chosen (i.e. "Thank you" or "I").
 #' @import dplyr
@@ -13,15 +13,15 @@
 #' @source https://stackoverflow.com/questions/41100482/split-speaker-and-dialogue-in-rstudio
 #' The function was altered from here.
 #' @export
-split_text <- function(textvec, splitsign, makersign) {
+split_text <- function(textvec, splitsign, speakermark) {
 
   # split text with split sign
   splitText <- strsplit(textvec, paste0(splitsign))
 
   # get speakers by marker sign
   allSpeakers <- lapply(splitText, function(thisText){
-    grep(paste0(makersign), thisText, value = TRUE) %>%
-      gsub(paste0(makersign, ".*"), "", .) %>%
+    grep(paste0(speakermark), thisText, value = TRUE) %>%
+      gsub(paste0(speakermark, ".*"), "", .) %>%
       gsub("\\(", "", .)
   }) %>%
     unlist() %>%
@@ -35,7 +35,7 @@ split_text <- function(textvec, splitsign, makersign) {
 
   # get non legit speakers by asking users
   for (i in 1:length(allSpeakers)) {
-    if (utils::askYesNo(paste(allSpeakers[i], "-", "is this speakers legit?")) == FALSE) {
+    if (utils::askYesNo(paste(allSpeakers[i], "-", "is this speaker legit?")) == FALSE) {
       nlegit <- paste(i)
       notlegit = rbind(notlegit, nlegit)
     }
@@ -46,7 +46,7 @@ split_text <- function(textvec, splitsign, makersign) {
     legitSpeakers <- allSpeakers
   } else {
     # tranform in numbers column
-    notlegit <- dplyr::rename(notlegit, num = X.1.)
+    names(notlegit)[1] <- 'num'
     # get the equivalent from allSpeakers vector
     plist <- unique(notlegit$num)
     lst <- setNames(vector("list", length(plist)), plist)
@@ -74,13 +74,13 @@ split_text <- function(textvec, splitsign, makersign) {
   cleanText <- grep("(^\\(.*\\)$)|(^$)", thisText, value = TRUE, invert = TRUE)
 
   # Split each line by a semicolor
-  strsplit(cleanText, paste(makersign)) %>%
+  strsplit(cleanText, paste(speakermark)) %>%
     lapply(function(x){
       # Check if the first element is a legit speaker
       if(x[1] %in% legitSpeakers){
         # If so, set the speaker, and put the statement in a separate portion
         # taking care to re-collapse any breaks caused by additional colons
-         out <- data.frame(speaker = x[1], text = paste(x[-1], collapse = paste(makersign)))
+         out <- data.frame(speaker = x[1], text = paste(x[-1], collapse = paste(speakermark)))
       } else{
         # If not a legit speaker, set speaker to NA and reset text as above
         out <- data.frame(speaker = NA, text = paste(x, collapse = ":"))
