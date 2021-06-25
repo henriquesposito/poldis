@@ -248,7 +248,15 @@ camp <- data.frame(camp[grep("press release", camp$title, ignore.case = TRUE, in
 head(camp$title, 100)
 camp[67,]
 camp[3,]
-camp [24,]
-camp [61,]
-# Most campaign statements for Trump appear very short and are delivered by his campaign staff.
+camp[24,]
+camp[61,]
+camp[17,]
+camp[82,]
+camp[15,]
+# Most campaign statements for Trump appear very short and are often delivered by his campaign staff.
 # While Biden appears to deliver most his campaign statements...
+# The ones delivered by candidates appear to have the word "by" in title.
+# Let's investigate once more
+tail(camp$title, 100)
+# For last 100 titles are a bit different.
+#
