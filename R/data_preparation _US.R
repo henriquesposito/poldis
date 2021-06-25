@@ -56,8 +56,30 @@ unique(US_interviews$speaker)
 # Note that no programatic cleaning is done for interviews for two reasons,
 # first intreviewers usually talk little and, second, doing so programatically risks losing
 # some importnat portions for interviewees.
-usethis::use_data(US_interviews, overwrite = TRUE)
+
+# Importantly, when presidential candidates provided interviews at campaign periods,
+# these were recorded under the US_campaign data.
+# Let's extract that information here.
+load("~/GitHub/Poldis/data-raw/US_Campaign.rda")
+camp_inter <- as.data.frame(US_Campaign)
+# Get observations since 1981
+camp_inter$date <- lubridate::mdy(camp_inter$date)
+camp_inter <- camp_inter %>% dplyr::filter(date > "1980-01-01")
+# Let's select only observations that have the word interview in title
+camp_inter <- data.frame(camp_inter[grep("interview", camp_inter$title, ignore.case = TRUE),])
+# Let's inspect the 180 observations
+camp_inter$title
+camp_inter$speaker # We do not want some of these speakers
+unique(camp_inter$speaker)
+# Let's keep only the speakers we are interested in
+camp_inter <- data.frame(camp_inter[grep("Donald J. Trump|Bernie Sanders|Hillary Clinton|John McCain|Barack Obama|Joseph R. Biden|Mitt Romney|Robert Dole" , camp_inter$speaker, ignore.case = TRUE),])
+
+# bind datasets together
+US_interviews <- rbind(US_interviews, camp_inter)
+# double check
+unique(US_interviews$speaker)
 # exporting clean data to data folder
+usethis::use_data(US_interviews, overwrite = TRUE)
 
 ### Debates
 
@@ -138,7 +160,7 @@ US_debates$text[28] # ",ANDERSON:" (indepenedent candidate) and ",REAGAN:" (Shou
 # The function gives you some flexibility to work with, as arguments can be set for split marks
 # (splitsign) and for speakers markers (markersign)
 # Let's see how it works:
-debate1 <- split_text(US_debates$text[1], ",.", ":") # inspected and works great
+debate1 <- split_text(US_debates$text[1], ",.", ":") # inspected and works
 debate2 <- split_text(US_debates$text[2], ",.", ":") # inspected
 
 # Though we can do this text by text, I prefer subbing how speakers are
@@ -150,7 +172,7 @@ x <- gsub(",TRUMP:", "xxx Donald Trump:", x)
 x <- gsub(",BIDEN:", "xxx Joe Biden:", x)
 x <- gsub(",CLINTON:", "xxx Hillary Clinton:", x)
 x <- gsub(",Gov. Romney.", "xxx Mitt Romney:", x)
-x <- gsub(",The President.", "xxx The President P:", x) #### can you gsub this only in specific text?
+x <- gsub(",The President.", "xxx The President P:", x) # ambiguous, will have to fix later = Obama
 x <- gsub(",OBAMA:", "xxx Barack Obama:", x)
 x <- gsub(",MCCAIN:", "xxx John McCain:", x)
 x <- gsub(",Senator Kerry.", "xxx John Kerry:", x)
@@ -195,7 +217,133 @@ s_debates
 # Now we need to clean all of that and merge with US_debates data for titles and dates.
 # With careful clicking, we are now at 59 observations.
 # The issue was "the president" being mathed as a speaker where he should not have.
+# Specifically, in debates 12, 13, 14, 20, 27 I was asked if "Prsident P" - was a ligit speaker
+# and answerd no since for those cases the speakers were coded differently
+# (for all legit speakers per debate rfer to lines 104-132 above).
+
 # Now, let's bind US_debates data with the new debates data by speaker
+# First, we need to extract the titles from all the debates twice.
+US_debates$title # copy titles and duplicates names for all but 20, 21, 22
+# for which need to triplicate for the three speakers
+td <- data.frame(Title = c("Presidential Debate at Belmont University in Nashville, Tennessee",
+                           "Presidential Debate at Belmont University in Nashville, Tennessee",
+                           "Presidential Debate at Case Western Reserve University in Cleveland, Ohio",
+                           "Presidential Debate at Case Western Reserve University in Cleveland, Ohio",
+                           "Presidential Debate at the University of Nevada in Las Vegas",
+                           "Presidential Debate at the University of Nevada in Las Vegas",
+                           "Presidential Debate at Washington University in St. Louis, Missouri",
+                           "Presidential Debate at Washington University in St. Louis, Missouri" ,
+                           "Presidential Debate at Hofstra University in Hempstead, New York",
+                           "Presidential Debate at Hofstra University in Hempstead, New York",
+                           "Presidential Debate in Boca Raton, Florida" ,
+                           "Presidential Debate in Boca Raton, Florida",
+                           "Presidential Debate in Hempstead, New York",
+                           "Presidential Debate in Hempstead, New York",
+                           "Presidential Debate in Denver, Colorado",
+                           "Presidential Debate in Denver, Colorado",
+                           "Presidential Debate at Hofstra University in Hempstead, New York",
+                           "Presidential Debate at Hofstra University in Hempstead, New York",
+                           "Presidential Debate at Belmont University in Nashville, Tennessee",
+                           "Presidential Debate at Belmont University in Nashville, Tennessee" ,
+                           "Presidential Debate at the University of Mississippi in Oxford",
+                           "Presidential Debate at the University of Mississippi in Oxford",
+                           "Presidential Debate in Tempe, Arizona",
+                           "Presidential Debate in Tempe, Arizona",
+                           "Presidential Debate in St. Louis, Missouri",
+                           "Presidential Debate in St. Louis, Missouri",
+                           "Presidential Debate in Coral Gables, Florida",
+                           "Presidential Debate in Coral Gables, Florida",
+                           "Presidential Debate in St. Louis",
+                           "Presidential Debate in St. Louis",
+                           "Presidential Debate in Winston-Salem, North Carolina",
+                           "Presidential Debate in Winston-Salem, North Carolina",
+                           "Presidential Debate in Boston",
+                           "Presidential Debate in Boston",
+                           "Presidential Debate in San Diego",
+                           "Presidential Debate in San Diego",
+                           "Presidential Debate in Hartford",
+                           "Presidential Debate in Hartford",
+                           "Presidential Debate in East Lansing, Michigan", # 3
+                           "Presidential Debate in East Lansing, Michigan", # 3
+                           "Presidential Debate in East Lansing, Michigan", # 3
+                           "Presidential Debate at the University of Richmond", # 3
+                           "Presidential Debate at the University of Richmond", # 3
+                           "Presidential Debate at the University of Richmond", # 3
+                           "Presidential Debate in St. Louis", # 3
+                           "Presidential Debate in St. Louis", # 3
+                           "Presidential Debate in St. Louis", # 3
+                           "Presidential Debate at the University of California in Los Angeles",
+                           "Presidential Debate at the University of California in Los Angeles",
+                           "Presidential Debate in Winston-Salem, North Carolina",
+                           "Presidential Debate in Winston-Salem, North Carolina",
+                           "Debate Between the President and Former Vice President Walter F. Mondale in Kansas City, Missouri",
+                           "Debate Between the President and Former Vice President Walter F. Mondale in Kansas City, Missouri",
+                           "Debate Between the President and Former Vice President Walter F. Mondale in Louisville, Kentucky",
+                           "Debate Between the President and Former Vice President Walter F. Mondale in Louisville, Kentucky",
+                           "Presidential Debate in Cleveland",
+                           "Presidential Debate in Cleveland",
+                           "Presidential Debate in Baltimore (Reagan-Anderson)",
+                           "Presidential Debate in Baltimore (Reagan-Anderson)"))
+
+# Now let's do the same for dates
+US_debates$date
+dt <- data.frame(Date = c( "2020-10-22", "2020-10-22",
+                           "2020-09-29", "2020-09-29",
+                           "2016-10-19", "2016-10-19",
+                           "2016-10-09", "2016-10-09",
+                           "2016-09-26", "2016-09-26",
+                           "2012-10-22", "2012-10-22",
+                           "2012-10-16", "2012-10-16",
+                           "2012-10-03", "2012-10-03",
+                           "2008-10-15", "2008-10-15",
+                           "2008-10-07", "2008-10-07",
+                           "2008-09-26", "2008-09-26",
+                           "2004-10-13", "2004-10-13",
+                           "2004-10-08", "2004-10-08",
+                           "2004-09-30", "2004-09-30",
+                           "2000-10-17", "2000-10-17",
+                           "2000-10-11", "2000-10-11",
+                           "2000-10-03", "2000-10-03",
+                           "1996-10-16", "1996-10-16",
+                           "1996-10-06", "1996-10-06",
+                           "1992-10-19", "1992-10-19", "1992-10-19", #3
+                           "1992-10-15", "1992-10-15", "1992-10-15", #3
+                           "1992-10-11", "1992-10-11", "1992-10-11", #3
+                           "1988-10-13", "1988-10-13",
+                           "1988-09-25", "1988-09-25",
+                           "1984-10-21", "1984-10-21",
+                           "1984-10-07", "1984-10-07",
+                           "1980-10-28", "1980-10-28",
+                           "1980-09-21", "1980-09-21"))
+
+# bind things together
+US_debates <- cbind(td, dt, s_debates)
+
+# rename columns
+US_debates <- rename(US_debates, Speakers = Group.1, Text = x)
+# rename some ambuiguos speakers
+US_debates$Speakers
+US_debates$Speakers[12] <- " Barack Obama"
+US_debates$Speakers[14] <- " Barack Obama"
+US_debates$Speakers[16] <- " Barack Obama"
+US_debates$Speakers[24] <- " George W. Bush"
+US_debates$Speakers[26] <- " George W. Bush"
+US_debates$Speakers[28] <- " George W. Bush"
+US_debates$Speakers[30] <- " George W. Bush"
+US_debates$Speakers[32] <- " George W. Bush"
+US_debates$Speakers[34] <- " George W. Bush"
+US_debates$Speakers[36] <- " Bill Clinton"
+US_debates$Speakers[38] <- " Bill Clinton"
+US_debates$Speakers[40] <- " George Bush"
+US_debates$Speakers[43] <- " George Bush"
+US_debates$Speakers[46] <- " George Bush"
+US_debates$Speakers[48] <- " George Bush"
+US_debates$Speakers[50] <- " George Bush"
+US_debates$Speakers[52] <- " Ronald Reagan"
+US_debates$Speakers[54] <- " Ronald Reagan"
+
+# export clean data
+usethis::use_data(US_debates, overwrite = TRUE)
 
 ### Campaign Remarks
 
@@ -228,6 +376,9 @@ ss
 # copy and paste output in function
 camp <- data.frame(camp[grep("Donald J. Trump|Joseph R. Biden|Hillary Clinton|Barack Obama|William J. Clinton|Bernie Sanders|Mitt Romney|George W. Bush|John McCain|Albert Gore, Jr.|John F. Kerry|Robert Dole|George Bush|H. Ross Perot|Ronald Reagan|Michael S. Dukakis|Walter F. Mondale|Jimmy Carter", camp$speaker),])
 
+# Remove interviews which were added to the US_interviews dataset above
+camp <- data.frame(camp[grep("interview", camp$title, ignore.case = TRUE, invert = TRUE),])
+
 # Investigate title
 head(camp$title, 100)
 tail(camp$title, 100)
@@ -253,10 +404,35 @@ camp[61,]
 camp[17,]
 camp[82,]
 camp[15,]
-# Most campaign statements for Trump appear very short and are often delivered by his campaign staff.
+# Most campaign statements for Trump appear very short and are often delivered by
+# his campaign staff.
 # While Biden appears to deliver most his campaign statements...
 # The ones delivered by candidates appear to have the word "by" in title.
 # Let's investigate once more
 tail(camp$title, 100)
+sample(camp$title, 100)
 # For last 100 titles are a bit different.
-#
+# Let's start by removing observations that contain "biden campaign statement"
+# or "trup campign statement" in title.
+camp <- data.frame(camp[grep("Biden Campaign Statement|Trump Campaign Statement", camp$title, ignore.case = TRUE, invert = TRUE),])
+head(camp$title, 100)
+sample(camp$title, 100)
+# Remove as well "Biden for President Statement", ""Further Statement from the Trump Campaign"
+# and "Merry Christmas from the Trump Campaign".
+camp <- data.frame(camp[grep("Biden for President Statement|Further Statement from the Trump Campaign|Merry Christmas from the Trump Campaign", camp$title, ignore.case = TRUE, invert = TRUE),])
+sample(camp$title, 100)
+# Remove "Trump Campaign Message", "Statement from Biden for President", "Michelle Obama: Address",
+# "E-mail Message" and "Campaign Statement - Trump".
+camp <- data.frame(camp[grep("Trump Campaign Message|Statement from Biden for President|Michelle Obama: Address|E-mail Message|Campaign Statement - Trump", camp$title, ignore.case = TRUE, invert = TRUE),])
+sample(camp$title, 100)
+# Remove "Letter to Superdelegates|Happy New Year from the Trump Campaign"
+camp <- data.frame(camp[grep("Letter to Superdelegates|Happy New Year from the Trump Campaign", camp$title, ignore.case = TRUE, invert = TRUE),])
+sample(camp$title, 100)
+# Lastly, remove "Commencement Address|News Conference"
+camp <- data.frame(camp[grep("Commencement Address|News Conference", camp$title, ignore.case = TRUE, invert = TRUE),])
+sample(camp$title, 100)
+# Most titles left are "remarks at/in" (usually refer to campaign rallies)
+# and "statement by" (statement delivered by candidate).
+# export clean data
+US_campaign <- camp
+usethis::use_data(US_campaign, overwrite = TRUE)
