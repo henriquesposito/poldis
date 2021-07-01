@@ -81,6 +81,98 @@ unique(US_interviews$speaker)
 # exporting clean data to data folder
 usethis::use_data(US_interviews, overwrite = TRUE)
 
+### Campaign Remarks
+
+# Campaign documents and debates also reuire some wrangling, besides filtering dates...
+# We want to keep only discursive content and remove press conferences given by campaig staff as
+# well as statements simply read by campaign staff.
+# This entails removing observations that have "press release" or "campaign statement" in title.
+load("~/GitHub/Poldis/data-raw/US_Campaign.rda")
+camp <- as.data.frame(US_Campaign)
+
+# Get observations since 1981
+camp$date <- lubridate::mdy(camp$date)
+camp <- camp %>% dplyr::filter(date > "1980-01-01")
+
+# Take a look at speakers
+unique(camp$speaker)
+# All looks proper, but many speakers we do not care about...
+# let's remove some speakers we know we do not care about
+# Let's keep all present in the list of debate speakers plus Bernie Sanders just in case.
+speakers <- unique(camp$speaker)
+sp <- speakers[c(1,2,7,8,9,13,18,19,40, 44, 48,49,51,52, 54,55,56,57)]
+sp
+# paste together
+ss <- paste0(sp, sep = "|", collapse = " ")
+ss
+# remove white space and last brace
+ss <- gsub("\\| ", "|", ss)
+ss <- gsub("\\|$", "", ss)
+ss
+# copy and paste output in function, also good for double chacking
+camp <- data.frame(camp[grep("Donald J. Trump|Joseph R. Biden|Hillary Clinton|Barack Obama|William J. Clinton|Bernie Sanders|Mitt Romney|George W. Bush|John McCain|Albert Gore, Jr.|John F. Kerry|Robert Dole|George Bush|H. Ross Perot|Ronald Reagan|Michael S. Dukakis|Walter F. Mondale|Jimmy Carter", camp$speaker),])
+
+# Remove interviews which were added to the US_interviews dataset above
+camp <- data.frame(camp[grep("interview", camp$title, ignore.case = TRUE, invert = TRUE),])
+
+# Investigate title
+head(camp$title, 100)
+tail(camp$title, 100)
+# Most titles in first 100 read "press release" or campaign statement, let's investigate
+camp[1,]
+camp[54,]
+camp[98,]
+# maybe press releases are not as helpful as they appear to be usually written documents
+# or, in some cases, read by campaign staff...
+camp[21,]
+camp[76,]
+# some campaing statements appear to be delivered by candidates...
+
+# let's remove press releases from campaign docs first
+camp <- data.frame(camp[grep("press release", camp$title, ignore.case = TRUE, invert = TRUE),])
+
+# Let's investigate again
+head(camp$title, 100)
+camp[67,]
+camp[3,]
+camp[24,]
+camp[61,]
+camp[17,]
+camp[82,]
+camp[15,]
+# Most campaign statements for Trump appear very short and are often delivered by
+# his campaign staff.
+# While Biden appears to deliver most his campaign statements...
+# The ones delivered by candidates appear to have the word "by" in title.
+# Let's investigate once more
+tail(camp$title, 100)
+sample(camp$title, 100)
+# For last 100 titles are a bit different.
+# Let's start by removing observations that contain "biden campaign statement"
+# or "trup campign statement" in title.
+camp <- data.frame(camp[grep("Biden Campaign Statement|Trump Campaign Statement", camp$title, ignore.case = TRUE, invert = TRUE),])
+head(camp$title, 100)
+sample(camp$title, 100)
+# Remove as well "Biden for President Statement", ""Further Statement from the Trump Campaign"
+# and "Merry Christmas from the Trump Campaign".
+camp <- data.frame(camp[grep("Biden for President Statement|Further Statement from the Trump Campaign|Merry Christmas from the Trump Campaign", camp$title, ignore.case = TRUE, invert = TRUE),])
+sample(camp$title, 100)
+# Remove "Trump Campaign Message", "Statement from Biden for President", "Michelle Obama: Address",
+# "E-mail Message" and "Campaign Statement - Trump".
+camp <- data.frame(camp[grep("Trump Campaign Message|Statement from Biden for President|Michelle Obama: Address|E-mail Message|Campaign Statement - Trump", camp$title, ignore.case = TRUE, invert = TRUE),])
+sample(camp$title, 100)
+# Remove "Letter to Superdelegates|Happy New Year from the Trump Campaign"
+camp <- data.frame(camp[grep("Letter to Superdelegates|Happy New Year from the Trump Campaign", camp$title, ignore.case = TRUE, invert = TRUE),])
+sample(camp$title, 100)
+# Lastly, remove "Commencement Address|News Conference"
+camp <- data.frame(camp[grep("Commencement Address|News Conference", camp$title, ignore.case = TRUE, invert = TRUE),])
+sample(camp$title, 100)
+# Most titles left are "remarks at/in" (usually refer to campaign rallies)
+# and "statement by" (statement delivered by candidate).
+# export clean data
+US_campaign <- camp
+usethis::use_data(US_campaign, overwrite = TRUE)
+
 ### Debates
 
 # For debates we want to isolate all parts where certain candidate speaks into one observation for each candidate.
@@ -344,95 +436,3 @@ US_debates$Speakers[54] <- " Ronald Reagan"
 
 # export clean data
 usethis::use_data(US_debates, overwrite = TRUE)
-
-### Campaign Remarks
-
-# Campaign documents and debates also reuire some wrangling, besides filtering dates...
-# We want to keep only discursive content and remove press conferences given by campaig staff as
-# well as statements simply read by campaign staff.
-# This entails removing observations that have "press release" or "campaign statement" in title.
-load("~/GitHub/Poldis/data-raw/US_Campaign.rda")
-camp <- as.data.frame(US_Campaign)
-
-# Get observations since 1981
-camp$date <- lubridate::mdy(camp$date)
-camp <- camp %>% dplyr::filter(date > "1980-01-01")
-
-# Take a look at speakers
-unique(camp$speaker)
-# All looks proper, but many speakers we do not care about...
-# let's remove some speakers we know we do not care about
-# Let's keep all present in the list of debate speakers plus Bernie Sanders just in case.
-speakers <- unique(camp$speaker)
-sp <- speakers[c(1,2,7,8,9,13,18,19,40, 44, 48,49,51,52, 54,55,56,57)]
-sp
-# paste together
-ss <- paste0(sp, sep = "|", collapse = " ")
-ss
-# remove white space and last brace
-ss <- gsub("\\| ", "|", ss)
-ss <- gsub("\\|$", "", ss)
-ss
-# copy and paste output in function
-camp <- data.frame(camp[grep("Donald J. Trump|Joseph R. Biden|Hillary Clinton|Barack Obama|William J. Clinton|Bernie Sanders|Mitt Romney|George W. Bush|John McCain|Albert Gore, Jr.|John F. Kerry|Robert Dole|George Bush|H. Ross Perot|Ronald Reagan|Michael S. Dukakis|Walter F. Mondale|Jimmy Carter", camp$speaker),])
-
-# Remove interviews which were added to the US_interviews dataset above
-camp <- data.frame(camp[grep("interview", camp$title, ignore.case = TRUE, invert = TRUE),])
-
-# Investigate title
-head(camp$title, 100)
-tail(camp$title, 100)
-# Most titles in first 100 read "press release" or campaign statement, let's investigate
-camp[1,]
-camp[54,]
-camp[98,]
-# maybe press releases are not as helpful as they appear to be usually written documents
-# or, in some cases, read by campaign staff...
-camp[21,]
-camp[76,]
-# some campaing statements appear to be delivered by candidates...
-
-# let's remove press releases from campaign docs first
-camp <- data.frame(camp[grep("press release", camp$title, ignore.case = TRUE, invert = TRUE),])
-
-# Let's investigate again
-head(camp$title, 100)
-camp[67,]
-camp[3,]
-camp[24,]
-camp[61,]
-camp[17,]
-camp[82,]
-camp[15,]
-# Most campaign statements for Trump appear very short and are often delivered by
-# his campaign staff.
-# While Biden appears to deliver most his campaign statements...
-# The ones delivered by candidates appear to have the word "by" in title.
-# Let's investigate once more
-tail(camp$title, 100)
-sample(camp$title, 100)
-# For last 100 titles are a bit different.
-# Let's start by removing observations that contain "biden campaign statement"
-# or "trup campign statement" in title.
-camp <- data.frame(camp[grep("Biden Campaign Statement|Trump Campaign Statement", camp$title, ignore.case = TRUE, invert = TRUE),])
-head(camp$title, 100)
-sample(camp$title, 100)
-# Remove as well "Biden for President Statement", ""Further Statement from the Trump Campaign"
-# and "Merry Christmas from the Trump Campaign".
-camp <- data.frame(camp[grep("Biden for President Statement|Further Statement from the Trump Campaign|Merry Christmas from the Trump Campaign", camp$title, ignore.case = TRUE, invert = TRUE),])
-sample(camp$title, 100)
-# Remove "Trump Campaign Message", "Statement from Biden for President", "Michelle Obama: Address",
-# "E-mail Message" and "Campaign Statement - Trump".
-camp <- data.frame(camp[grep("Trump Campaign Message|Statement from Biden for President|Michelle Obama: Address|E-mail Message|Campaign Statement - Trump", camp$title, ignore.case = TRUE, invert = TRUE),])
-sample(camp$title, 100)
-# Remove "Letter to Superdelegates|Happy New Year from the Trump Campaign"
-camp <- data.frame(camp[grep("Letter to Superdelegates|Happy New Year from the Trump Campaign", camp$title, ignore.case = TRUE, invert = TRUE),])
-sample(camp$title, 100)
-# Lastly, remove "Commencement Address|News Conference"
-camp <- data.frame(camp[grep("Commencement Address|News Conference", camp$title, ignore.case = TRUE, invert = TRUE),])
-sample(camp$title, 100)
-# Most titles left are "remarks at/in" (usually refer to campaign rallies)
-# and "statement by" (statement delivered by candidate).
-# export clean data
-US_campaign <- camp
-usethis::use_data(US_campaign, overwrite = TRUE)
