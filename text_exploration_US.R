@@ -41,7 +41,10 @@ cleanCorpus<-function(corpus, customStopwords){
 pal <- brewer.pal(8,"Dark2")
 stops <- stopwords('english')
 
-### Let's start with one dataset at a time
+# Let's start with one dataset at a time
+
+### Campaign US
+
 load("~/GitHub/Poldis/data/US_campaign.rda")
 ucamp <- US_campaign
 
@@ -170,6 +173,7 @@ chartJSRadar(scores = sent_ob_tr,
              labs = rownames(sent_ob_tr),
              labelSize = 20, showLegend = TRUE, main = "Obama versus Trump Sentiments in Campaign Compared (Normalized by the number of documents for each speaker)")
 # Interesting, they do not seem all that different afterall...
+# Trump appears just to augment usage of some emotional words, but patterns do not seem to differ too much.
 
 ### Debates
 
@@ -230,6 +234,7 @@ bush <- deb_comp_wf %>% filter(id == " George Bush") %>% slice_head(n = 10)
 top_terms <- cbind(w_bush, b_clinton, al_gore, bush)
 # Not super helpful...
 # How about we do sentiment for each speaker?
+# Let's get the words and sentiment frequency for each speakers
 w_bush_sent <- deb_comp_wf %>% filter(id == " George W. Bush")
 w_bush_sent <- inner_join(w_bush_sent, get_sentiments("nrc"), by = "word") %>%
   group_by(sentiment) %>%
@@ -246,35 +251,146 @@ bush_sent <- deb_comp_wf %>% filter(id == " George Bush")
 bush_sent <- inner_join(bush_sent, get_sentiments("nrc"), by = "word") %>%
   group_by(sentiment) %>%
   summarize(bush_sent = sum(n))
+# merge data
 sent_deb_sp <- data.frame(cbind(w_bush_sent, b_clinton_sent, al_gore_sent, bush_sent)) %>%
   select(-c(sentiment.1, sentiment.2, sentiment.3))
 sent_deb_sp <- data.frame(sent_deb_sp[,-1], row.names=sent_deb_sp[,1])
+# plot
 chartJSRadar(scores = sent_deb_sp,
              labs = rownames(sent_deb_sp),
              labelSize = 20, showLegend = TRUE, main = "Sentiments in Debates Compared")
-# Interesting, they do not seem all that different afterall...
-
-
+# IT appears that W.Bush displayed more carried words than others...
+# But does it seem to be a trend in using more emotional words from 1992 to 2000?
 
 ### Interviews
 
+# get datase
+load("~/GitHub/Poldis/data/US_interviews.rda")
 uint <- US_interviews
-
+# rename
 uint <- uint %>% rename(doc_id = title) %>%
   select(-source_links) %>%
   arrange(doc_id, text, speaker, date)
+# create a corpus and clean
 int_corpus <- VCorpus(DataframeSource(uint))
 int_corpus <- cleanCorpus(int_corpus, stops)
-
+# document term matrix
 int_DTM  <- DocumentTermMatrix(int_corpus)
 int_DTMm <- as.matrix(int_DTM)
-
+# simple word frequencies
 int_WFM <- data.frame(term = names(colSums(int_DTMm)),
                       freq = colSums(int_DTMm))
 int_WFM <- int_WFM[order(int_WFM$freq, decreasing = T),]
 rownames(int_WFM) <- NULL
 head(int_WFM, 30)
 # Similar generic words...
+# Bigrams it is...
+tint <- VCorpus(VectorSource(uint$text))
+tint <- cleanCorpus(tint, stops)
+tint <- tidy(tint)
+tintt <- tint %>%
+  unnest_tokens(bigram, text , token = "ngrams", n = 3, n_min = 2) %>%
+  dplyr::count(bigram, sort = TRUE) %>%
+  ungroup()
+# 50 most common bigrams
+tintt %>% with(wordcloud(bigram, n, random.order = FALSE, max.words = 50, colors=pal))
+# Ok, not as informative either...
+# Let's compare a few speakers
+# How about we compare all of them for once here.
+unique(uint$speaker)
+# 12 total speakers
+# before we join things, we also need to normalize sentiment by the number of obs
+sp <- as.factor(uint$speaker)
+summary(sp)
+# First lets agregate the observations by speaker in a new dataset
+int_comp <-  aggregate(uint$text, list(uint$speaker), paste, collapse =" ")
+# Clean and transfrom into a corpus
+int_comp <- rename(int_comp, doc_id = "Group.1", text = "x")
+int_comp_corpus <- VCorpus(DataframeSource(int_comp))
+int_comp_DTM <- TermDocumentMatrix(int_comp_corpus)
+int_comp_DTMm <- as.matrix(int_comp_DTM)
+# Let's first look at word frequencies and associations for each speaker
+int_compr_t <- tidy(int_comp_corpus)
+int_compr_wf <- int_compr_t %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+w_bush_int <- int_compr_wf %>% filter(id == "George W. Bush")
+w_bush_int <- inner_join(w_bush_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(w_bush_int = sum(n)/159) %>% # 159 = number of interviews in dataset
+  select(-sentiment)
+b_clinton_int <- int_compr_wf %>% filter(id == "William J. Clinton")
+b_clinton_int <- inner_join(b_clinton_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(b_clinton_int = sum(n)/239) %>% #interviews in dataset
+  select(-sentiment)
+bush_int <- int_compr_wf %>% filter(id == "George Bush")
+bush_int <- inner_join(bush_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(bush_int = sum(n)/36) %>% #interviews in dataset
+  select(-sentiment)
+trump_int <- int_compr_wf %>% filter(id == "Donald J. Trump")
+trump_int <- inner_join(trump_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(trump_int = sum(n)/25) %>% #interviews in dataset
+  select(-sentiment)
+reagan_int <- int_compr_wf %>% filter(id == "Ronald Reagan")
+reagan_int <- inner_join(reagan_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(reagan_int = sum(n)/118) #interviews in dataset
+h_clinton_int <- int_compr_wf %>% filter(id == "Hillary Clinton")
+h_clinton_int <- inner_join(h_clinton_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(h_clinton_int = sum(n)/39) %>% #interviews in dataset
+  select(-sentiment)
+obama_int <- int_compr_wf %>% filter(id == "Barack Obama")
+obama_int <- inner_join(obama_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(obama_int = sum(n)/252) %>% #interviews in dataset
+  select(-sentiment)
+mccain_int <- int_compr_wf %>% filter(id == "John McCain")
+mccain_int <- inner_join(mccain_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(mccain_int = sum(n)/27) %>% #interviews in dataset
+  select(-sentiment)
+sanders_int <- int_compr_wf %>% filter(id == "Bernie Sanders")
+sanders_int <- inner_join(sanders_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(sanders_int = sum(n)/31) %>% #interviews in dataset
+  select(-sentiment)
+dole_int <- int_compr_wf %>% filter(id == "Robert Dole")
+dole_int <- inner_join(dole_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(dole_int = sum(n)/1) %>% #interviews in dataset
+  select(-sentiment)
+romney_int <- int_compr_wf %>% filter(id == "Mitt Romney")
+romney_int <- inner_join(romney_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(romney_int = sum(n)/4) %>% #interviews in dataset
+  select(-sentiment)
+biden_int <- int_compr_wf %>% filter(id == "Joseph R. Biden")
+biden_int <- inner_join(biden_int, get_sentiments("nrc"), by = "word") %>%
+  group_by(sentiment) %>%
+  summarize(biden_int = sum(n)/5) %>% #interviews in dataset
+  select(-sentiment)
+# bind things together
+sent_int_sp <- data.frame(cbind(reagan_int, bush_int, b_clinton_int, dole_int, w_bush_int, obama_int, mccain_int, romney_int,
+                                sanders_int, h_clinton_int, trump_int, biden_int))
+sent_int_sp <- data.frame(sent_int_sp[,-1], row.names=sent_int_sp[,1])
+# plot
+chartJSRadar(scores = sent_int_sp,
+             labs = rownames(sent_int_sp),
+             labelSize = 20, showLegend = TRUE, main = "Sentiments in Interviews Compared (Normalized by number of interviews per speaker")
+# Trump does not seem to be an outlier here at all...
+# Not too informative though...
+# How about we simply collapse things altogether and see the "number of emotions" for speaker
+# Let's try to see a different way
+sent_int_plot <- data.frame(t(sent_int_sp))
+sent_int_plot$total <- rowSums(sent_int_plot)
+sent_int_plot$speaker <- gsub("_int", "", rownames(sent_int_plot))
+sent_int_plot <- sent_int_plot %>% tidyr::gather(key = Sentiment, value = Value, anger:trust)
+ggplot(sent_int_plot, aes(speaker, Value, fill = Sentiment)) +
+  geom_bar(position="stack", stat="identity")
 
 ### Oral
 
@@ -299,3 +415,4 @@ head(ora_WFM, 30)
 ora_sent <- ora_DTMt %>%
   inner_join(get_sentiments("bing"), by = c(term = "word")) %>%
   arrange(desc(count))
+unique(uint$speaker)
