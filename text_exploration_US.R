@@ -429,9 +429,10 @@ reagan_speech <- uora %>% filter(speaker == "Ronald Reagan")
 reagan_speech$doc_id <- paste0("Reagan_", stringr::str_extract_all(reagan_speech$date, "^[0-9]{4}"))
 reagan_speech <- aggregate(reagan_speech$text, list(reagan_speech$doc_id), paste, collapse =" ")
 reagan_speech <- rename(reagan_speech, doc_id = "Group.1", text = "x")
+reagan_speech <- reagan_speech[-9,] # removes 1989, transition year and, thus, very few speeches
 # Get a corcpus and clean
 reagan_corpus <- VCorpus(DataframeSource(reagan_speech))
-reagan_corpus <- cleanCorpus(reagan_corpus, stops)
+reagan_corpus <- tm_map(reagan_corpus, content_transformer(tryTolower))
 reagan_corpus <- tidy(reagan_corpus)
 # Repeat the same for all speakers
 # Clinton
@@ -439,23 +440,104 @@ clinton_speech <- uora %>% filter(speaker == "William J. Clinton")
 clinton_speech$doc_id <- paste0("Clinton_", stringr::str_extract_all(clinton_speech$date, "^[0-9]{4}"))
 clinton_speech <- aggregate(clinton_speech$text, list(clinton_speech$doc_id), paste, collapse =" ")
 clinton_speech <- rename(clinton_speech, doc_id = "Group.1", text = "x")
+clinton_speech <- clinton_speech[-c(9,10,11),] # removes 2001 and onwards, transition year and, thus, very few speeches
 clinton_corpus <- VCorpus(DataframeSource(clinton_speech))
-clinton_corpus <- cleanCorpus(clinton_corpus, stops)
+clinton_corpus <- tm_map(clinton_corpus, content_transformer(tryTolower))
 clinton_corpus <- tidy(clinton_corpus)
 # W. Bush
 w_bush_speech <- uora %>% filter(speaker == "George W. Bush")
 w_bush_speech$doc_id <- paste0("W_Bush_", stringr::str_extract_all(w_bush_speech$date, "^[0-9]{4}"))
 w_bush_speech <- aggregate(w_bush_speech$text, list(w_bush_speech$doc_id), paste, collapse =" ")
 w_bush_speech <- rename(w_bush_speech, doc_id = "Group.1", text = "x")
+w_bush_speech <- w_bush_speech[-9,] # removes 2009, transition year and, thus, very few speeches
 w_bush_corpus <- VCorpus(DataframeSource(w_bush_speech))
-w_bush_corpus <- cleanCorpus(w_bush_corpus, stops)
+w_bush_corpus <- tm_map(w_bush_corpus, content_transformer(tryTolower))
 w_bush_corpus <- tidy(w_bush_corpus)
 # Obama
 obama_speech <- uora %>% filter(speaker == "Barack Obama")
 obama_speech$doc_id <- paste0("Obama_", stringr::str_extract_all(obama_speech$date, "^[0-9]{4}"))
 obama_speech <- aggregate(obama_speech$text, list(obama_speech$doc_id), paste, collapse =" ")
 obama_speech <- rename(obama_speech, doc_id = "Group.1", text = "x")
+obama_speech <- obama_speech[-9,] # removes 2017, transition year and, thus, very few speeches
 obama_corpus <- VCorpus(DataframeSource(obama_speech))
-obama_corpus <- cleanCorpus(obama_corpus, stops)
+obama_corpus <- tm_map(obama_corpus, content_transformer(tryTolower))
 obama_corpus <- tidy(obama_corpus)
 # Get sentiment across time for speakers
+# And normalize by numbers of obs
+sp <- as.factor(uora$speaker)
+summary(sp)
+# Get word frequency
+reagan_wf <- reagan_corpus %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+# Inner join with NRC sentiment lexicon
+reagan_speech_sent <- inner_join(reagan_wf, get_sentiments("nrc"), by = "word") %>%
+  group_by(id, sentiment) %>%
+  summarize(value = sum(n)/2505) # normalized by speeches for speaker in dataset
+ggplot(reagan_speech_sent, aes(id, value, fill = sentiment)) +
+  geom_bar(position="stack", stat="identity")
+# Why a peak in 1984? Campaign for reelection?
+# Repeat for other speakers
+clinton_wf <- clinton_corpus %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+clinton_speech_sent <- inner_join(clinton_wf, get_sentiments("nrc"), by = "word") %>%
+  group_by(id, sentiment) %>%
+  summarize(value = sum(n)/3756) # normalized by speeches for speaker in dataset
+ggplot(clinton_speech_sent, aes(id, value, fill = sentiment)) +
+  geom_bar(position="stack", stat="identity")
+# Why a peak in 2000? Campaign for Al Gore?
+w_bush_wf <- w_bush_corpus %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+w_bush_speech_sent <- inner_join(w_bush_wf, get_sentiments("nrc"), by = "word") %>%
+  group_by(id, sentiment) %>%
+  summarize(value = sum(n)/3756) # normalized by speeches for speaker in dataset
+ggplot(w_bush_speech_sent, aes(id, value, fill = sentiment)) +
+  geom_bar(position="stack", stat="identity")
+# reelection 2004 spike? Or, on the other hand, 2007 and 2008 decline correlated to mortage crisis?
+obama_wf <- obama_corpus %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+obama_speech_sent <- inner_join(obama_wf, get_sentiments("nrc"), by = "word") %>%
+  group_by(id, sentiment) %>%
+  summarize(value = sum(n)/3756) # normalized by speeches for speaker in dataset
+ggplot(obama_speech_sent, aes(id, value, fill = sentiment)) +
+  geom_bar(position="stack", stat="identity")
+# Why 2009 and 2010 peak? Recovery and nobel? and decline in 2012 at reelection period?
+# This is all interesting but can we compare all of these in one graph?
+# Let's re-work the data a bit here to get the number fo words coded as carried in time.
+# Statr with Reagan.
+reagan_sum <- reagan_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
+reagan_sum$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(reagan_sum$id, "[0-9]{4}$")))
+reagan_sum$id <- gsub("_[0-9]{4}$", "", reagan_sum$id)
+ggplot(reagan_sum, aes(x = date, y = value , fill = id)) +
+  geom_line() +
+  geom_point(size = 4, shape = 21)
+# Clinton
+clinton_sum <- clinton_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
+clinton_sum$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(clinton_sum$id, "[0-9]{4}$")))
+clinton_sum$id <- gsub("_[0-9]{4}$", "", clinton_sum$id)
+ggplot(clinton_sum, aes(x = date, y = value , fill = id)) +
+  geom_line() +
+  geom_point(size = 4, shape = 21)
+# W. Bush
+w_bush_sum <- w_bush_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
+w_bush_sum$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(w_bush_sum$id, "[0-9]{4}$")))
+w_bush_sum$id <- gsub("_[0-9]{4}$", "", w_bush_sum$id)
+ggplot(w_bush_sum, aes(x = date, y = value , fill = id)) +
+  geom_line() +
+  geom_point(size = 4, shape = 21)
+# Obama
+ob_sum <- obama_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
+ob_sum$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(ob_sum$id, "[0-9]{4}$")))
+ob_sum$id <- gsub("_[0-9]{4}$", "", ob_sum$id)
+ggplot(ob_sum, aes(x = date, y = value , fill = id)) +
+  geom_line() +
+  geom_point(size = 4, shape = 21)
+# Let's bind all
+speakers_sum <- rbind(reagan_sum, clinton_sum, w_bush_sum, ob_sum)
+ggplot(speakers_sum, aes(x = date, y = value , fill = id)) +
+  geom_line() +
+  geom_point(size = 4, shape = 21)
+# W. Bush is an intense speaker!
