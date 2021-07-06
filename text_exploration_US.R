@@ -63,7 +63,7 @@ camp_DTMm <- as.matrix(camp_DTM)
 
 # Get most frequent terms
 camp_WFM <- data.frame(term = names(colSums(camp_DTMm)),
-                   freq = colSums(camp_DTMm))
+                       freq = colSums(camp_DTMm))
 camp_WFM <- camp_WFM[order(camp_WFM$freq, decreasing = T),]
 rownames(camp_WFM) <- NULL
 head(camp_WFM, 30)
@@ -130,7 +130,7 @@ trump_DTM  <- DocumentTermMatrix(trump_corpus)
 trump_DTMm <- as.matrix(trump_DTM)
 # Let's checkout word frequencies for both
 obama_WFM <- data.frame(term = names(colSums(obama_DTMm)),
-                       freq = colSums(obama_DTMm))
+                        freq = colSums(obama_DTMm))
 obama_WFM <- obama_WFM[order(obama_WFM$freq, decreasing = T),]
 rownames(obama_WFM) <- NULL
 head(obama_WFM, 30)
@@ -417,5 +417,45 @@ ora_WFM <- aggregate(count ~ term, data = ora_WFM, FUN=sum)
 ora_WFM <- ora_WFM %>% arrange(desc(count))
 head(ora_WFM, 30)
 # Okay, this has not been all that helpful..
-# Let's get bigrams just for the sake of it
-
+# At this point I will split the data by speaker.
+# I will skip bigrams as they are not all that helpful either and
+# dataset is too big and causes R to crash.
+# Let me look at the two term presidents in sample,
+# Reagan, Clinton, W. Bush and Obama.
+unique(uora$speaker)
+# Filter speaker
+reagan_speech <- uora %>% filter(speaker == "Ronald Reagan")
+# Let's agregate the dataset by speaker and year
+reagan_speech$doc_id <- paste0("Reagan_", stringr::str_extract_all(reagan_speech$date, "^[0-9]{4}"))
+reagan_speech <- aggregate(reagan_speech$text, list(reagan_speech$doc_id), paste, collapse =" ")
+reagan_speech <- rename(reagan_speech, doc_id = "Group.1", text = "x")
+# Get a corcpus and clean
+reagan_corpus <- VCorpus(DataframeSource(reagan_speech))
+reagan_corpus <- cleanCorpus(reagan_corpus, stops)
+reagan_corpus <- tidy(reagan_corpus)
+# Repeat the same for all speakers
+# Clinton
+clinton_speech <- uora %>% filter(speaker == "William J. Clinton")
+clinton_speech$doc_id <- paste0("Clinton_", stringr::str_extract_all(clinton_speech$date, "^[0-9]{4}"))
+clinton_speech <- aggregate(clinton_speech$text, list(clinton_speech$doc_id), paste, collapse =" ")
+clinton_speech <- rename(clinton_speech, doc_id = "Group.1", text = "x")
+clinton_corpus <- VCorpus(DataframeSource(clinton_speech))
+clinton_corpus <- cleanCorpus(clinton_corpus, stops)
+clinton_corpus <- tidy(clinton_corpus)
+# W. Bush
+w_bush_speech <- uora %>% filter(speaker == "George W. Bush")
+w_bush_speech$doc_id <- paste0("W_Bush_", stringr::str_extract_all(w_bush_speech$date, "^[0-9]{4}"))
+w_bush_speech <- aggregate(w_bush_speech$text, list(w_bush_speech$doc_id), paste, collapse =" ")
+w_bush_speech <- rename(w_bush_speech, doc_id = "Group.1", text = "x")
+w_bush_corpus <- VCorpus(DataframeSource(w_bush_speech))
+w_bush_corpus <- cleanCorpus(w_bush_corpus, stops)
+w_bush_corpus <- tidy(w_bush_corpus)
+# Obama
+obama_speech <- uora %>% filter(speaker == "Barack Obama")
+obama_speech$doc_id <- paste0("Obama_", stringr::str_extract_all(obama_speech$date, "^[0-9]{4}"))
+obama_speech <- aggregate(obama_speech$text, list(obama_speech$doc_id), paste, collapse =" ")
+obama_speech <- rename(obama_speech, doc_id = "Group.1", text = "x")
+obama_corpus <- VCorpus(DataframeSource(obama_speech))
+obama_corpus <- cleanCorpus(obama_corpus, stops)
+obama_corpus <- tidy(obama_corpus)
+# Get sentiment across time for speakers
