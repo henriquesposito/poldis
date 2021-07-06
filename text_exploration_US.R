@@ -386,33 +386,36 @@ chartJSRadar(scores = sent_int_sp,
 # How about we simply collapse things altogether and see the "number of emotions" for speaker
 # Let's try to see a different way
 sent_int_plot <- data.frame(t(sent_int_sp))
+sent_int_plot <- sent_int_plot[-4,] # removes Bob Dole since he has only 1 interview
 sent_int_plot$total <- rowSums(sent_int_plot)
 sent_int_plot$speaker <- gsub("_int", "", rownames(sent_int_plot))
 sent_int_plot <- sent_int_plot %>% tidyr::gather(key = Sentiment, value = Value, anger:trust)
 ggplot(sent_int_plot, aes(speaker, Value, fill = Sentiment)) +
   geom_bar(position="stack", stat="identity")
+# What do you get from all this? Not much but to say that
+# Romney, Trump and Biden use more carried words, according to this disctionary,
+# than Bush, H. Clinton or Sanders.
 
 ### Oral
 
+# Get Oral remarks, the big one...
+load("~/GitHub/Poldis/data/US_oral.rda")
 uora <- US_oral
-
+# Rename variables
 uora <- uora %>% rename(doc_id = title) %>%
   select(-source_links) %>%
   arrange(doc_id, text, speaker, date)
+# create a big corpus and clean
 ora_corpus <- VCorpus(DataframeSource(uora))
 ora_corpus <- cleanCorpus(ora_corpus, stops)
-
+# DTM
 ora_DTM  <- DocumentTermMatrix(ora_corpus)
 ora_DTMt <- tidy(ora_DTM) # Issue with size here hence why we conveted to tidy
-
+# Let's see word frequencies, though this is likely not helpful...
 ora_WFM <- ora_DTMt %>% select(term, count)
 ora_WFM <- aggregate(count ~ term, data = ora_WFM, FUN=sum)
 ora_WFM <- ora_WFM %>% arrange(desc(count))
 head(ora_WFM, 30)
 # Okay, this has not been all that helpful..
+# Let's get bigrams just for the sake of it
 
-# get sentiment easy with tidy
-ora_sent <- ora_DTMt %>%
-  inner_join(get_sentiments("bing"), by = c(term = "word")) %>%
-  arrange(desc(count))
-unique(uint$speaker)
