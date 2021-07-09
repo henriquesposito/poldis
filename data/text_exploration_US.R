@@ -565,8 +565,7 @@ head(ora_WFM, 30)
 # I will skip bigrams as they are not all that helpful either and
 # dataset is too big and causes R to crash.
 
-# Let me look at the two term presidents in sample,
-# Reagan, Clinton, W. Bush and Obama.
+# Let me look at all the presidents in the dataset
 unique(uora$speaker)
 
 # Filter speaker
@@ -583,6 +582,16 @@ reagan_corpus <- VCorpus(DataframeSource(reagan_speech))
 reagan_corpus <- tm_map(reagan_corpus, content_transformer(tryTolower))
 reagan_corpus <- tidy(reagan_corpus)
 # Repeat the same for all speakers
+
+# Bush
+bush_speech <- uora %>% filter(speaker == "George Bush")
+bush_speech$doc_id <- paste0("Bush", stringr::str_extract_all(bush_speech$date, "^[0-9]{4}"))
+bush_speech <- aggregate(bush_speech$text, list(bush_speech$doc_id), paste, collapse =" ")
+bush_speech <- rename(bush_speech, doc_id = "Group.1", text = "x")
+bush_speech <- bush_speech[-c(1,2,7),] # removes prior to 1988 and after 1992
+bush_corpus<- VCorpus(DataframeSource(bush_speech))
+bush_corpus <- tm_map(bush_corpus, content_transformer(tryTolower))
+bush_corpus <- tidy(bush_corpus)
 
 # Clinton
 clinton_speech <- uora %>% filter(speaker == "William J. Clinton")
@@ -614,16 +623,118 @@ obama_corpus <- VCorpus(DataframeSource(obama_speech))
 obama_corpus <- tm_map(obama_corpus, content_transformer(tryTolower))
 obama_corpus <- tidy(obama_corpus)
 
-# Get sentiment across time for speakers
-# And normalize by numbers of obs
-sp <- as.factor(uora$speaker)
-summary(sp)
+# Trump
+trump_speech <- uora %>% filter(speaker == "Donald J. Trump")
+trump_speech$doc_id <- paste0("Trump_", stringr::str_extract_all(trump_speech$date, "^[0-9]{4}"))
+trump_speech <- aggregate(trump_speech$text, list(trump_speech$doc_id), paste, collapse =" ")
+trump_speech <- rename(trump_speech, doc_id = "Group.1", text = "x")
+trump_speech <- trump_speech[-c(1,6),] # removes 2016 and 2021
+trump_corpus <- VCorpus(DataframeSource(trump_speech))
+trump_corpus <- tm_map(trump_corpus, content_transformer(tryTolower))
+trump_corpus <- tidy(trump_corpus)
+
+# Biden
+biden_speech <- uora %>% filter(speaker == "Joseph R. Biden")
+biden_speech$doc_id <- paste0("Biden_", stringr::str_extract_all(biden_speech$date, "^[0-9]{4}"))
+biden_speech <- aggregate(biden_speech$text, list(biden_speech$doc_id), paste, collapse =" ")
+biden_speech <- rename(biden_speech, doc_id = "Group.1", text = "x")
+biden_speech <- biden_speech[11,] # keep 2021 only
+biden_corpus <- VCorpus(DataframeSource(biden_speech))
+biden_corpus <- tm_map(biden_corpus, content_transformer(tryTolower))
+biden_corpus <- tidy(biden_corpus)
 
 # Get word frequency
 reagan_wf <- reagan_corpus %>%
   unnest_tokens(word, text) %>%
   count(id, word, sort = TRUE)
+# Bush
+bush_wf <- bush_corpus %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+# Clinton
+clinton_wf <- clinton_corpus %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+# W. Bush
+w_bush_wf <- w_bush_corpus %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+# Obama
+obama_wf <- obama_corpus %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+# Trump
+trump_wf <- trump_corpus %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+# Biden
+biden_wf <- biden_corpus %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
 
+# Join with afinn lexicon for sentiment.
+# Affin differs from NRC as it has values for words, but it is more restricted (less words).
+# Get sentiment across time for speakers
+# And normalize by numbers of obs
+sp <- as.factor(uora$speaker)
+summary(sp)
+
+reagan_speech_af <- inner_join(reagan_wf, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n)/2505) # normalized by speeches for speaker in dataset
+bush_speech_af <- inner_join(bush_wf, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n)/1669)
+clinton_speech_af <- inner_join(clinton_wf, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n)/3756)
+w_bush_speech_af <- inner_join(w_bush_wf, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n)/2934)
+obama_speech_af <- inner_join(obama_wf, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n)/2201)
+trump_speech_af <- inner_join(trump_wf, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n)/1360)
+biden_speech_af <- inner_join(biden_wf, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n)/336)
+
+# Get dates in correct format
+reagan_speech_af$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(reagan_speech_af$id, "[0-9]{4}$")))
+bush_speech_af$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(bush_speech_af$id, "[0-9]{4}$")))
+clinton_speech_af$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(clinton_speech_af$id, "[0-9]{4}$")))
+w_bush_speech_af$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(w_bush_speech_af$id, "[0-9]{4}$")))
+obama_speech_af$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(obama_speech_af$id, "[0-9]{4}$")))
+trump_speech_af$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(trump_speech_af$id, "[0-9]{4}$")))
+biden_speech_af$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(biden_speech_af$id, "[0-9]{4}$")))
+
+# Add a speker column
+reagan_speech_af$speaker <- "Reagan"
+bush_speech_af$speaker <- "Bush"
+clinton_speech_af$speaker <- "Clinton"
+w_bush_speech_af$speaker <- "W. Bush"
+obama_speech_af$speaker <- "Obama"
+trump_speech_af$speaker <- "Trump"
+biden_speech_af$speaker <- "Biden"
+
+# Let's bind all and plot
+speakers_speech_sent <- rbind(reagan_speech_af, bush_speech_af, clinton_speech_af, w_bush_speech_af,
+                              obama_speech_af, trump_speech_af, biden_speech_af)
+ggplot(speakers_speech_sent, aes(x = date, y = value , fill = speaker)) +
+  geom_line() +
+  geom_point(size = 4, shape = 21) +
+  labs(x = "Year",
+       y = "",
+       title = "Sentiment for Presidents in Official Speeches Across time",
+       subtitle = "Normalized by observations for speaker in dataset",
+       caption = "Sentiments were generated with 'Afinn' lexicon") +
+  theme_fivethirtyeight()
+# This is getteing much more interesting!!! Trump is an outlier when it comes to
+# using certain words, however, it appears that he uses more positive words than others.
+
+# NRC sentiment comparison
 # Inner join with NRC sentiment lexicon
 reagan_speech_sent <- inner_join(reagan_wf, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
@@ -632,41 +743,25 @@ ggplot(reagan_speech_sent, aes(id, value, fill = sentiment)) +
   geom_bar(position="stack", stat="identity")
 # Why a peak in 1984? Campaign for reelection?
 # Repeat for other speakers
-
-# Clinton
-clinton_wf <- clinton_corpus %>%
-  unnest_tokens(word, text) %>%
-  count(id, word, sort = TRUE)
 clinton_speech_sent <- inner_join(clinton_wf, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
   summarize(value = sum(n)/3756) # normalized by speeches for speaker in dataset
 ggplot(clinton_speech_sent, aes(id, value, fill = sentiment)) +
   geom_bar(position="stack", stat="identity")
 # Why a peak in 2000? Campaign for Al Gore?
-
-# W. Bush
-w_bush_wf <- w_bush_corpus %>%
-  unnest_tokens(word, text) %>%
-  count(id, word, sort = TRUE)
 w_bush_speech_sent <- inner_join(w_bush_wf, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
-  summarize(value = sum(n)/3756) # normalized by speeches for speaker in dataset
+  summarize(value = sum(n)/2934) # normalized by speeches for speaker in dataset
 ggplot(w_bush_speech_sent, aes(id, value, fill = sentiment)) +
   geom_bar(position="stack", stat="identity")
 # reelection 2004 spike? Or, on the other hand, 2007 and 2008 decline correlated to mortage crisis?
-
-# Obama
-obama_wf <- obama_corpus %>%
-  unnest_tokens(word, text) %>%
-  count(id, word, sort = TRUE)
 obama_speech_sent <- inner_join(obama_wf, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
-  summarize(value = sum(n)/3756) # normalized by speeches for speaker in dataset
+  summarize(value = sum(n)/2201) # normalized by speeches for speaker in dataset
 ggplot(obama_speech_sent, aes(id, value, fill = sentiment)) +
   geom_bar(position="stack", stat="identity")
 # Why 2009 and 2010 peak? Recovery and nobel? and decline in 2012 at reelection period?
 # This is all interesting but can we compare all of these in one graph?
-
 # Let's re-work the data a bit here to get the number fo words coded as carried in time.
 # Start with Reagan.
 reagan_sum <- reagan_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
@@ -675,7 +770,6 @@ reagan_sum$id <- gsub("_[0-9]{4}$", "", reagan_sum$id)
 ggplot(reagan_sum, aes(x = date, y = value , fill = id)) +
   geom_line() +
   geom_point(size = 4, shape = 21)
-
 # Clinton
 clinton_sum <- clinton_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
 clinton_sum$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(clinton_sum$id, "[0-9]{4}$")))
@@ -683,7 +777,6 @@ clinton_sum$id <- gsub("_[0-9]{4}$", "", clinton_sum$id)
 ggplot(clinton_sum, aes(x = date, y = value , fill = id)) +
   geom_line() +
   geom_point(size = 4, shape = 21)
-
 # W. Bush
 w_bush_sum <- w_bush_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
 w_bush_sum$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(w_bush_sum$id, "[0-9]{4}$")))
@@ -691,7 +784,6 @@ w_bush_sum$id <- gsub("_[0-9]{4}$", "", w_bush_sum$id)
 ggplot(w_bush_sum, aes(x = date, y = value , fill = id)) +
   geom_line() +
   geom_point(size = 4, shape = 21)
-
 # Obama
 ob_sum <- obama_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
 ob_sum$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(ob_sum$id, "[0-9]{4}$")))
@@ -699,7 +791,6 @@ ob_sum$id <- gsub("_[0-9]{4}$", "", ob_sum$id)
 ggplot(ob_sum, aes(x = date, y = value , fill = id)) +
   geom_line() +
   geom_point(size = 4, shape = 21)
-
 # Let's bind all and plot
 speakers_sum <- rbind(reagan_sum, clinton_sum, w_bush_sum, ob_sum)
 ggplot(speakers_sum, aes(x = date, y = value , fill = id)) +
