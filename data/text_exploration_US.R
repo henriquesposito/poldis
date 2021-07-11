@@ -733,70 +733,67 @@ ggplot(speakers_speech_sent, aes(x = date, y = value , fill = speaker)) +
   theme_fivethirtyeight()
 # This is getteing much more interesting!!! Trump is an outlier when it comes to
 # using certain words, however, it appears that he uses more positive words than others.
+# Why a peak in 1984? Campaign for reelection?
+# Why a peak in 2000? Campaign for Al Gore?
+# reelection 2004 spike? Or, on the other hand, 2007 and 2008 decline correlated to mortage crisis?
+# Why 2009 and 2010 peak? Recovery and nobel? and decline in 2012 at reelection period?
 
 # NRC sentiment comparison
 # Inner join with NRC sentiment lexicon
-reagan_speech_sent <- inner_join(reagan_wf, get_sentiments("nrc"), by = "word") %>%
+reagan_speech_nrc <- inner_join(reagan_wf, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
   summarize(value = sum(n)/2505) # normalized by speeches for speaker in dataset
-ggplot(reagan_speech_sent, aes(id, value, fill = sentiment)) +
-  geom_bar(position="stack", stat="identity")
-# Why a peak in 1984? Campaign for reelection?
-# Repeat for other speakers
-clinton_speech_sent <- inner_join(clinton_wf, get_sentiments("nrc"), by = "word") %>%
+bush_speech_nrc <- inner_join(bush_wf, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
-  summarize(value = sum(n)/3756) # normalized by speeches for speaker in dataset
-ggplot(clinton_speech_sent, aes(id, value, fill = sentiment)) +
-  geom_bar(position="stack", stat="identity")
-# Why a peak in 2000? Campaign for Al Gore?
-w_bush_speech_sent <- inner_join(w_bush_wf, get_sentiments("nrc"), by = "word") %>%
+  summarize(value = sum(n)/1669)
+clinton_speech_nrc <- inner_join(clinton_wf, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
-  summarize(value = sum(n)/2934) # normalized by speeches for speaker in dataset
-ggplot(w_bush_speech_sent, aes(id, value, fill = sentiment)) +
-  geom_bar(position="stack", stat="identity")
-# reelection 2004 spike? Or, on the other hand, 2007 and 2008 decline correlated to mortage crisis?
-obama_speech_sent <- inner_join(obama_wf, get_sentiments("nrc"), by = "word") %>%
+  summarize(value = sum(n)/3756)
+w_bush_speech_nrc <- inner_join(w_bush_wf, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
-  summarize(value = sum(n)/2201) # normalized by speeches for speaker in dataset
-ggplot(obama_speech_sent, aes(id, value, fill = sentiment)) +
-  geom_bar(position="stack", stat="identity")
-# Why 2009 and 2010 peak? Recovery and nobel? and decline in 2012 at reelection period?
-# This is all interesting but can we compare all of these in one graph?
-# Let's re-work the data a bit here to get the number fo words coded as carried in time.
-# Start with Reagan.
-reagan_sum <- reagan_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
-reagan_sum$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(reagan_sum$id, "[0-9]{4}$")))
-reagan_sum$id <- gsub("_[0-9]{4}$", "", reagan_sum$id)
-ggplot(reagan_sum, aes(x = date, y = value , fill = id)) +
-  geom_line() +
-  geom_point(size = 4, shape = 21)
-# Clinton
-clinton_sum <- clinton_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
-clinton_sum$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(clinton_sum$id, "[0-9]{4}$")))
-clinton_sum$id <- gsub("_[0-9]{4}$", "", clinton_sum$id)
-ggplot(clinton_sum, aes(x = date, y = value , fill = id)) +
-  geom_line() +
-  geom_point(size = 4, shape = 21)
-# W. Bush
-w_bush_sum <- w_bush_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
-w_bush_sum$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(w_bush_sum$id, "[0-9]{4}$")))
-w_bush_sum$id <- gsub("_[0-9]{4}$", "", w_bush_sum$id)
-ggplot(w_bush_sum, aes(x = date, y = value , fill = id)) +
-  geom_line() +
-  geom_point(size = 4, shape = 21)
-# Obama
-ob_sum <- obama_speech_sent %>% group_by(id) %>% summarize(value = sum(value))
-ob_sum$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(ob_sum$id, "[0-9]{4}$")))
-ob_sum$id <- gsub("_[0-9]{4}$", "", ob_sum$id)
-ggplot(ob_sum, aes(x = date, y = value , fill = id)) +
-  geom_line() +
-  geom_point(size = 4, shape = 21)
+  summarize(value = sum(n)/2934)
+obama_speech_nrc <- inner_join(obama_wf, get_sentiments("nrc"), by = "word") %>%
+  group_by(id, sentiment) %>%
+  summarize(value = sum(n)/2201)
+trump_speech_nrc <- inner_join(trump_wf, get_sentiments("nrc"), by = "word") %>%
+  group_by(id, sentiment) %>%
+  summarize(value = sum(n)/1360)
+biden_speech_nrc <- inner_join(biden_wf, get_sentiments("nrc"), by = "word") %>%
+  group_by(id, sentiment) %>%
+  summarize(value = sum(n)/336)
+
+# Add a speker column
+reagan_speech_nrc$speaker <- "Reagan"
+bush_speech_nrc$speaker <- "Bush"
+clinton_speech_nrc$speaker <- "Clinton"
+w_bush_speech_nrc$speaker <- "W. Bush"
+obama_speech_nrc$speaker <- "Obama"
+trump_speech_nrc$speaker <- "Trump"
+biden_speech_nrc$speaker <- "Biden"
+
+# Add date
+reagan_speech_nrc$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(reagan_speech_nrc$id, "[0-9]{4}$")))
+bush_speech_nrc$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(bush_speech_nrc$id, "[0-9]{4}$")))
+clinton_speech_nrc$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(clinton_speech_nrc$id, "[0-9]{4}$")))
+w_bush_speech_nrc$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(w_bush_speech_nrc$id, "[0-9]{4}$")))
+obama_speech_nrc$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(obama_speech_nrc$id, "[0-9]{4}$")))
+trump_speech_nrc$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(trump_speech_nrc$id, "[0-9]{4}$")))
+biden_speech_nrc$date <- lubridate::dmy(paste0("15-06-", stringr::str_extract_all(biden_speech_nrc$id, "[0-9]{4}$")))
+
 # Let's bind all and plot
-speakers_sum <- rbind(reagan_sum, clinton_sum, w_bush_sum, ob_sum)
-ggplot(speakers_sum, aes(x = date, y = value , fill = id)) +
-  geom_line() +
-  geom_point(size = 4, shape = 21)
-# W. Bush is an intense speaker!
+speakers_nrc <- rbind(reagan_speech_nrc, bush_speech_nrc, clinton_speech_nrc, w_bush_speech_nrc,
+                      obama_speech_nrc, trump_speech_nrc, biden_speech_nrc) %>%
+  arrange(date)
+
+ggplot(speakers_nrc, aes(reorder(id, date), value, fill = sentiment)) +
+  geom_bar(position="stack", stat="identity") +
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=1)) +
+  labs(x = "",
+       y = "",
+       title = "NRC Sentiment for Presidents in Official Speeches Across time",
+       subtitle = "Normalized by observations for speaker in dataset",
+       caption = "Sentiments were generated with 'NRC' lexicon") +
+  coord_flip()
 
 #################### Compare sentiment for Obama and Trump across settings
 
@@ -831,9 +828,12 @@ camp_sent_obama$id <- "Obama_campaign"
 camp_sent_obama <- camp_sent_obama %>%
   unnest_tokens(word, text) %>%
   count(id, word, sort = TRUE)
-camp_sent_obama <- inner_join(camp_sent_obama, get_sentiments("nrc"), by = "word") %>%
+camp_sent_obama_nrc <- inner_join(camp_sent_obama, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
   summarize(value = sum(n)/544) # normalized by campaign texts for speaker in dataset
+camp_sent_obama_afinn <- inner_join(camp_sent_obama, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n)/544) # normalized by camapign texts speaker in dataset
 
 # Trump campaign
 camp_sent_trump <- ucamp %>% filter(speaker == "Donald J. Trump")
@@ -843,9 +843,12 @@ camp_sent_trump$id <- "Trump_campaign"
 camp_sent_trump <- camp_sent_trump %>%
   unnest_tokens(word, text) %>%
   count(id, word, sort = TRUE)
-camp_sent_trump <- inner_join(camp_sent_trump, get_sentiments("nrc"), by = "word") %>%
+camp_sent_trump_nrc <- inner_join(camp_sent_trump, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
   summarize(value = sum(n)/108) # normalized by campaign texts for speaker in dataset
+camp_sent_trump_afinn <- inner_join(camp_sent_trump, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n)/108)
 
 # Obama debates
 debate_sent_obama <- udeb %>% filter(speaker == " Barack Obama")
@@ -855,8 +858,11 @@ debate_sent_obama$id <- "Obama_debate"
 debate_sent_obama <- debate_sent_obama %>%
   unnest_tokens(word, text) %>%
   count(id, word, sort = TRUE)
-debate_sent_obama <- inner_join(debate_sent_obama, get_sentiments("nrc"), by = "word") %>%
+debate_sent_obama_nrc <- inner_join(debate_sent_obama, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
+  summarize(value = sum(n)/6) # normalized by debates for speaker in dataset
+debate_sent_obama_afinn <- inner_join(debate_sent_obama, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
   summarize(value = sum(n)/6) # normalized by debates for speaker in dataset
 
 # Trump debates
@@ -867,8 +873,11 @@ debate_sent_trump$id <- "Trump_debate"
 debate_sent_trump <- debate_sent_trump %>%
   unnest_tokens(word, text) %>%
   count(id, word, sort = TRUE)
-debate_sent_trump <- inner_join(debate_sent_trump, get_sentiments("nrc"), by = "word") %>%
+debate_sent_trump_nrc <- inner_join(debate_sent_trump, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
+  summarize(value = sum(n)/5) # normalized by debates for speaker in dataset
+debate_sent_trump_afinn <- inner_join(debate_sent_trump, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
   summarize(value = sum(n)/5) # normalized by debates for speaker in dataset
 
 # Obama Interviews
@@ -879,8 +888,11 @@ interview_sent_obama$id <- "Obama_interview"
 interview_sent_obama <- interview_sent_obama %>%
   unnest_tokens(word, text) %>%
   count(id, word, sort = TRUE)
-interview_sent_obama <- inner_join(interview_sent_obama, get_sentiments("nrc"), by = "word") %>%
+interview_sent_obama_nrc <- inner_join(interview_sent_obama, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
+  summarize(value = sum(n)/252) # normalized by interviews for speaker in dataset
+interview_sent_obama_afinn <- inner_join(interview_sent_obama, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
   summarize(value = sum(n)/252) # normalized by interviews for speaker in dataset
 
 # Trump interview
@@ -891,8 +903,11 @@ interview_sent_trump$id <- "Trump_intreview"
 interview_sent_trump <- interview_sent_trump %>%
   unnest_tokens(word, text) %>%
   count(id, word, sort = TRUE)
-interview_sent_trump <- inner_join(interview_sent_trump, get_sentiments("nrc"), by = "word") %>%
+interview_sent_trump_nrc <- inner_join(interview_sent_trump, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
+  summarize(value = sum(n)/25) # normalized by interviews for speaker in dataset
+interview_sent_trump_afinn <- inner_join(interview_sent_trump, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
   summarize(value = sum(n)/25) # normalized by interviews for speaker in dataset
 
 # Obama speeches
@@ -903,8 +918,11 @@ oral_sent_obama$id <- "Obama_speeches"
 oral_sent_obama <- oral_sent_obama %>%
   unnest_tokens(word, text) %>%
   count(id, word, sort = TRUE)
-oral_sent_obama <- inner_join(oral_sent_obama, get_sentiments("nrc"), by = "word") %>%
+oral_sent_obama_nrc <- inner_join(oral_sent_obama, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
+  summarize(value = sum(n)/2201) # normalized by speeches for speaker in dataset
+oral_sent_obama_afinn <- inner_join(oral_sent_obama, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
   summarize(value = sum(n)/2201) # normalized by speeches for speaker in dataset
 
 # Trump speeches
@@ -915,18 +933,41 @@ oral_sent_trump$id <- "Trump_speeches"
 oral_sent_trump <- oral_sent_trump %>%
   unnest_tokens(word, text) %>%
   count(id, word, sort = TRUE)
-oral_sent_trump <- inner_join(oral_sent_trump, get_sentiments("nrc"), by = "word") %>%
+oral_sent_trump_nrc <- inner_join(oral_sent_trump, get_sentiments("nrc"), by = "word") %>%
   group_by(id, sentiment) %>%
+  summarize(value = sum(n)/1306) # normalized by speeches for speaker in dataset
+oral_sent_trump_afinn <- inner_join(oral_sent_trump, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
   summarize(value = sum(n)/1306) # normalized by speeches for speaker in dataset
 
 # Bind datasets
-campaign_sentiment_ot <- rbind(camp_sent_obama, camp_sent_trump, interview_sent_obama, interview_sent_trump,
-                               debate_sent_obama, debate_sent_trump, oral_sent_obama, oral_sent_trump)
+campaign_sentiment_nrc <- rbind(camp_sent_obama_nrc, camp_sent_trump_nrc, interview_sent_obama_nrc, interview_sent_trump_nrc,
+                               debate_sent_obama_nrc, debate_sent_trump_nrc, oral_sent_obama_nrc, oral_sent_trump_nrc)
+campaign_sentiment_nrc$setting <- gsub(".*_", "",campaign_sentiment_nrc$id)
+campaign_sentiment_afinn <- rbind(camp_sent_obama_afinn, camp_sent_trump_afinn, interview_sent_obama_afinn, interview_sent_trump_afinn,
+                                debate_sent_obama_afinn, debate_sent_trump_afinn, oral_sent_obama_afinn, oral_sent_trump_afinn)
+campaign_sentiment_afinn$setting <- gsub(".*_", "",campaign_sentiment_afinn$id)
+campaign_sentiment_afinn$speaker <- gsub("_.*", "",campaign_sentiment_afinn$id)
 
 # Let's visualize
-ggplot(campaign_sentiment_ot, aes(id, value, fill = sentiment)) +
+nrc <- ggplot(campaign_sentiment_nrc, aes(reorder(id, setting) , value, fill = sentiment)) +
   geom_bar(position="stack", stat="identity") +
-  labs(x = "Speaker and Setting",
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=1)) +
+  labs(x = "",
        y = "",
        title = "Sentiment for Obama and Trump in Different Political Settings",
-       subtitle = "Normalized by observations for speaker in dataset")
+       subtitle = "Normalized by observations for speaker in dataset",
+       caption = "NRC sentiment lexicon") +
+  theme_fivethirtyeight()
+
+afinn <- ggplot(campaign_sentiment_afinn, aes(x = setting, y = value, fill = speaker)) +
+  geom_line(aes(group = speaker)) +
+  geom_point(size = 4, shape = 21) +
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=1)) +
+  labs(x = "",
+       y = "",
+       caption = "Afinn sentiment lexicon") +
+  theme_fivethirtyeight()
+
+gridExtra::grid.arrange(nrc, afinn)
+dev.off()
