@@ -19,7 +19,10 @@ Imports:
     rvest,
     dplyr,
     usethis,
-    stringr
+    stringr, 
+    translateR,
+    cld2,
+    purrr
 RoxygenNote: 7.1.1
 Depends: 
     R (>= 2.10)
