@@ -8,17 +8,20 @@
 #' @param target_lang Which language would you like this translated to?
 #' Please provide a two letter language abbreviation (e.g. "en" or "pt")
 #' @param key Google API key.
-#  For more information please go to: https://cloud.google.com/translate/docs/setup
+#' For more information please go to: https://cloud.google.com/translate/docs/setup
+#' @importFrom  cld2 detect_language
+#' @importFrom translateR translate
+#' @importFrom purrr map_chr
 #' @return A character vector of the same length of original.
 #' @export
-str_translate <- function(s, target_lang, key) {
+str_translate <- function(s, target_lang, API) {
 
-  if(missing(key)) {
+  if(missing(API)) {
     stop("Please declare a Google API key.
          For more information please go to: https://cloud.google.com/translate/docs/setup")
   }
 
-  if(missing(target_lang)||length(target_lang > 2)) {
+  if(missing(target_lang)) {
     stop("Please declare a target language.
          Language should be decalred following ISO two letter codes.
          For more info, please go to: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes")
@@ -30,16 +33,15 @@ str_translate <- function(s, target_lang, key) {
   source_lang <- out %>%
     vapply(., purrr::map_chr, "", cld2::detect_language) %>%
     data.frame(check.names = FALSE)
-    out <- cbind(out, source_lang)
+  out <- cbind(out, source_lang)
 
   for (k in seq_len(nrow(out))) {
     if (is.na(out$.[k])) {
       out$out[k] == out$out[k]
-      print(paste("Could not tranlate", [k], ". Langauge not detect.
-                  Manually input source language argument, if possible, for better results.")
+      # print(paste0("Could not translate ", [k], ", langauge not detect."))
     } else {
       out$out[k] <- suppressWarnings(translateR::translate(content.vec = out$out[k],
-                                                           google.api.key = api_key,
+                                                           google.api.key = API,
                                                            source.lang = out$.[k],
                                                            target.lang = target_lang))
     }
