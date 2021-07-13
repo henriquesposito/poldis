@@ -41,6 +41,20 @@ cleanCorpus<-function(corpus, customStopwords){
 pal <- brewer.pal(8,"Dark2")
 stops <- stopwords('portuguese')
 
+# Get lexicons for sentiment
+# Both NRC and Afinn are in English...
+# The for NRC authors argue that it does a good job in other
+# languages when translated, so, let's try.
+# I download the NRC dictionary data from the syuzhet package here
+# (https://github.com/mjockers/syuzhet/blob/master/R/sysdata.rda).
+# Then, I keep only portuguese observations and add as internal data in the package.
+load("~/GitHub/poldis/R/sysdata.rda")
+
+# Shall we try to translate Afinn to portuguese even if it might leed to some biasis?
+# The translations was done with the str_translate() function.
+# The Afinn_pt lexicon in portuguese was added to the package as internal data.
+load("~/GitHub/poldis/R/sysdata.rda")
+
 ### Campaign
 
 # Load data
@@ -88,70 +102,167 @@ bcamp_sent_tidy <- tidy(bcamp_sent_corpus)
 bcamp_sent_wf <- bcamp_sent_tidy %>%
   unnest_tokens(word, text) %>%
   count(id, word, sort = TRUE)
-# Now, the clear issue, the "Afinn" lexicon is in English...
-# Shall we try to translate it to portuguese even if it might leed to some biasis?
-# The translations was done with the str_translate() function.
-# The Afinn_pt lexicon in portuguese was added to the package as internal data.
-# load("~/GitHub/poldis/R/sysdata.rda")
+# Now, the clear issue, the "Afinn" lexicon is in English, but ...
 bcamp_sent <- inner_join(bcamp_sent_wf, Afinn_pt, by = "word") %>%
   group_by(id) %>%
-  summarize(value = sum(n)) # normalized by obs in dataset
+  summarize(value = sum(n))
 bcamp_sent$obs <- unname(summary(as.factor(bcamp$Speaker))) # get number of obs for each for normalization
-bcamp_sent$n_value <- bcamp_sent$value/bcamp_sent$obs
+bcamp_sent$n_value <- bcamp_sent$value/bcamp_sent$obs  # normalized by obs in dataset
 bcamp_sent$date <- paste0(stringr::str_extract(bcamp_sent$id, "[0-9]{4}"))
 bcamp_sent$id <- stringr::str_replace_all(bcamp_sent$id, "_[0-9]{4}", "")
 
 # Let's make a pretty bar plot
-ggplot(bcamp_sent, aes(x = date, y = n_value , fill = id)) +
+camp_af <- ggplot(bcamp_sent, aes(x = date, y = n_value , fill = id)) +
   geom_line(aes(group = id)) +
-  geom_point(size = 10, shape = 21) +
-  labs(x = "Speaker",
+  geom_point(size = 8, shape = 21) +
+  labs(x = "",
        y = "",
-       title = "Sentiment for Candidates in Campaign Remarks in Brazil",
-       subtitle = "Normalized by observations for speaker in dataset",
-       caption = "Sentiments were generated with 'Afinn' lexicon") +
+       title = "Campaign") +
   theme_fivethirtyeight()
 
 # In case you want explore a bit further with NRC
-# # Let's look by speaker for the last 2 elections
-# br_camp_sp <- bcamp %>% filter(Date > "2013")
-# summary(as.factor(br_camp_sp$Speaker))
-# # Four speakers Bolsonaro, Haddad, Dilma and Aecio
-# # Let's aggregate by speakers and transform into a corpus
-# br_camp <-  aggregate(br_camp_sp$text, list(br_camp_sp$Speaker), paste, collapse =" ")
-# br_camp <- rename(br_camp, doc_id = "Group.1", text = "x")
-# br_camp_corpus <- VCorpus(DataframeSource(br_camp))
-# br_camp_corpus <- tm_map(br_camp_corpus, content_transformer(tryTolower))
-# br_camp_corpus <- tidy(br_camp_corpus)
-# # get word frequencies
-# br_camp_corpus_wf <- br_camp_corpus %>%
-#   unnest_tokens(word, text) %>%
-#   count(id, word, sort = TRUE)
-# # Inner join with NRC sentiment lexicon, however, lexicon is in English...
-# # The authors argue that it does a good job in other languages when translated, so, let's try.
-# # I download the NRC dictionary data from the syuzhet package here
-# # (https://github.com/mjockers/syuzhet/blob/master/R/sysdata.rda).
-# # Then, I keep only portuguese observations and add as internal data in the package.
-# load("~/GitHub/poldis/R/sysdata.rda")
-# br_camp_corpus_sent <- inner_join(br_camp_corpus_wf, nrc_portuguese, by = "word") %>%
-#   group_by(id, sentiment) %>%
-#   summarize(value = sum(n))
-# # normalized values by numbers of documents for speaker in dataset
-# summary(as.factor(br_camp_sp$Speaker))
-# norm_value_aecio <- data.frame(norm_value = br_camp_corpus_sent$value[1:10]/27)
-# norm_value_bolsonaro <- data.frame(norm_value = br_camp_corpus_sent$value[11:20]/29)
-# norm_value_dilma <- data.frame(norm_value = br_camp_corpus_sent$value[21:30]/23)
-# norm_value_haddad <- data.frame(norm_value = br_camp_corpus_sent$value[31:40]/22)
-# norm_value <- rbind(norm_value_aecio, norm_value_bolsonaro, norm_value_dilma, norm_value_haddad)
-# br_camp_corpus_sent <- cbind(br_camp_corpus_sent, norm_value)
-# # plot values
-# ggplot(br_camp_corpus_sent, aes(id, norm_value, fill = sentiment)) +
-#   geom_bar(position="stack", stat="identity")
-# # Bolsonaro does use some carried words more than othrs in all senses.
+bcamp_sent_nrc <- inner_join(bcamp_sent_wf, nrc_portuguese, by = "word") %>%
+  group_by(id, sentiment) %>%
+  summarize(value = sum(n)) # normalized by obs in dataset
+obs <- summary(as.factor(bcamp$Speaker)) # get number of obs for each for normalization
+# Get obs for each sentiment and speaker to work properly (10 sentiments for each speaker year)
+rep_obs <- data.frame(rep("", 160))
+rep_obs$obs[1:10] <- unname(summary(as.factor(bcamp$Speaker)))[1]
+rep_obs$obs[11:20] <- unname(summary(as.factor(bcamp$Speaker)))[2]
+rep_obs$obs[21:30] <- unname(summary(as.factor(bcamp$Speaker)))[3]
+rep_obs$obs[31:40] <- unname(summary(as.factor(bcamp$Speaker)))[4]
+rep_obs$obs[41:50] <- unname(summary(as.factor(bcamp$Speaker)))[5]
+rep_obs$obs[51:60] <- unname(summary(as.factor(bcamp$Speaker)))[6]
+rep_obs$obs[61:70] <- unname(summary(as.factor(bcamp$Speaker)))[7]
+rep_obs$obs[71:80] <- unname(summary(as.factor(bcamp$Speaker)))[8]
+rep_obs$obs[81:90] <- unname(summary(as.factor(bcamp$Speaker)))[9]
+rep_obs$obs[91:100] <- unname(summary(as.factor(bcamp$Speaker)))[10]
+rep_obs$obs[101:110] <- unname(summary(as.factor(bcamp$Speaker)))[11]
+rep_obs$obs[111:120] <- unname(summary(as.factor(bcamp$Speaker)))[12]
+rep_obs$obs[121:130] <- unname(summary(as.factor(bcamp$Speaker)))[13]
+rep_obs$obs[131:140] <- unname(summary(as.factor(bcamp$Speaker)))[14]
+rep_obs$obs[141:150] <- unname(summary(as.factor(bcamp$Speaker)))[15]
+rep_obs$obs[151:160] <- unname(summary(as.factor(bcamp$Speaker)))[16]
+bcamp_sent_nrc$obs <- rep_obs$obs # bind
+bcamp_sent_nrc$n_value <- bcamp_sent_nrc$value/bcamp_sent_nrc$obs # get normalized value
+bcamp_sent_nrc$date <- as.numeric(paste0(stringr::str_extract(bcamp_sent_nrc$id, "[0-9]{4}")))
+ggplot(bcamp_sent_nrc, aes(x = reorder(id, date), y = n_value, fill = sentiment)) +
+  geom_bar(position="stack", stat="identity") +
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=1)) +
+  labs(x = "",
+       y = "",
+       title = "Sentiment for Candidates in Campaign Remarks in Brazil",
+       subtitle = "Normalized by observations for speaker in dataset",
+       caption = "NRC sentiment lexicon") +
+  theme_fivethirtyeight() +
+  coord_flip()
 
-### Intreviews
+### Intreviews, Debates and Oral Remarks
 
+# Let's start with debates
 # Load data
+load("~/GitHub/Poldis/data/BR_debates.rda")
+# Rename and wrangle
+bdeb <- BR_debates %>% rename(doc_id = Title, text = Text) %>%
+  arrange(doc_id, text, Speaker, Date)
+# Aggregate data by speaker
+bdeb$Speaker <- paste0(bdeb$Speaker, "_", stringr::str_extract(bdeb$Date, "^[0-9]{4}")) # get speaker year
+bdeb_sent <-  aggregate(bdeb$text, list(bdeb$Speaker), paste, collapse =" ")
+# Clean and transfrom into a corpus
+bdeb_sent <- rename(bdeb_sent, doc_id = "Group.1", text = "x")
+bdeb_sent_corpus <- VCorpus(DataframeSource(bdeb_sent))
+bdeb_sent_corpus <- cleanCorpus(bdeb_sent_corpus, stops)
+# Get into tidy and get some word frequencies
+bdeb_sent_tidy <- tidy(bdeb_sent_corpus)
+bdeb_sent_wf <- bdeb_sent_tidy %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+# get sentiment
+bdeb_sent_af <- inner_join(bdeb_sent_wf, Afinn_pt, by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n))
+bdeb_sent_af$obs <- unname(summary(as.factor(bdeb$Speaker))) # get number of obs for each for normalization
+bdeb_sent_af$n_value <- bdeb_sent_af$value/bdeb_sent_af$obs # normalized by obs in dataset
+bdeb_sent_af$date <- paste0(stringr::str_extract(bdeb_sent_af$id, "[0-9]{4}"))
+bdeb_sent_af$id <- stringr::str_replace_all(bdeb_sent_af$id, "_[0-9]{4}", "")
+# Plot
+deb_af <- ggplot(bdeb_sent_af, aes(x = date, y = n_value , fill = id)) +
+  geom_line(aes(group = id)) +
+  geom_point(size = 8, shape = 21) +
+  labs(x = "",
+       y = "",
+       title = "Debates") +
+  theme_fivethirtyeight()
 
+# Let's do the same for interviews
+load("~/GitHub/Poldis/data/BR_interviews.rda")
+# Rename and wrangle
+bint <- BR_Interviews %>% rename(doc_id = Title, text = Text) %>%
+  arrange(doc_id, text, Speaker, Date)
+# Aggregate data by speaker
+bint$Speaker <- paste0(bint$Speaker, "_", stringr::str_extract(bint$Date, "^[0-9]{4}")) # get speaker year
+bint_sent <-  aggregate(bint$text, list(bint$Speaker), paste, collapse =" ")
+# Clean and transfrom into a corpus
+bint_sent <- rename(bint_sent, doc_id = "Group.1", text = "x")
+bint_sent_corpus <- VCorpus(DataframeSource(bint_sent))
+bint_sent_corpus <- cleanCorpus(bint_sent_corpus, stops)
+# Get into tidy and get some word frequencies
+bint_sent_tidy <- tidy(bint_sent_corpus)
+bint_sent_wf <- bint_sent_tidy %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+# get sentiment
+bint_sent_af <- inner_join(bint_sent_wf, Afinn_pt, by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n))
+bint_sent_af$obs <- unname(summary(as.factor(bint$Speaker))) # get number of obs for each for normalization
+bint_sent_af$n_value <- bint_sent_af$value/bint_sent_af$obs # normalized by obs in dataset
+bint_sent_af$date <- paste0(stringr::str_extract(bint_sent_af$id, "[0-9]{4}"))
+bint_sent_af$id <- stringr::str_replace_all(bint_sent_af$id, "_[0-9]{4}", "")
+# Plot
+int_af <- ggplot(bint_sent_af, aes(x = date, y = n_value , fill = id)) +
+  geom_line(aes(group = id)) +
+  geom_point(size = 8, shape = 21) +
+  labs(x = "",
+       y = "",
+       title = "Interviews") +
+  theme_fivethirtyeight()
 
+# Let's do the same for oral remarks
+load("~/GitHub/Poldis/data/BR_oral.rda")
+# Rename and wrangle
+boral <- BR_oral %>% select(date, presid, text)
+# Aggregate data by speaker
+boral$Speaker <- paste0(boral$presid, "_", boral$date) # get speaker year
+boral_sent <-  aggregate(boral$text, list(boral$Speaker), paste, collapse =" ")
+# Clean and transfrom into a corpus
+boral_sent <- rename(boral_sent, doc_id = "Group.1", text = "x")
+boral_sent_corpus <- VCorpus(DataframeSource(boral_sent))
+# dataset is too big to clean with cleancorpus and can cause computer to crash...
+# since we are doing sentiment and no cleaning is really needed for now...
+# Get into tidy and get some word frequencies
+boral_sent_tidy <- tidy(boral_sent_corpus)
+boral_sent_wf <- boral_sent_tidy %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+# Get sentiment
+boral_sent_af <- inner_join(boral_sent_wf, Afinn_pt, by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n))
+boral_sent_af$obs <- unname(summary(as.factor(boral$Speaker))) # get number of obs for each for normalization
+boral_sent_af$n_value <- boral_sent_af$value/boral_sent_af$obs  # normalized by obs in dataset
+boral_sent_af$date <- paste0(stringr::str_extract(boral_sent_af$id, "[0-9]{4}"))
+boral_sent_af$id <- stringr::str_replace_all(boral_sent_af$id, "_[0-9]{4}", "")
+# Plot
+oral_af <- ggplot(boral_sent_af, aes(x = date, y = n_value , fill = id)) +
+  geom_line(aes(group = id)) +
+  geom_point(size = 8, shape = 21) +
+  labs(x = "",
+       y = "",
+       title = "Speeches") +
+  theme_fivethirtyeight()
 
+# Compare all the graphs side-by-side
+gridExtra::grid.arrange(camp_af, int_af, deb_af, oral_af, ncol=2,
+                        top = "Comparing Speakers in Different Settings across Time for Brazil",
+                        bottom = "Sentiment generated with the Afinn lexicon and values normalized observations for speaker in data.")
