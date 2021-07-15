@@ -899,7 +899,7 @@ interview_sent_obama_afinn <- inner_join(interview_sent_obama, get_sentiments("a
 interview_sent_trump <- uint %>% filter(speaker == "Donald J. Trump")
 interview_sent_trump <- VCorpus(DataframeSource(interview_sent_trump))
 interview_sent_trump <- tidy(interview_sent_trump)
-interview_sent_trump$id <- "Trump_intreview"
+interview_sent_trump$id <- "Trump_interview"
 interview_sent_trump <- interview_sent_trump %>%
   unnest_tokens(word, text) %>%
   count(id, word, sort = TRUE)
@@ -944,13 +944,14 @@ oral_sent_trump_afinn <- inner_join(oral_sent_trump, get_sentiments("afinn"), by
 campaign_sentiment_nrc <- rbind(camp_sent_obama_nrc, camp_sent_trump_nrc, interview_sent_obama_nrc, interview_sent_trump_nrc,
                                debate_sent_obama_nrc, debate_sent_trump_nrc, oral_sent_obama_nrc, oral_sent_trump_nrc)
 campaign_sentiment_nrc$setting <- gsub(".*_", "",campaign_sentiment_nrc$id)
+campaign_sentiment_nrc$speaker <- gsub("_.*", "",campaign_sentiment_nrc$id)
 campaign_sentiment_afinn <- rbind(camp_sent_obama_afinn, camp_sent_trump_afinn, interview_sent_obama_afinn, interview_sent_trump_afinn,
                                 debate_sent_obama_afinn, debate_sent_trump_afinn, oral_sent_obama_afinn, oral_sent_trump_afinn)
 campaign_sentiment_afinn$setting <- gsub(".*_", "",campaign_sentiment_afinn$id)
 campaign_sentiment_afinn$speaker <- gsub("_.*", "",campaign_sentiment_afinn$id)
 
 # Let's visualize
-nrc <- ggplot(campaign_sentiment_nrc, aes(reorder(id, setting) , value, fill = sentiment)) +
+nrc_ot <- ggplot(campaign_sentiment_nrc, aes(reorder(id, setting) , value, fill = sentiment)) +
   geom_bar(position="stack", stat="identity") +
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=1)) +
   labs(x = "",
@@ -960,7 +961,7 @@ nrc <- ggplot(campaign_sentiment_nrc, aes(reorder(id, setting) , value, fill = s
        caption = "NRC sentiment lexicon") +
   theme_fivethirtyeight()
 
-afinn <- ggplot(campaign_sentiment_afinn, aes(x = setting, y = value, fill = speaker)) +
+afinn_ot <- ggplot(campaign_sentiment_afinn, aes(x = setting, y = value, fill = speaker)) +
   geom_line(aes(group = speaker)) +
   geom_point(size = 4, shape = 21) +
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=1)) +
@@ -969,5 +970,5 @@ afinn <- ggplot(campaign_sentiment_afinn, aes(x = setting, y = value, fill = spe
        caption = "Afinn sentiment lexicon") +
   theme_fivethirtyeight()
 
-gridExtra::grid.arrange(nrc, afinn)
+gridExtra::grid.arrange(nrc_ot, afinn_ot)
 dev.off()

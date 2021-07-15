@@ -111,7 +111,7 @@ bcamp_sent$n_value <- bcamp_sent$value/bcamp_sent$obs  # normalized by obs in da
 bcamp_sent$date <- paste0(stringr::str_extract(bcamp_sent$id, "[0-9]{4}"))
 bcamp_sent$id <- stringr::str_replace_all(bcamp_sent$id, "_[0-9]{4}", "")
 
-# Let's make a pretty bar plot
+# Let's make a pretty plot
 camp_af <- ggplot(bcamp_sent, aes(x = date, y = n_value , fill = id)) +
   geom_line(aes(group = id)) +
   geom_point(size = 8, shape = 21) +
@@ -123,7 +123,7 @@ camp_af <- ggplot(bcamp_sent, aes(x = date, y = n_value , fill = id)) +
 # In case you want explore a bit further with NRC
 bcamp_sent_nrc <- inner_join(bcamp_sent_wf, nrc_portuguese, by = "word") %>%
   group_by(id, sentiment) %>%
-  summarize(value = sum(n)) # normalized by obs in dataset
+  summarize(value = sum(n))
 obs <- summary(as.factor(bcamp$Speaker)) # get number of obs for each for normalization
 # Get obs for each sentiment and speaker to work properly (10 sentiments for each speaker year)
 rep_obs <- data.frame(rep("", 160))
@@ -266,3 +266,9 @@ oral_af <- ggplot(boral_sent_af, aes(x = date, y = n_value , fill = id)) +
 gridExtra::grid.arrange(camp_af, int_af, deb_af, oral_af, ncol=2,
                         top = "Comparing Speakers in Different Settings across Time for Brazil",
                         bottom = "Sentiment generated with the Afinn lexicon and values normalized observations for speaker in data.")
+
+# Okay, I do not think there is apoint in going futher. I will stop here and move to analysis.
+# All this to say, the types of conclusions we can make using sentiment, word frequencies and
+# unsupervised text modelling are limited. Though some might be used to support the types of
+# arguments abouthow some politicians discourses is more intense and non neutral languege at
+# higher frequencies, this can only be said for some settings and, perhaps, for some cases.
