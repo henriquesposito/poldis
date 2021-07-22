@@ -8,6 +8,8 @@ library(dplyr)
 library(readr)
 library(stringr)
 library(stringi)
+library(ggplot2)
+library(ggthemes)
 
 # Bind all data by speaker and year to create one big dataset for each case
 
@@ -132,13 +134,86 @@ US$anti_PC <- stringr::str_count(US$text, paste0("(?i)", anti_pc))
 US$territory <- stringr::str_count(US$text, paste0("(?i)", territory))
 
 # take a quick look at the findings
-US_1985 <- US %>%  filter(date == 1985) %>% select(-text)
-US_1985
 US_1995 <- US %>%  filter(date == 1995) %>% select(-text)
 US_1995
-US_2005 <- US %>%  filter(date == 2005) %>% select(-text)
-US_2005
 US_2015 <- US %>%  filter(date == 2015) %>% select(-text)
 US_2015
-
-truth_time <- US %>% select(truth, date, setting, length) # Get obs per year and plot
+# Get obs per year and plot
+truth_time <- US %>%
+  select(truth, date, setting, length) %>%
+  mutate(n_truth = truth/length) %>%
+  group_by(setting, date) %>%
+  summarize(value = sum(n_truth))
+ggplot(truth_time, aes(x = date, y = value , fill = setting)) +
+  geom_line(aes(group = setting)) +
+  geom_point(size = 8, shape = 21)
+# interesting spike later years
+lies_time <- US %>%
+  select(lies, date, setting, length) %>%
+  mutate(n_lies = lies/length) %>%
+  group_by(setting, date) %>%
+  summarize(value = sum(n_lies))
+ggplot(lies_time, aes(x = date, y = value , fill = setting)) +
+  geom_line(aes(group = setting)) +
+  geom_point(size = 8, shape = 21)
+# also spike in later years
+antipc_time <- US %>%
+  select(anti_PC, date, setting, length) %>%
+  mutate(n_PC = anti_PC/length) %>%
+  group_by(setting, date) %>%
+  summarize(value = sum(n_PC))
+ggplot(antipc_time, aes(x = date, y = value , fill = setting)) +
+  geom_line(aes(group = setting)) +
+  geom_point(size = 8, shape = 21)
+# interesting as well
+# table the findings by year and setting
+aut_perf_time <- US %>%
+  select(-c(doc_id, setting, text)) %>%
+  group_by(date) %>%
+  summarise(across(everything(), sum)) %>%
+  mutate(truth_telling = truth/length,
+         lie_accusations = lies/length,
+         consistency = consistency/length,
+         finger_pointing = fpoint/length,
+         origins = origins/length,
+         common_sense = common_sense/length,
+         anti_pc = anti_PC/length,
+         territory = territory/length) %>%
+  select(-c(length, truth, lies, fpoint,anti_PC))
+aut_perf_time_long <- aut_perf_time %>%
+  tidyr::pivot_longer(consistency:anti_pc, "Performance")
+ggplot(aut_perf_time_long, aes(x = date, y = value , fill = Performance)) +
+  geom_line(aes(group = Performance)) +
+  geom_point(size = 3, shape = 21) +
+  labs(x = "",
+       y = "",
+       title = "Authenticity Performances in the US in Time",
+       subtitle = "Normalized by number of characters per year in dataset") +
+  theme_fivethirtyeight()
+aut_perf_setting <- US %>%
+  select(-c(doc_id, text)) %>%
+  group_by(date, setting) %>%
+  summarise(across(everything(), sum)) %>%
+  mutate(truth_telling = truth/length,
+         lie_accusations = lies/length,
+         consistency = consistency/length,
+         finger_pointing = fpoint/length,
+         origins = origins/length,
+         common_sense = common_sense/length,
+         anti_pc = anti_PC/length,
+         territory = territory/length) %>%
+  select(-c(length, truth, lies, fpoint,anti_PC))
+# Does this tell us anything?
+aut_perf_set_long <- aut_perf_setting %>%
+  tidyr::pivot_longer(consistency:anti_pc) %>%
+  group_by(setting, date) %>%
+  summarise(value = sum(value))
+ggplot(aut_perf_set_long, aes(x = date, y = value , fill = setting)) +
+  geom_line(aes(group = setting)) +
+  geom_point(size = 3, shape = 21) +
+  labs(x = "",
+       y = "",
+       title = "Authenticity Performances by Setting in the US in Time",
+       subtitle = "Normalized by number of characters per year and setting in dataset") +
+  theme_fivethirtyeight()
+# Speaker matters?
