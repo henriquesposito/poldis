@@ -60,8 +60,8 @@ uoral_sent_af$id <- stringr::str_replace_all(uoral_sent_af$id, "_[0-9]{4}", "")
 sent_speech_af <- rbind(boral_sent_af, uoral_sent_af)
 sent_speech_af$date_2 <- stringr::str_extract(sent_speech_af$date, "[0-9]{2}$")
 sent_speech_af$id <- gsub("W. Bush", "W_Bush", sent_speech_af$id)
-sent_speech_af$id_2 <- stringi::stri_extract_last_words(sent_speech_af$id)
-ggplot(sent_speech_af, aes(x = reorder(date_2, as.numeric(date)), y = n_value , fill = id_2)) +
+sent_speech_af$Speaker <- stringi::stri_extract_last_words(sent_speech_af$id)
+ggplot(sent_speech_af, aes(x = reorder(date_2, as.numeric(date)), y = n_value , fill = Speaker)) +
   geom_line(aes(group = id)) +
   geom_point(size = 8, shape = 21) +
   labs(x = "",
@@ -123,9 +123,187 @@ sent_speech_nrc_br <- ggplot(boral_nrc, aes(x = reorder(id, as.numeric(date)), y
   expand_limits(y=c(0, 1000)) +
   coord_flip()
 
+# Shal we compare just sentiment in settings across the cases?
+load("~/GitHub/Poldis/data/US_campaign.rda")
+load("~/GitHub/Poldis/data/US_debates.rda")
+load("~/GitHub/Poldis/data/US_interviews.rda")
+# US_oral is already loaded
+load("~/GitHub/Poldis/data/BR_campaign.rda")
+load("~/GitHub/Poldis/data/BR_debates.rda")
+load("~/GitHub/Poldis/data/BR_interviews.rda")
+# BR_oral is already loaded
+# Let's just agregate all obs in dataset and then join them
+# US
+uoral_all <- paste(US_oral$text, collapse = " ")
+uoral_all <- data.frame(doc_id = "US Speeches", text = uoral_all, char = nchar(uoral_all))
+ucamp_all <- paste(US_campaign$text, collapse = " ")
+ucamp_all <- data.frame(doc_id = "US Campaign", text = ucamp_all, char = nchar(ucamp_all))
+udeb_all <- paste(US_debates$Text, collapse = " ")
+udeb_all <- data.frame(doc_id = "US Debate", text = udeb_all, char = nchar(udeb_all))
+uint_all <- paste(US_interviews$text, collapse = " ")
+uint_all <- data.frame(doc_id = "US Interviews", text = uint_all, char = nchar(uint_all))
+us_all <- rbind(uoral_all, ucamp_all, udeb_all, uint_all)
+# Brazil
+boral_all <- paste(BR_oral$text, collapse = " ")
+boral_all <- data.frame(doc_id = "BR Speeches", text = boral_all, char = nchar(boral_all))
+bcamp_all <- paste(BR_Campaign$Text, collapse = " ")
+bcamp_all <- data.frame(doc_id = "BR Campaign", text = bcamp_all, char = nchar(bcamp_all))
+bdeb_all <- paste(BR_debates$Text, collapse = " ")
+bdeb_all <- data.frame(doc_id = "BR Debate", text = bdeb_all, char = nchar(bdeb_all))
+bint_all <- paste(BR_Interviews$Text, collapse = " ")
+bint_all <- data.frame(doc_id = "BR Interviews", text = bint_all, char = nchar(bint_all))
+BR_all <- rbind(boral_all, bcamp_all, bdeb_all, bint_all)
+# Get sentiment NRC
+# US
+us_all_sent <- VCorpus(DataframeSource(us_all))
+us_all_sent_t <- tidy(us_all_sent)
+us_all_sent_wf <- us_all_sent_t %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+us_all_nrc <- inner_join(us_all_sent_wf, get_sentiments("nrc"), by = "word") %>%
+  group_by(id, sentiment) %>%
+  summarize(value = sum(n))
+# Normailze
+us_c_char <- data.frame(char = rep(ucamp_all$char, 10))
+us_d_char <- data.frame(char =rep(udeb_all$char, 10))
+us_i_char <- data.frame(char =rep(uint_all$char, 10))
+us_s_char <- data.frame(char =rep(uoral_all$char, 10))
+us_char <- rbind(us_c_char, us_d_char, us_i_char, us_s_char)
+us_all_nrc <- cbind(us_all_nrc, us_char)
+us_all_nrc$n_value <- us_all_nrc$value/us_all_nrc$char
+# BR
+BR_all_sent <- VCorpus(DataframeSource(BR_all))
+BR_all_sent_t <- tidy(BR_all_sent)
+BR_all_sent_wf <- BR_all_sent_t %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+BR_all_nrc <- inner_join(BR_all_sent_wf, nrc_portuguese, by = "word") %>%
+  group_by(id, sentiment) %>%
+  summarize(value = sum(n))
+# Normailze
+BR_c_char <- data.frame(char = rep(bcamp_all$char, 10))
+BR_d_char <- data.frame(char =rep(bdeb_all$char, 10))
+BR_i_char <- data.frame(char =rep(bint_all$char, 10))
+BR_s_char <- data.frame(char =rep(boral_all$char, 10))
+BR_char <- rbind(BR_c_char, BR_d_char, BR_i_char, BR_s_char)
+BR_all_nrc <- cbind(BR_all_nrc, BR_char)
+BR_all_nrc$n_value <- BR_all_nrc$value/BR_all_nrc$char
+# Bind all
+nrc_all <- rbind(us_all_nrc, BR_all_nrc)
+# Plot
+ggplot(nrc_all, aes(x = id, y = n_value, fill = sentiment)) +
+  geom_bar(position="stack", stat="identity") +
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=1)) +
+  labs(x = "",
+       y = "",
+       title = "Sentiment Scross Settings Compared for Brazil and the US",
+       subtitle = "Normalized by number of characters for text in dataset",
+       caption = "NRC sentiment lexicon") +
+  theme_fivethirtyeight()
+
+# How about we compare sentiment across time for different settings?
+# US
+# Speeches
+US_oral$year <- paste0("US_Speeches_", stringr::str_extract(US_oral$date, "^[0-9]{4}"))
+uoral <- aggregate(US_oral$text, list(US_oral$year), paste, collapse = " ")
+uoral <- rename(uoral, doc_id = "Group.1", text = "x")
+# Campaign
+US_campaign$year <- paste0("US_Campaign_", stringr::str_extract(US_campaign$date, "^[0-9]{4}"))
+ucamp <- aggregate(US_campaign$text, list(US_campaign$year), paste, collapse = " ")
+ucamp <- rename(ucamp, doc_id = "Group.1", text = "x")
+# Debates
+US_debates$year <- paste0("US_Debates_",stringr::str_extract(US_debates$Date, "^[0-9]{4}"))
+udeb <- aggregate(US_debates$Text, list(US_debates$year), paste, collapse = " ")
+udeb <- rename(udeb, doc_id = "Group.1", text = "x")
+# Interviews
+US_interviews$year <- paste0("US_Interviews_", stringr::str_extract(US_interviews$date, "^[0-9]{4}"))
+uint <- aggregate(US_interviews$text, list(US_interviews$year), paste, collapse = " ")
+uint <- rename(uint, doc_id = "Group.1", text = "x")
+us_setyear <- rbind(uoral, ucamp, udeb, uint)
+us_setyear$char <- nchar(us_setyear$text)
+# Get sentimen Afinn lexicon
+us_setyear_c <- VCorpus(DataframeSource(us_setyear))
+us_setyear_t <- tidy(us_setyear_c)
+us_setyear_wf <- us_setyear_t %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+us_setyear_af <- inner_join(us_setyear_wf, get_sentiments("afinn"), by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n))
+us_setyear_af$date <- stringr::str_extract(us_setyear_af$id, "[0-9]{4}$")
+us_setyear_af$setting <- stringr::str_remove(us_setyear_af$id, "_[0-9]{4}$")
+us_setyear_af$char <- us_setyear$char
+us_setyear_af$n_value <- us_setyear_af$value/us_setyear_af$char
+us_setyear_af$date2 <- stringr::str_extract(us_setyear_af$date, "[0-9]{2}$")
+# Plot Us to check US
+ggplot(us_setyear_af, aes(x = reorder(date2, as.numeric(date)), y = n_value , fill = setting)) +
+  geom_line(aes(group = setting)) +
+  geom_point(size = 8, shape = 21) +
+  labs(x = "",
+       y = "",
+       title = "Sentiment Across Settings and Time Compared in the US",
+       subtitle = "Normalized by number of characters for text in dataset",
+       caption = "Afinn sentiment lexicon") +
+  theme_fivethirtyeight()
+# Why the peak in 2019 in US? Interesting...
+# BR
+# Speeches
+BR_oral$year <- paste0("BR_Speeches_", BR_oral$date)
+boral <- aggregate(BR_oral$text, list(BR_oral$year), paste, collapse = " ")
+boral <- rename(boral, doc_id = "Group.1", text = "x")
+# Campaign
+BR_Campaign$year <- paste0("BR_Campaign_", BR_Campaign$Date)
+bcamp <- aggregate(BR_Campaign$Text, list(BR_Campaign$year), paste, collapse = " ")
+bcamp <- rename(bcamp, doc_id = "Group.1", text = "x")
+# Debates
+BR_debates$year <- paste0("BR_Debates_", stringr::str_extract(BR_debates$Date, "^[0-9]{4}"))
+bdeb <- aggregate(BR_debates$Text, list(BR_debates$year), paste, collapse = " ")
+bdeb <- rename(bdeb, doc_id = "Group.1", text = "x")
+# Interviews
+BR_Interviews$year <- paste0("BR_Interviews_", BR_Interviews$Date)
+bint <- aggregate(BR_Interviews$Text, list(BR_Interviews$year), paste, collapse = " ")
+bint <- rename(bint, doc_id = "Group.1", text = "x")
+br_setyear <- rbind(boral, bcamp, bdeb, bint)
+br_setyear$char <- nchar(br_setyear$text)
+# Get sentimen Afinn lexicon
+br_setyear_c <- VCorpus(DataframeSource(br_setyear))
+br_setyear_t <- tidy(br_setyear_c)
+br_setyear_wf <- br_setyear_t %>%
+  unnest_tokens(word, text) %>%
+  count(id, word, sort = TRUE)
+br_setyear_af <- inner_join(br_setyear_wf, Afinn_pt, by = "word") %>%
+  group_by(id) %>%
+  summarize(value = sum(n))
+br_setyear_af$date <- stringr::str_extract(br_setyear_af$id, "[0-9]{4}$")
+br_setyear_af$setting <- stringr::str_remove(br_setyear_af$id, "_[0-9]{4}$")
+br_setyear_af$char <- br_setyear$char
+br_setyear_af$n_value <- br_setyear_af$value/br_setyear_af$char
+br_setyear_af$date2 <- stringr::str_extract(br_setyear_af$date, "[0-9]{2}$")
+# Plot to check BR
+ggplot(br_setyear_af, aes(x = reorder(date2, as.numeric(date)), y = n_value , fill = setting)) +
+  geom_line(aes(group = setting)) +
+  geom_point(size = 8, shape = 21) +
+  labs(x = "",
+       y = "",
+       title = "Sentiment Across Settings and Time Compared in the US",
+       subtitle = "Normalized by number of characters for text in dataset",
+       caption = "Afinn sentiment lexicon") +
+  theme_fivethirtyeight()
+# Bind dataframes and plot
+sent_af_all <- rbind(us_setyear_af, br_setyear_af)
+ggplot(sent_af_all, aes(x = reorder(date2, as.numeric(date)), y = n_value , fill = setting)) +
+  geom_line(aes(group = setting)) +
+  geom_point(size = 8, shape = 21) +
+  labs(x = "",
+       y = "",
+       title = "Sentiment Across Settings and Time Compared for Brazil and the US",
+       subtitle = "Normalized by number of characters for text in dataset",
+       caption = "Afinn sentiment lexicon") +
+  theme_fivethirtyeight()
+# Not a lot of variation but for official speeches in 2019? Trump?
+
 # Let's compare settings for a few speakers
 # Shall we compare Trump and Obama with Bolsonaro and Lula across settings?
-
 # For obama and Trump, this was partially done in the text_exploration_US script (lines 800-974).
 # Please refer to that and run those lines to get the tibles below.
 campaign_sentiment_nrc

@@ -182,7 +182,8 @@ aut_perf_time <- US %>%
   select(-c(length, truth, lies, fpoint,anti_PC))
 aut_perf_time_long <- aut_perf_time %>%
   tidyr::pivot_longer(consistency:anti_pc, "Performance")
-ggplot(aut_perf_time_long, aes(x = date, y = value , fill = Performance)) +
+aut_perf_time_long$date2 <- stringr::str_extract(aut_perf_time_long$date, "[0-9]{2}$")
+ggplot(aut_perf_time_long, aes(x = reorder(date2, as.numeric(date)), y = value , fill = Performance)) +
   geom_line(aes(group = Performance)) +
   geom_point(size = 3, shape = 21) +
   labs(x = "",
@@ -208,7 +209,8 @@ aut_perf_set_long <- aut_perf_setting %>%
   tidyr::pivot_longer(consistency:anti_pc) %>%
   group_by(setting, date) %>%
   summarise(value = sum(value))
-ggplot(aut_perf_set_long, aes(x = date, y = value , fill = setting)) +
+aut_perf_set_long$date2 <- stringr::str_extract(aut_perf_set_long$date, "[0-9]{2}$")
+ggplot(aut_perf_set_long, aes(x = reorder(date2, as.numeric(date)), y = value , fill = setting)) +
   geom_line(aes(group = setting)) +
   geom_point(size = 3, shape = 21) +
   labs(x = "",
