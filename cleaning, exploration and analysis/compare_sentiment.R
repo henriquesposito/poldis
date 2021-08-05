@@ -30,8 +30,9 @@ boral_sent_af <- inner_join(boral_sent_wf, Afinn_pt, by = "word") %>%
   group_by(id) %>%
   summarize(value = sum(n))
 boral_sent_af$obs <- unname(summary(as.factor(boral$Speaker)))
+boral_sent_af$char <- nchar(boral_sent$text)
 boral_sent_af <- boral_sent_af %>% filter(obs > 20) # removes years with too littles obs (president leaving office)
-boral_sent_af$n_value <- boral_sent_af$value/boral_sent_af$obs  # normalized by obs in dataset
+boral_sent_af$n_value <- boral_sent_af$value/boral_sent_af$char  # normalized by characters in text obs
 boral_sent_af$date <- paste0(stringr::str_extract(boral_sent_af$id, "[0-9]{4}"))
 boral_sent_af$id <- stringr::str_replace_all(boral_sent_af$id, "_[0-9]{4}", "")
 # US
@@ -52,8 +53,9 @@ uoral_sent_af <- inner_join(uoral_sent_wf, get_sentiments("afinn"), by = "word")
   group_by(id) %>%
   summarize(value = sum(n))
 uoral_sent_af$obs <- unname(summary(as.factor(uoral$speaker)))
+uoral_sent_af$char <- nchar(uoral_sent$text)
 uoral_sent_af <- uoral_sent_af %>% filter(obs > 20) # removes years with too littles obs (president leaving office)
-uoral_sent_af$n_value <- uoral_sent_af$value/uoral_sent_af$obs  # normalized by obs in dataset
+uoral_sent_af$n_value <- uoral_sent_af$value/uoral_sent_af$char  # normalized by number of character for obs
 uoral_sent_af$date <- paste0(stringr::str_extract(uoral_sent_af$id, "[0-9]{4}"))
 uoral_sent_af$id <- stringr::str_replace_all(uoral_sent_af$id, "_[0-9]{4}", "")
 # Bind and plot
@@ -67,7 +69,7 @@ ggplot(sent_speech_af, aes(x = reorder(date_2, as.numeric(date)), y = n_value , 
   labs(x = "",
        y = "",
        title = "Sentiment in Official Speeches Compared for Brazil and the US",
-       subtitle = "Normalized by observations for speaker in dataset",
+       subtitle = "Normalized by number characters for text per speaker and year",
        caption = "Afinn sentiment lexicon") +
   theme_fivethirtyeight()
 
@@ -190,13 +192,18 @@ BR_all_nrc <- cbind(BR_all_nrc, BR_char)
 BR_all_nrc$n_value <- BR_all_nrc$value/BR_all_nrc$char
 # Bind all
 nrc_all <- rbind(us_all_nrc, BR_all_nrc)
+# Let's remove positive and negative codes since these are not too informative
+nrc_all <- nrc_all[nrc_all$sentiment!="negative",]
+nrc_all <- nrc_all[nrc_all$sentiment!="positive",]
+# Fixing minor speeling mistake
+nrc_all$Sentiment <- nrc_all$sentiment
 # Plot
-ggplot(nrc_all, aes(x = id, y = n_value, fill = sentiment)) +
+ggplot(nrc_all, aes(x = id, y = n_value, fill = Sentiment)) +
   geom_bar(position="stack", stat="identity") +
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=1)) +
   labs(x = "",
        y = "",
-       title = "Sentiment Scross Settings Compared for Brazil and the US",
+       title = "Sentiment Across Settings Compared for Brazil and the US",
        subtitle = "Normalized by number of characters for text in dataset",
        caption = "NRC sentiment lexicon") +
   theme_fivethirtyeight()
