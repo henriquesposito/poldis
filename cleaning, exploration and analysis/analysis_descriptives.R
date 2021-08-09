@@ -14,7 +14,8 @@ library(ggplot2)
 library(ggthemes)
 library(tm)
 library(tidytext)
-library(plm)
+library(corrplot)
+library(Hmisc)
 
 # Bind all data by speaker and year to create one big dataset for each case
 
@@ -247,6 +248,14 @@ ggplot(aut_perf_set_long, aes(x = reorder(date2, as.numeric(date)), y = value , 
        title = "Authenticity Performances by Setting in the US in Time",
        subtitle = "Normalized by number of characters per year and setting in dataset") +
   theme_fivethirtyeight()
+US_setting_time <- ggplot(aut_perf_set_long, aes(x = reorder(date2, as.numeric(date)), y = value, fill = Setting)) +
+  geom_line(aes(group = Setting, color = Setting), size = 1.2) +
+  labs(x = "",
+       y = "",
+       title = "Authenticity Performances by Setting in the US in Time",
+       subtitle = "Normalized by number of characters per year and setting in dataset") +
+  theme_fivethirtyeight()
+US_setting_time
 # Not at all as expected... but interesting!!!
 
 # Brazil
@@ -372,6 +381,14 @@ ggplot(aut_perf_set_long_BR, aes(x = reorder(date2, as.numeric(date)), y = value
        title = "Authenticity Performances by Setting in the Brazil in Time",
        subtitle = "Normalized by number of characters per year and setting in dataset") +
   theme_fivethirtyeight()
+BR_setting_time <- ggplot(aut_perf_set_long_BR, aes(x = reorder(date2, as.numeric(date)), y = value, fill = Setting)) +
+  geom_line(aes(group = Setting, color = Setting), size = 1.2) +
+  labs(x = "",
+       y = "",
+       title = "Authenticity Performances by Setting in Brazil in Time",
+       subtitle = "Normalized by number of characters per year and setting in dataset") +
+  theme_fivethirtyeight()
+BR_setting_time
 
 # Let's compare Brazil and the US for authenticity performances across settings
 aut_perf_set_long$Setting <- paste0(aut_perf_set_long$setting, "_US")
@@ -398,6 +415,7 @@ ggplot(all_setting_ap, aes(x = reorder(date2, as.numeric(date)), y = value, fill
 gridExtra::grid.arrange(US_aut_perf, BR_aut_perf)
 # ggpubr::ggarrange(US_aut_perf, BR_aut_perf, nrow = 2, common.legend = TRUE, legend="bottom")
 # Interesting!!!
+gridExtra::grid.arrange(US_setting_time, BR_setting_time)
 
 # How about we create a stacked bar plot for both cases in time.
 US_time <- US %>%
@@ -470,6 +488,7 @@ BR_ttt <- ggplot(BR_time_l, aes(reorder(date2, -c(as.numeric(date))), value2, fi
   coord_flip()
 BR_ttt
 
+# See both plots at the same time
 ggpubr::ggarrange(US_ttt, BR_ttt, ncol=2, common.legend = TRUE, legend="bottom")
 
 # How about we compare authenticity and sentiment visualy?
@@ -558,11 +577,28 @@ ggplot(sent_all, aes(x = reorder(date2, as.numeric(date)), y = value, fill = cas
        caption = "Afinn sentiment lexicon") +
   theme_fivethirtyeight()
 
+# What if we plot simply authnticity in time as a line plot?
+# Nothing else, just this, a simple line plot for once
+US_time_s <- US_time_ap
+US_time_s$case <- "US"
+BR_time_s <- BR_time_ap
+BR_time_s$case <- "BR"
+all_simple <- rbind(US_time_s, BR_time_s)
+all_simple$date2 <- stringr::str_extract(all_simple$date, "[0-9]{2}$")
+# Plot
+ggplot(all_simple, aes(x = reorder(date2, as.numeric(date)), y = value, fill = case)) +
+  geom_line(aes(group = case, color = case), size = 1.2) +
+  labs(x = "",
+       y = "",
+       title = "Authenticity Performances in Brazil and the US in Time",
+       subtitle = "Normalized by number of characters per year in dataset") +
+  theme_fivethirtyeight()
+
 # Lastly, let's see who performs authenticity more, when and how...
 # One performce at a time
 # There is a little bug with data, fix when you have time!
-BR_bug <- BR %>% select(-text) %>% filter(setting != "debates")
-bb <- BR  %>% select(-text) %>% filter(setting == "debates") %>%
+BR_bug <- BR_ap %>% select(-text) %>% filter(setting != "debates")
+bb <- BR_ap  %>% select(-text) %>% filter(setting == "debates") %>%
   select(-c(date, setting, settingc))
 bb$doc_id <- stringr::str_remove(bb$doc_id, "-[0-9]{2}-[0-9]{2}")
 bb <- bb %>%
@@ -574,8 +610,8 @@ bb$date <- str_extract(bb$doc_id, "[0-9]{4}")
 BR_pp <- rbind(BR_bug, bb)
 
 # Remove text
-# BR_pp <- select(BR, -text)
-US_pp <- select(US, -text)
+# BR_pp <- select(BR_ap, -text)
+US_pp <- select(US_ap, -text)
 
 # Merge datasets
 ap_all <- rbind(BR_pp, US_pp)
@@ -598,6 +634,59 @@ ap_all_n$speaker <- gsub("George W. Bush", "W_Bush", ap_all_n$speaker)
 ap_all_n$speaker <- stringr::word(ap_all_n$speaker, -1) # standardises some speaker names
 
 # Let's get the top 8 performers for each Authenticity Performance
+
+# before we begin, let's try and see a few frequencies for certain speakers
+trump <- ap_all_n %>%
+  filter(speaker == "Trump", date == 2016) %>%
+  select(-c(setting, speaker, settingc)) %>%
+  group_by(date) %>%
+  summarise(across(everything(), sum)) %>%
+  mutate(speaker = "Trump_2016",
+         ap_total = consistency + origins + common_sense + # create a total frequency variable
+           territory + truth_telling + lie_accusations +
+           finger_pointing + anti_pc) %>%
+  select(-date) %>%
+  relocate(speaker, truth_telling, lie_accusations, consistency, finger_pointing)
+clinton <- ap_all_n %>%
+  filter(speaker == "H_Clinton", date == 2016) %>%
+  select(-c(setting, speaker, settingc)) %>%
+  group_by(date) %>%
+  summarise(across(everything(), sum)) %>%
+  mutate(speaker = "H_Clinton_2016",
+         ap_total = consistency + origins + common_sense + # create a total frequency variable
+           territory + truth_telling + lie_accusations +
+           finger_pointing + anti_pc) %>%
+  select(-date) %>%
+  relocate(speaker, truth_telling, lie_accusations, consistency, finger_pointing)
+clinton_trump_2016 <- rbind(trump, clinton)
+# Super interesting!
+# Is there a relationship between authenticity performances and being elected?
+bolsonaro <- ap_all_n %>%
+  filter(speaker == "Bolsonaro", date == 2018) %>%
+  select(-c(setting, speaker, settingc)) %>%
+  group_by(date) %>%
+  summarise(across(everything(), sum)) %>%
+  mutate(speaker = "Bolsonaro_2018",
+         ap_total = consistency + origins + common_sense + # create a total frequency variable
+           territory + truth_telling + lie_accusations +
+           finger_pointing + anti_pc) %>%
+  select(-date) %>%
+  relocate(speaker, truth_telling, lie_accusations, consistency, finger_pointing)
+haddad <- ap_all_n %>%
+  filter(speaker == "Haddad", date == 2018) %>%
+  select(-c(setting, speaker, settingc)) %>%
+  group_by(date) %>%
+  summarise(across(everything(), sum)) %>%
+  mutate(speaker = "Haddad_2018",
+         ap_total = consistency + origins + common_sense + # create a total frequency variable
+           territory + truth_telling + lie_accusations +
+           finger_pointing + anti_pc) %>%
+  select(-date) %>%
+  relocate(speaker, truth_telling, lie_accusations, consistency, finger_pointing)
+bolsonaro_haddad_18 <- rbind(bolsonaro, haddad)
+# cool!
+
+# Let's get the top 8 authenticity performances for each performance for both cases
 truth_8 <- ap_all_n %>%
   arrange(-truth_telling) %>%
   slice_head(n = 8) %>%
@@ -746,3 +835,61 @@ US_sp <- ggplot(ap_all_US, aes(x = reorder(date2, as.numeric(date)),
 US_sp
 # Plot side by side
 gridExtra::grid.arrange(US_sp, bb_sp)
+
+# Let's see how authenticity performances correlate amonsgt themselves
+# BR
+BR_corr <- BR_pp %>%
+  mutate(truth_telling = (truth/length)*100000,
+         lie_accusations = (lies/length)*100000,
+         consistency = (consistency/length)*100000,
+         finger_pointing = (fpoint/length)*100000,
+         origins = (origins/length)*100000,
+         common_sense = (common_sense/length)*100000,
+         anti_pc = (anti_PC/length)*100000,
+         territory = (territory/length)*100000) %>%
+  select(-c(doc_id, setting, length, settingc, date, truth, lies, fpoint, anti_PC))
+ap_cor_BR <- cor(BR_corr, method = "pearson", use = "everything")  # correlation tables for RP data
+corrplot::corrplot(ap_cor_BR, type = "upper", order = "hclust",
+         tl.col = "black", tl.srt = 45)
+# Super interesting!
+# Let's get a table as well
+ap_cor_BR2 <- rcorr(as.matrix(BR_corr))
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+  )
+}
+corr_table_BR <- flattenCorrMatrix(ap_cor_BR2$r, ap_cor_BR2$P)
+knitr::kable(corr_table_BR, caption = " Correlation Table", format.args = list(scientific = FALSE), digits=4)
+# US
+US_corr <- US_pp %>%
+  mutate(truth_telling = (truth/length)*100000,
+         lie_accusations = (lies/length)*100000,
+         consistency = (consistency/length)*100000,
+         finger_pointing = (fpoint/length)*100000,
+         origins = (origins/length)*100000,
+         common_sense = (common_sense/length)*100000,
+         anti_pc = (anti_PC/length)*100000,
+         territory = (territory/length)*100000) %>%
+  select(-c(doc_id, setting, length, settingc, date, truth, lies, fpoint, anti_PC))
+ap_cor_US <- cor(US_corr, method = "pearson", use = "everything")  # correlation tables for RP data
+corrplot::corrplot(ap_cor_US, type = "upper", order = "hclust",
+                   tl.col = "black", tl.srt = 45)
+# okay...
+# Let's get a table as well
+ap_cor_US2 <- rcorr(as.matrix(US_corr))
+corr_table_US <- flattenCorrMatrix(ap_cor_US2$r, ap_cor_US2$P)
+knitr::kable(corr_table_US, caption = " Correlation Table", format.args = list(scientific = FALSE), digits=4)
+# Let's try to add the plots together
+par(mfrow=c(1,2))
+corrplot::corrplot(ap_cor_BR, type = "upper",
+                   tl.col = "black", tl.srt = 60)
+title("Brazil Authenticity Correlations")
+corrplot::corrplot(ap_cor_US, type = "upper",
+                   tl.col = "black", tl.srt = 60)
+title("US Authenticity correlations")
+par(mfrow=c(1,1))
