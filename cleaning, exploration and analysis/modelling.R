@@ -205,7 +205,85 @@ stargazer::stargazer(truth_US, lie_US, con_US, fp_US, og_US, cs_US, anti_pc_US, 
                      title = "Pooled OLS for Different Authenticity Performances in the US",
                      out = "ap_US.htm", align=TRUE)
 
-# Let's see for the aggregation
+# For the sake of it, what if we say time effects might be indivudual?
+fe_truth_BR <- plm(truth_telling ~ speaker + setting, data = BR_model_final, model = "within", index = "date")
+fe_truth_US <- plm(truth_telling ~ speaker + setting, data = US_model_final, model = "within", index = "date")
+# Lie accusations
+fe_lie_BR <- plm(lie_accusations ~ speaker + setting, data = BR_model_final, model = "within", index = c("date"))
+fe_lie_US <- plm(lie_accusations ~ speaker + setting, data = US_model_final, model = "within", index = c("date"))
+# Consistency
+fe_con_BR <- plm(consistency ~ speaker + setting, data = BR_model_final, model = "within", index = c("date"))
+fe_con_US <- plm(consistency ~ speaker + setting, data = US_model_final, model = "within", index = c("date"))
+# Finger-pointing
+fe_fp_BR <- plm(finger_pointing ~ speaker + setting, data = BR_model_final, model = "within", index = c("date"))
+fe_fp_US <- plm(finger_pointing ~ speaker + setting, data = US_model_final, model = "within", index = c("date"))
+# Origins
+fe_og_BR <- plm(origins ~ speaker + setting, data = BR_model_final, model = "within", index = c("date"))
+fe_og_US <- plm(origins ~ speaker + setting, data = US_model_final, model = "within", index = c("date"))
+# Common Sense
+fe_cs_BR <- plm(common_sense ~ speaker + setting, data = BR_model_final, model = "within", index = c("date"))
+fe_cs_US <- plm(common_sense ~ speaker + setting, data = US_model_final, model = "within", index = c("date"))
+# Anti_PC
+fe_anti_pc_BR <- plm(anti_pc ~ speaker + setting, data = BR_model_final, model = "within", index = c("date"))
+fe_anti_pc_US <- plm(anti_pc ~ speaker + setting, data = US_model_final, model = "within", index = c("date"))
+# territory
+fe_tt_BR <- plm(territory ~ speaker + setting, data = BR_model_final, model = "within", index = c("date"))
+fe_tt_US <- plm(territory ~ speaker + setting, data = US_model_final, model = "within", index = c("date"))
+# Total
+fe_pol_ap_BR <- plm(ap_total ~ speaker + setting, data = BR_model_final, model = "within", index = c("date"))
+fe_pol_ap_US <- plm(ap_total ~ speaker + setting , data = US_model_final, model = "within", index = c("date"))
+# table all
+stargazer::stargazer(fe_truth_BR, fe_lie_BR, fe_con_BR, fe_fp_BR, fe_og_BR, fe_cs_BR, fe_anti_pc_BR,
+                     fe_tt_BR, fe_pol_ap_BR, type = "text",
+                     title = "Fixed Effects for Different Authenticity Performances in Brazil", align=TRUE)
+stargazer::stargazer(fe_truth_US, fe_lie_US, fe_con_US, fe_fp_US, fe_og_US, fe_cs_US,
+                     fe_anti_pc_US, fe_tt_US, fe_pol_ap_US, type = "text",
+                     title = "Fixed Effects for Different Authenticity Performances in the US", align=TRUE)
+# Okay, thera appears to be be more statistically significant correlations, but the issue with data structure remains.
+# Also, for the US model fitting for R squared statistics are for the most part worse than pooled OLS.
+# For Brazil, most of the models appears to fit much better. It could be related to the fact that Brazil has more political
+# continuities for speakers than the US.
+# Since data is pooled and cross sectional, all of these time effects might be
+# correlated to speakers because speakers change not due to change in performances...
+
+# For the sake of it, as well, let's model using random effects.
+re_truth_BR <- plm(truth_telling ~ speaker + setting, data = BR_model_final, model = "random", index = "date")
+re_truth_US <- plm(truth_telling ~ speaker + setting, data = US_model_final, model = "random", index = "date")
+# Lie accusations
+re_lie_BR <- plm(lie_accusations ~ speaker + setting, data = BR_model_final, model = "random", index = c("date"))
+re_lie_US <- plm(lie_accusations ~ speaker + setting, data = US_model_final, model = "random", index = c("date"))
+# Consistency
+re_con_BR <- plm(consistency ~ speaker + setting, data = BR_model_final, model = "random", index = c("date"))
+re_con_US <- plm(consistency ~ speaker + setting, data = US_model_final, model = "random", index = c("date"))
+# Finger-pointing
+re_fp_BR <- plm(finger_pointing ~ speaker + setting, data = BR_model_final, model = "random", index = c("date"))
+re_fp_US <- plm(finger_pointing ~ speaker + setting, data = US_model_final, model = "random", index = c("date"))
+# Origins
+re_og_BR <- plm(origins ~ speaker + setting, data = BR_model_final, model = "random", index = c("date"))
+re_og_US <- plm(origins ~ speaker + setting, data = US_model_final, model = "random", index = c("date"))
+# Common Sense
+re_cs_BR <- plm(common_sense ~ speaker + setting, data = BR_model_final, model = "random", index = c("date"))
+re_cs_US <- plm(common_sense ~ speaker + setting, data = US_model_final, model = "random", index = c("date"))
+# Anti_PC
+re_anti_pc_BR <- plm(anti_pc ~ speaker + setting, data = BR_model_final, model = "random", index = c("date"))
+re_anti_pc_US <- plm(anti_pc ~ speaker + setting, data = US_model_final, model = "random", index = c("date"))
+# territory
+re_tt_BR <- plm(territory ~ speaker + setting, data = BR_model_final, model = "random", index = c("date"))
+re_tt_US <- plm(territory ~ speaker + setting, data = US_model_final, model = "random", index = c("date"))
+# Total
+re_pol_ap_BR <- plm(ap_total ~ speaker + setting, data = BR_model_final, model = "random", index = c("date"))
+re_pol_ap_US <- plm(ap_total ~ speaker + setting , data = US_model_final, model = "random", index = c("date"))
+# table all
+stargazer::stargazer(re_truth_BR, re_lie_BR, re_con_BR, re_fp_BR, re_og_BR, re_cs_BR, re_anti_pc_BR,
+                     re_tt_BR, re_pol_ap_BR, type = "text",
+                     title = "Random Effects for Different Authenticity Performances in Brazil", align=TRUE)
+stargazer::stargazer(re_truth_US, re_lie_US, re_con_US, re_fp_US, re_og_US, re_cs_US,
+                     re_anti_pc_US, re_tt_US, re_pol_ap_US, type = "text",
+                     title = "Random Effects for Different Authenticity Performances in the US", align=TRUE)
+# Virtually identical to pooled OLS, better go with the simpler modelling techinique.
+
+
+# Let's see for the aggregation, just for the sake of it...
 fe_ap_BR <- plm(ap_total ~ speaker + setting , data = BR_model_final, model = "within", index = c("date"))
 fe_ap_US <- plm(ap_total ~ speaker + setting, data = US_model_final, model = "within", index = c("date"))
 re_ap_BR <- plm(ap_total ~ speaker + setting, data = BR_model_final, model = "random", index = c("date"))
@@ -230,3 +308,16 @@ stargazer::stargazer(pol_ap_US, fe_ap_US, re_ap_US, pol_ap_USc, fe_ap_USc, re_ap
                      column.labels = c("Pooled OLS", "Fixed-Effects", "Random-Effects", "Pooled OLS", "Fixed-Effects", "Random-Effects"),
                      title = "Total Authenticity Performances in the US in Time",
                      out = "ap_US_total_c.htm", align=TRUE)
+
+# Post estimation tests
+plmtest(pol_ap_BR)
+plmtest(pol_ap_US)
+# The Lagrange Multiplier Test (plmtest) which indicates that there are no significant individual
+# or time effects present on both pooled OLS models (does not allow to rejectthe null hypotesis of no effects).
+pbsytest(pol_ap_BR)
+pbsytest(pol_ap_US)
+# The Bera, Sosa-Escudero and Yoon locally robust test (pbsytest) performed on the pooled OLS regressions shows different
+# results for each case, For Brazil allows us to barely reject the null hypothesis (p < 0.05) and indicates that
+# there is a possibility that errors are either serially correlated or randomly correlated;
+# this means that the pooled OLS models could not be appropriate to analyze the data (FE for Brazil?)
+# For the US, it indicates hat errors are neither serially correlated or randomly correlated;
