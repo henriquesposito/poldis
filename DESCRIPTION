@@ -1,6 +1,6 @@
 Package: poldis
 Type: Package
-Title: Data and Analysis for Political Discourses
+Title: Tools for analysing political discourse
 Version: 0.0.1
 Author: person(given = "Henrique",
            family = "Sposito", 
