@@ -17,6 +17,7 @@ context <- function(string,
                     context_side = c("both", "left", "right"),
                     ignore.case = TRUE) {
 
+
   if (is.null(var)) {
     stop("Please declare the level of the text variable")
   }
@@ -25,8 +26,7 @@ context <- function(string,
   }
   if (context_level == "sentences" & is.null(context_size) $ ignore.case == TRUE) {
     # One sentence before and one after string match
-    s <- gsub(paste0(".*?(([^.]+\\.){1}[^.]+(", string, ").*?\\.(.*?\\.){1}).*"),
-                     "\\1", var, ignore.case = TRUE)
+    s <- stringr::str_extract_all(var, paste0(".*?(([^.]+\\.){0,1}[^.]+", string, "*?\\.(.*?\\.){0,1}).*"))
   }
 
 }
