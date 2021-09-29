@@ -4,7 +4,7 @@
 \alias{extract_date}
 \title{Extract dates from text}
 \usage{
-extract_date(v, language = NULL)
+extract_date(v, language = "en")
 }
 \arguments{
 \item{v}{Text variable/object}
@@ -16,5 +16,6 @@ For portuguese, specify "pt".}
 A list of dates
 }
 \description{
-Extract dates from text
+Sometimes dates can be contained in text,
+this function extracts those dates from text.
 }

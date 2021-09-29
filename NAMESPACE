@@ -2,6 +2,7 @@
 
 export(context)
 export(extract_date)
+export(extract_title)
 export(split_text)
 export(str_translate)
 import(dplyr)
