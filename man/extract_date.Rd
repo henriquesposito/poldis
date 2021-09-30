@@ -4,13 +4,10 @@
 \alias{extract_date}
 \title{Extract dates from text}
 \usage{
-extract_date(v, language = "en")
+extract_date(v)
 }
 \arguments{
 \item{v}{Text variable/object}
-
-\item{language}{English ("en") is default.
-For portuguese, specify "pt".}
 }
 \value{
 A list of dates
