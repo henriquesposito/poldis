@@ -8,7 +8,6 @@
 #' @param context_side
 #' @param ignore.case
 #' @return A list of string matches an their context
-#' @example
 #' @export
 context <- function(string,
                     var = NULL,

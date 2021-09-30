@@ -18,3 +18,7 @@ For political texts, dates and locations are often contained in the
 first sentence.
 This function extracts the first sentence of text.
 }
+\examples{
+text <- "This is the first sentence. This is the second sentence."
+extract_title(text)
+}

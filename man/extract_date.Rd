@@ -9,7 +9,7 @@ extract_date(v, language = "en")
 \arguments{
 \item{v}{Text variable/object}
 
-\item{language}{English is default.
+\item{language}{English ("en") is default.
 For portuguese, specify "pt".}
 }
 \value{
@@ -18,4 +18,9 @@ A list of dates
 \description{
 Sometimes dates can be contained in text,
 this function extracts those dates from text.
+}
+\examples{
+text <- c("This function was created on the 29 September 2021",
+"Today is October 12, 2021")
+extract_date(text)
 }
