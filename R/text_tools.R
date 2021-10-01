@@ -33,6 +33,7 @@ extract_date <- function(v) {
   }
   # standardize separators
   out <- stringr::str_replace_all(out, " |/", "-")
+  out <- stringr::str_replace_all("[a-z]|[A-Z]", "?", out)
   out <- as.character(ifelse(out == "", NA, out))
   out
 }
