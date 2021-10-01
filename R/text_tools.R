@@ -18,7 +18,7 @@ extract_date <- function(v) {
   # remove ordinal signs and date related articles
   out <- stringr::str_remove_all(out, "de |of |st |nd |rd |th ")
   # correct double white space left
-  out <- gsub("  ", " ", out)
+  out <- stringr::str_squish(out)
   # get the first date per row
   out <- stringr::str_extract(out, "[:digit:]{2}\\s[:alpha:]{3}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{4}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{5}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{6}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{7}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{8}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{9}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{3}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{4}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{5}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{6}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{7}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{8}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{9}\\s[:digit:]{4}|[:alpha:]{3}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{4}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{5}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{6}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{7}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{8}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{9}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{3}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{4}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{5}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{6}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{7}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{8}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{9}\\s[:digit:]{1}\\s[:digit:]{4}|[:digit:]{2}-[:digit:]{2}-[:digit:]{4}|[:digit:]{1}-[:digit:]{2}-[:digit:]{4}|[:digit:]{2}-[:digit:]{2}-[:digit:]{2}|[:digit:]{1}-[:digit:]{2}-[:digit:]{2}|[:digit:]{2}-[:digit:]{1}-[:digit:]{4}|[:digit:]{1}-[:digit:]{1}-[:digit:]{4}|[:digit:]{2}-[:digit:]{1}-[:digit:]{2}|[:digit:]{1}-[:digit:]{1}-[:digit:]{2}|[:digit:]{4}-[:digit:]{2}-[:digit:]{2}|[:digit:]{4}-[:digit:]{2}-[:digit:]{1}|[:digit:]{4}-[:digit:]{1}-[:digit:]{2}|[:digit:]{4}-[:digit:]{1}-[:digit:]{1}|[:digit:]{2}/[:digit:]{2}/[:digit:]{4}|[:digit:]{1}/[:digit:]{2}/[:digit:]{4}|[:digit:]{2}/[:digit:]{2}/[:digit:]{2}|[:digit:]{1}/[:digit:]{2}/[:digit:]{2}|[:digit:]{2}/[:digit:]{1}/[:digit:]{4}|[:digit:]{1}/[:digit:]{1}/[:digit:]{4}|[:digit:]{2}/[:digit:]{1}/[:digit:]{2}|[:digit:]{1}/[:digit:]{1}/[:digit:]{2}|[:digit:]{4}/[:digit:]{2}/[:digit:]{2}|[:digit:]{4}/[:digit:]{2}/[:digit:]{1}|[:digit:]{4}/[:digit:]{1}/[:digit:]{2}|[:digit:]{4}/[:digit:]{1}/[:digit:]{1}|[:digit:]{3}\\s[:alpha:]{4}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{4}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{6}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{7}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{8}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{9}\\s[:digit:]{2}|[:digit:]{3}\\s[:alpha:]{4}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{4}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{6}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{7}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{8}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{9}\\s[:digit:]{1}")
   # re-order dates if necessary
@@ -45,7 +45,7 @@ extract_date <- function(v) {
 #' @import stringr
 #' @return A list of dates of the same lenghte but re-ordered, if necessary.
 re_order <- function(l) {
-  l <- stringr::str_trim(l, "both")
+  l <- stringr::str_squish(l)
   st <- stringr::word(l, 1)
   mi <- stringr::word(l, 2)
   ed <- stringr::word(l, 3)
