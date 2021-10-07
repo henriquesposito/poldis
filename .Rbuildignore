@@ -2,5 +2,6 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^README\.Rmd$
-^data-raw$
-^plots-tables$
+^.github$
+^.gitignore$
+^inst$
