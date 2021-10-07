@@ -12,7 +12,7 @@ str_translate(s, target_lang, API)
 \item{target_lang}{Which language would you like this translated to?
 Please provide a two letter language abbreviation (e.g. "en" or "pt")}
 
-\item{key}{Google API key.
+\item{API}{Google API key.
 For more information please go to: https://cloud.google.com/translate/docs/setup}
 }
 \value{

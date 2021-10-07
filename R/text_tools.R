@@ -72,3 +72,28 @@ extract_title <- function(v) {
   out <- gsub("([a-z0-9][?!.])\\s.*", "\\1", v)
   out
 }
+
+#' Extract location from strings
+#'
+#' Extracts location from strings.
+#' For now, only works for Brasilian states and other
+#' countries/Unions.
+#' @param v Text variable/object
+#' @importFrom stringi stri_trans_general
+#' @importFrom stringr word
+#' @return A list of the first locations
+#' @examples
+#' text <- c("This is the US", "This is Sao Paulo")
+#' extract_title(text)
+#' @export
+extract_location <- function(v) {
+  v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
+  for (k in seq_len(nrow(location))) {
+    name <- gsub(paste0(location$regex[[k]]),
+                 paste0(location$location[[k]]),
+                 v, ignore.case = TRUE,
+                 perl = T)
+  }
+  v <- stringr::word(v, 1)
+  v
+}
