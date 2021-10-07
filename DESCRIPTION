@@ -1,15 +1,15 @@
 Package: poldis
 Type: Package
-Title: Tools for analysing political discourse
+Title: Tools for analyzing political discourse
 Version: 0.0.1
 Author: person(given = "Henrique",
            family = "Sposito", 
            role = c("cre", "aut", "ctb"),
            email = "henrique.sposito@graduateinstitute.ch",
            ORDCID = "0000-0003-3420-6085")
-Description: Larger, cleaner and more organized text data
-    on political discourses in Brazil and the US across time.
-License: CC BY 4.0
+Maintainer: Henrique Sposito <henrique.sposito@graduateinstitute.ch>
+Description: Tools for analyzing political discourse beyond official speeches.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
@@ -22,7 +22,8 @@ Imports:
     stringr, 
     translateR,
     cld2,
-    purrr
+    purrr,
+    stringi
 RoxygenNote: 7.1.1
 Depends: 
     R (>= 2.10)
