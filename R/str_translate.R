@@ -7,9 +7,9 @@
 #' @param s A character string
 #' @param target_lang Which language would you like this translated to?
 #' Please provide a two letter language abbreviation (e.g. "en" or "pt")
-#' @param key Google API key.
+#' @param API Google API key.
 #' For more information please go to: https://cloud.google.com/translate/docs/setup
-#' @importFrom  cld2 detect_language
+#' @importFrom cld2 detect_language
 #' @importFrom translateR translate
 #' @importFrom purrr map_chr
 #' @return A character vector of the same length of original.
