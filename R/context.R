@@ -1,19 +1,25 @@
 #' Context to string matches
 #'
 #' A function for getting string matches and the context in which they occur.
-#' @param string
-#' @param var
-#' @param context_level
-#' @param context_size
-#' @param context_side
-#' @param ignore.case
+#' @param string Character string to be matched.
+#' For multiple strings, please use "|" as a separator.
+#' @param var Text variable
+#' @param context_level At which text level do you want matches to be returned?
+#' Options are sentences, words, and paragraph.
+#' @param context_size How many sentences or words do you want to be returned for matches?
+#' Note that size only works for sentences or words and not paragraphs.
+#' Sizes range from 1 to 3.
+#' @param context_side Which side do want matches?
+#' Default is "both" sides but "right" and "left" are available.
+#' @param ignore.case Should case be ignored?
+#' Default is TRUE.
 #' @return A list of string matches an their context
 #' @export
 context <- function(string,
                     var = NULL,
                     context_level = c("sentences", "words", "paragraph"),
                     context_size = NULL,
-                    context_side = c("both", "left", "right"),
+                    context_side = "both",
                     ignore.case = TRUE) {
 
 
