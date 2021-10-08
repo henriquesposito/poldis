@@ -2,18 +2,22 @@
 #'
 #' @param textvec text vector
 #' @param splitsign sign or string used to split text vector.
-#' Often these are line spaces ("\n") but depending on text different
+#' Often these are line spaces ("/n") but depending on text different
 #' or even string can be chosen (i.e. ",.")
 #' @param speakermark speaker marker sign.
 #' Often these are colon (":") but depending on text different
 #' or even string can be chosen (i.e. "Thank you" or "I").
 #' @import dplyr
 #' @import stringr
+#' @importFrom stats setNames aggregate
 #' @return All text aggregated by speaker.
 #' @source https://stackoverflow.com/questions/41100482/split-speaker-and-dialogue-in-rstudio
 #' The function was altered from here.
 #' @export
 split_text <- function(textvec, splitsign, speakermark) {
+
+  # initialize vectors
+  . <- speaker <- text <- speakingGroup <- NULL
 
   # split text with split sign
   splitText <- strsplit(textvec, paste0(splitsign))
@@ -49,7 +53,7 @@ split_text <- function(textvec, splitsign, speakermark) {
     names(notlegit)[1] <- 'num'
     # get the equivalent from allSpeakers vector
     plist <- unique(notlegit$num)
-    lst <- setNames(vector("list", length(plist)), plist)
+    lst <- stats::setNames(vector("list", length(plist)), plist)
     nn <- data.frame()
     for (i in seq_along(plist)) {
       n <- paste0(allSpeakers[i])
@@ -100,7 +104,7 @@ split_text <- function(textvec, splitsign, speakermark) {
   # Get into data frame
   sp <- as.data.frame(speechText)
   # Aggregate by speaker and see
-  ss <- aggregate(sp$fullText, list(sp$speaker), paste, collapse =" ")
+  ss <- stats::aggregate(sp$fullText, list(sp$speaker), paste, collapse =" ")
   # return data frame without punctuations but aphostrophe
   ss
 }

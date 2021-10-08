@@ -1,4 +1,4 @@
-# poldis 0.0.1
+# poldis 0.0.0
 
 2021-03-02
 
@@ -24,3 +24,5 @@
   * Added `data-raw` folder
   * Added `data` folder
 * Added package logo
+
+# poldis 0.0.1

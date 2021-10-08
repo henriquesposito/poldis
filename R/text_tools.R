@@ -80,7 +80,7 @@ extract_title <- function(v) {
 #' countries/Unions.
 #' @param v Text variable/object
 #' @importFrom stringi stri_trans_general
-#' @importFrom stringr word
+#' @importFrom stringr str_extract str_remove_all
 #' @return A list of the first locations
 #' @examples
 #' text <- c("This is the United States", "This is Sao Paulo")

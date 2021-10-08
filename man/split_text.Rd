@@ -14,7 +14,7 @@ split_text(textvec, splitsign, speakermark)
 \item{textvec}{text vector}
 
 \item{splitsign}{sign or string used to split text vector.
-Often these are line spaces ("\n") but depending on text different
+Often these are line spaces ("/n") but depending on text different
 or even string can be chosen (i.e. ",.")}
 
 \item{speakermark}{speaker marker sign.
