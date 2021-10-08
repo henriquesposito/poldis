@@ -83,17 +83,18 @@ extract_title <- function(v) {
 #' @importFrom stringr word
 #' @return A list of the first locations
 #' @examples
-#' text <- c("This is the US", "This is Sao Paulo")
-#' extract_title(text)
+#' text <- c("This is the United States", "This is Sao Paulo")
+#' extract_location(text)
 #' @export
 extract_location <- function(v) {
   v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
   for (k in seq_len(nrow(location))) {
-    name <- gsub(paste0(location$regex[[k]]),
+    v <- gsub(paste0(location$regex[[k]]),
                  paste0(location$location[[k]]),
                  v, ignore.case = TRUE,
                  perl = T)
   }
-  v <- stringr::word(v, 1)
+  v <- stringr::str_extract(v, "\\.\\.\\.[^()]+\\.\\.\\.")
+  v <- stringr::str_remove_all(v, "\\.\\.\\.")
   v
 }

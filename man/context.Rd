@@ -9,9 +9,28 @@ context(
   var = NULL,
   context_level = c("sentences", "words", "paragraph"),
   context_size = NULL,
-  context_side = c("both", "left", "right"),
+  context_side = "both",
   ignore.case = TRUE
 )
+}
+\arguments{
+\item{string}{Character string to be matched.
+For multiple strings, please use "|" as a separator.}
+
+\item{var}{Text variable}
+
+\item{context_level}{At which text level do you want matches to be returned?
+Options are sentences, words, and paragraph.}
+
+\item{context_size}{How many sentences or words do you want to be returned for matches?
+Note that size only works for sentences or words and not paragraphs.
+Sizes range from 1 to 3.}
+
+\item{context_side}{Which side do want matches?
+Default is "both" sides but "right" and "left" are available.}
+
+\item{ignore.case}{Should case be ignored?
+Default is TRUE.}
 }
 \value{
 A list of string matches an their context

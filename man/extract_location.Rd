@@ -18,6 +18,6 @@ For now, only works for Brasilian states and other
 countries/Unions.
 }
 \examples{
-text <- c("This is the US", "This is Sao Paulo")
-extract_title(text)
+text <- c("This is the United States", "This is Sao Paulo")
+extract_location(text)
 }
