@@ -18,6 +18,7 @@ For now, only works for Brasilian states and other
 countries/Unions.
 }
 \examples{
-text <- c("This is the United States", "This is Sao Paulo")
+text <- c("This is the United States", "This is Sao Paulo",
+"I was in Rio de Janeiro and Sao Paulo, then back to the United States")
 extract_location(text)
 }

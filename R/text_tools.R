@@ -80,10 +80,12 @@ extract_title <- function(v) {
 #' countries/Unions.
 #' @param v Text variable/object
 #' @importFrom stringi stri_trans_general
-#' @importFrom stringr str_extract str_remove_all
+#' @importFrom stringr str_extract
+#' @importFrom purrr map_chr
 #' @return A list of the first locations
 #' @examples
-#' text <- c("This is the United States", "This is Sao Paulo")
+#' text <- c("This is the United States", "This is Sao Paulo",
+#' "I was in Rio de Janeiro and Sao Paulo, then back to the United States")
 #' extract_location(text)
 #' @export
 extract_location <- function(v) {
@@ -95,6 +97,7 @@ extract_location <- function(v) {
                  perl = T)
   }
   v <- stringr::str_extract(v, "\\.\\.\\.[^()]+\\.\\.\\.")
-  v <- stringr::str_remove_all(v, "\\.\\.\\.")
+  v <- strsplit(v, "\\.\\.\\.")
+  v <- purrr::map_chr(v, c(2))
   v
 }
