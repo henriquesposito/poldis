@@ -4,14 +4,7 @@
 \alias{context}
 \title{Context to string matches}
 \usage{
-context(
-  string,
-  var = NULL,
-  context_level = c("sentences", "words", "paragraph"),
-  context_size = NULL,
-  context_side = "both",
-  ignore.case = TRUE
-)
+context(string, var, level = c("sentences", "words", "paragraph"))
 }
 \arguments{
 \item{string}{Character string to be matched.
@@ -19,22 +12,22 @@ For multiple strings, please use "|" as a separator.}
 
 \item{var}{Text variable}
 
-\item{context_level}{At which text level do you want matches to be returned?
+\item{level}{At which text level do you want matches to be returned?
 Options are sentences, words, and paragraph.}
-
-\item{context_size}{How many sentences or words do you want to be returned for matches?
-Note that size only works for sentences or words and not paragraphs.
-Sizes range from 1 to 3.}
-
-\item{context_side}{Which side do want matches?
-Default is "both" sides but "right" and "left" are available.}
-
-\item{ignore.case}{Should case be ignored?
-Default is TRUE.}
 }
 \value{
 A list of string matches an their context
 }
 \description{
 A function for getting string matches and the context in which they occur.
+}
+\details{
+For sentences, the sentence before and the sentence after match are returned.
+For words, 3 words before and 3 words after match are returned.
+For paragraph, the whole paragraph of the match is returned.
+For paragraph to work properly, please make sure paragraph marks are present in text.
+}
+\examples{
+context(string = "war|weapons of mass destruction|conflict|NATO|peace",
+var = US_News_Conferences$text[500], level = "sentences")
 }
