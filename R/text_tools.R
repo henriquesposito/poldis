@@ -97,6 +97,7 @@ extract_location <- function(v) {
                  perl = T)
   }
   v <- stringr::str_extract(v, "\\.\\.\\.[^()]+\\.\\.\\.")
+  v <- paste0(v, "...", NA_character_)
   v <- strsplit(v, "\\.\\.\\.")
   v <- purrr::map_chr(v, c(2))
   v
