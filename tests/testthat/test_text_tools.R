@@ -15,3 +15,14 @@ test_that("Titles are extracted properly", {
 test_that("Locations are extracted properly", {
   expect_equal(extract_location(text), c(NA, NA, NA, "United States of America", "Sao Paulo"))
 })
+
+test_that("Text is properly split", {
+  a <- split_text(text)
+  expect_length(a, 5)
+})
+
+test_that("Text matches are properly returned", {
+  b <- text_match(text, "Sao Paulo")
+  expect_equal(b[[1]], character(0))
+  expect_equal(b[[5]], "This is Sao Paulo")
+})
