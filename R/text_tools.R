@@ -102,3 +102,56 @@ extract_location <- function(v) {
   v <- purrr::map_chr(v, c(2))
   v
 }
+
+#' Split Texts
+#'
+#' Split texts into structured lists according to a split sign.
+#' @param text text variable
+#' @param splitsign Where do you want to split?
+#' By default sentences (".").
+#' This can also be words
+#' @return A splitted list for each row
+#' @examples
+#' text <- "This is the first sentence. This is the second sentence."
+#' split_text(text)
+#' @export
+split_text <- function(text, splitsign = "\\.") {
+
+  t <-  strsplit(as.character(text), splitsign)
+  # Add attribute for the number of divisions
+  for(i in seq_len(length(t))) {
+    attr(t[[i]], "Parts") <- paste0("Number of parts = ", lengths(t[i]))
+  }
+  t
+}
+
+#' Get text matches
+#'
+#' Get texts in which only certain "matches" occur.
+#' @param text A text variable
+#' @param match A regex match for a word(s) or expression.
+#' For multiple words, please use "|" to divide them.
+#' @param invert Do you want texts without certain matches to be returned?
+#' By default FALSE.
+#' @param ignore.case Shoud case be ignored?
+#' By default, TRUE.
+#' @importFrom purrr map_chr
+#' @return A list of matches of the same length as text variable
+#' @examples
+#' text <- c("This function was created on the 29 September 2021",
+#' "Today is October 12, 2021")
+#' text_match(text, "October")
+#' @export
+text_match <- function(text, match, invert = FALSE, ignore.case = TRUE) {
+
+  if (invert == TRUE & ignore.case == FALSE) {
+    t <- lapply(text, function(x) grep(match, x, value = TRUE, ignore.case = FALSE, invert = TRUE))
+  } else if (invert == TRUE & ignore.case == TRUE) {
+    t <- lapply(text, function(x) grep(match, x, value = TRUE, ignore.case = TRUE, invert = TRUE))
+  } else if (invert == FALSE & ignore.case == FALSE) {
+    t <- lapply(text, function(x) grep(match, x, value = TRUE, ignore.case = FALSE))
+  } else {
+    t <- lapply(text, function(x) grep(match, x, value = TRUE, ignore.case = TRUE))
+  }
+  t
+}
