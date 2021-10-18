@@ -33,11 +33,11 @@ context <- function(string, var, level = c("sentences", "words", "paragraph")) {
   }
   if (level == "paragraph") {
     # whole paragraph match
-    if (stringr::str_detect(var, "\n+\\s+", negate = TRUE))
+    if (stringr::str_detect(var, "\\.\n", negate = TRUE))
     {
       stop("No paragraph markings were found in text variable, please set level to sentences or words")
     }
-    paragraph <- strsplit(var, "\n+\\s+")
+    paragraph <- strsplit(var, "\\.\n")
     s <- ifelse(stringr::str_detect(string, paragraph), paragraph, "")
   }
   s
