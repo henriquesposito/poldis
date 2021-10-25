@@ -9,7 +9,7 @@ words <- context(string = "war|weapons of mass destruction|conflict|NATO|peace",
 test_that("Sentences before and after are extracted correctly", {
   expect_length(sentences, 1)
   expect_true(is.list(sentences))
-  expect_equal(sentences[[1]][24],
+  expect_equal(sentences[[1]][27],
                ",But you have to understand that those are the criteria for me. I've told you before, I don't believe we need to refight the Gulf war. It's history.")
 })
 

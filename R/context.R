@@ -23,7 +23,7 @@ context <- function(string, var, level = c("sentences", "words", "paragraph")) {
   }
   if (level == "sentences") {
     # sentence before and after string match
-    match <- paste0("([^.]+\\.){1}[^.]+(", string, ").*?\\.([^.]+\\.){1}")
+    match <- paste0("([^.]+\\.){0,1}[^.]+(", string, ").*?\\.([^.]+\\.){0,1}")
     s <- stringr::str_extract_all(var, match)
   }
   if (level == "words") {
