@@ -20,7 +20,41 @@ extract_date <- function(v) {
   # correct double white space left
   out <- stringr::str_squish(out)
   # get the first date per row
-  out <- stringr::str_extract(out, "[:digit:]{2}\\s[:alpha:]{3}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{4}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{5}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{6}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{7}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{8}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{9}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{3}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{4}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{5}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{6}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{7}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{8}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{9}\\s[:digit:]{4}|[:alpha:]{3}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{4}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{5}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{6}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{7}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{8}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{9}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{3}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{4}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{5}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{6}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{7}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{8}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{9}\\s[:digit:]{1}\\s[:digit:]{4}|[:digit:]{2}-[:digit:]{2}-[:digit:]{4}|[:digit:]{1}-[:digit:]{2}-[:digit:]{4}|[:digit:]{2}-[:digit:]{2}-[:digit:]{2}|[:digit:]{1}-[:digit:]{2}-[:digit:]{2}|[:digit:]{2}-[:digit:]{1}-[:digit:]{4}|[:digit:]{1}-[:digit:]{1}-[:digit:]{4}|[:digit:]{2}-[:digit:]{1}-[:digit:]{2}|[:digit:]{1}-[:digit:]{1}-[:digit:]{2}|[:digit:]{4}-[:digit:]{2}-[:digit:]{2}|[:digit:]{4}-[:digit:]{2}-[:digit:]{1}|[:digit:]{4}-[:digit:]{1}-[:digit:]{2}|[:digit:]{4}-[:digit:]{1}-[:digit:]{1}|[:digit:]{2}/[:digit:]{2}/[:digit:]{4}|[:digit:]{1}/[:digit:]{2}/[:digit:]{4}|[:digit:]{2}/[:digit:]{2}/[:digit:]{2}|[:digit:]{1}/[:digit:]{2}/[:digit:]{2}|[:digit:]{2}/[:digit:]{1}/[:digit:]{4}|[:digit:]{1}/[:digit:]{1}/[:digit:]{4}|[:digit:]{2}/[:digit:]{1}/[:digit:]{2}|[:digit:]{1}/[:digit:]{1}/[:digit:]{2}|[:digit:]{4}/[:digit:]{2}/[:digit:]{2}|[:digit:]{4}/[:digit:]{2}/[:digit:]{1}|[:digit:]{4}/[:digit:]{1}/[:digit:]{2}|[:digit:]{4}/[:digit:]{1}/[:digit:]{1}|[:digit:]{3}\\s[:alpha:]{4}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{4}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{6}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{7}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{8}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{9}\\s[:digit:]{2}|[:digit:]{3}\\s[:alpha:]{4}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{4}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{6}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{7}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{8}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{9}\\s[:digit:]{1}")
+  out <- stringr::str_extract(out,
+  "[:digit:]{2}\\s[:alpha:]{3}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{4}\\s[:digit:]{4}|
+  |[:digit:]{2}\\s[:alpha:]{5}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{6}\\s[:digit:]{4}|
+  |[:digit:]{2}\\s[:alpha:]{7}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{8}\\s[:digit:]{4}|
+  |[:digit:]{2}\\s[:alpha:]{9}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{3}\\s[:digit:]{4}|
+  |[:digit:]{1}\\s[:alpha:]{4}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{5}\\s[:digit:]{4}|
+  |[:digit:]{1}\\s[:alpha:]{6}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{7}\\s[:digit:]{4}|
+  |[:digit:]{1}\\s[:alpha:]{8}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{9}\\s[:digit:]{4}|
+  |[:alpha:]{3}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{4}\\s[:digit:]{2}\\s[:digit:]{4}|
+  |[:alpha:]{5}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{6}\\s[:digit:]{2}\\s[:digit:]{4}|
+  |[:alpha:]{7}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{8}\\s[:digit:]{2}\\s[:digit:]{4}|
+  |[:alpha:]{9}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{3}\\s[:digit:]{1}\\s[:digit:]{4}|
+  |[:alpha:]{4}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{5}\\s[:digit:]{1}\\s[:digit:]{4}|
+  |[:alpha:]{6}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{7}\\s[:digit:]{1}\\s[:digit:]{4}|
+  |[:alpha:]{8}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{9}\\s[:digit:]{1}\\s[:digit:]{4}|
+  |[:digit:]{2}-[:digit:]{2}-[:digit:]{4}|[:digit:]{1}-[:digit:]{2}-[:digit:]{4}|
+  |[:digit:]{2}-[:digit:]{2}-[:digit:]{2}|[:digit:]{1}-[:digit:]{2}-[:digit:]{2}|
+  |[:digit:]{2}-[:digit:]{1}-[:digit:]{4}|[:digit:]{1}-[:digit:]{1}-[:digit:]{4}|
+  |[:digit:]{2}-[:digit:]{1}-[:digit:]{2}|[:digit:]{1}-[:digit:]{1}-[:digit:]{2}|
+  |[:digit:]{4}-[:digit:]{2}-[:digit:]{2}|[:digit:]{4}-[:digit:]{2}-[:digit:]{1}|
+  |[:digit:]{4}-[:digit:]{1}-[:digit:]{2}|[:digit:]{4}-[:digit:]{1}-[:digit:]{1}|
+  |[:digit:]{2}/[:digit:]{2}/[:digit:]{4}|[:digit:]{1}/[:digit:]{2}/[:digit:]{4}|
+  |[:digit:]{2}/[:digit:]{2}/[:digit:]{2}|[:digit:]{1}/[:digit:]{2}/[:digit:]{2}|
+  |[:digit:]{2}/[:digit:]{1}/[:digit:]{4}|[:digit:]{1}/[:digit:]{1}/[:digit:]{4}|
+  |[:digit:]{2}/[:digit:]{1}/[:digit:]{2}|[:digit:]{1}/[:digit:]{1}/[:digit:]{2}|
+  |[:digit:]{4}/[:digit:]{2}/[:digit:]{2}|[:digit:]{4}/[:digit:]{2}/[:digit:]{1}|
+  |[:digit:]{4}/[:digit:]{1}/[:digit:]{2}|[:digit:]{4}/[:digit:]{1}/[:digit:]{1}|
+  |[:digit:]{3}\\s[:alpha:]{4}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{4}\\s[:digit:]{2}|
+  |[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{2}|
+  |[:digit:]{4}\\s[:alpha:]{6}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{7}\\s[:digit:]{2}|
+  |[:digit:]{4}\\s[:alpha:]{8}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{9}\\s[:digit:]{2}|
+  |[:digit:]{3}\\s[:alpha:]{4}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{4}\\s[:digit:]{1}|
+  |[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{1}|
+  |[:digit:]{4}\\s[:alpha:]{6}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{7}\\s[:digit:]{1}|
+  |[:digit:]{4}\\s[:alpha:]{8}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{9}\\s[:digit:]{1}")
   # re-order dates if necessary
   out <- lapply(out, re_order)
   # get the months into numeric form
@@ -91,10 +125,10 @@ extract_title <- function(v) {
 extract_location <- function(v) {
   v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
   for (k in seq_len(nrow(location))) {
-    v <- gsub(paste0(location$regex[[k]]),
-                 paste0(location$location[[k]]),
-                 v, ignore.case = TRUE,
-                 perl = T)
+    v <- gsub(paste0(location$regex[k]),
+              paste0(location$location[k]),
+              v, ignore.case = TRUE,
+              perl = T)
   }
   v <- stringr::str_extract(v, "\\.\\.\\.[^()]+\\.\\.\\.")
   v <- paste0(v, "...", NA_character_)
