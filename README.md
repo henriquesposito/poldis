@@ -1,5 +1,5 @@
-
-# poldis <img src="inst/poldishexlogo.png" align="right" width="220"/>
+poldis <img src="inst/poldishexlogo.png" align="right" width="220"/>
+====================================================================
 
 <!-- badges: start -->
 
@@ -25,21 +25,17 @@ questions removed for analysis, or only the context of a string matches
 is wanted… It is exactly these tasks `{poldis}` aims at making easier.
 
 A lot more is yet to come, keep your eyes open for it, but I hope the
-first few functions available are helpful to you\!
+first few functions available are helpful to you!
 
 To download the latest version of ´{poldis}´ from GitHub and use it
 locally:
 
-``` r
-# install.packages("remotes")
-remotes::install_github("henriquesposito/poldis")
-```
+    # install.packages("remotes")
+    remotes::install_github("henriquesposito/poldis")
 
 Lastly, if you are using ´{poldis}´, please do not forget to cite us ;)
 
-``` r
-citation("poldis")
-```
+    citation("poldis")
 
     ## 
     ## To cite poldis in publications use:
