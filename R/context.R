@@ -13,7 +13,7 @@
 #' For paragraph to work properly, please make sure paragraph marks are present in text.
 #' @examples
 #' context(string = "war|weapons of mass destruction|conflict|NATO|peace",
-#' var = US_News_Conferences$text[500], level = "sentences")
+#' var = US_News_Conferences_1960_1980$text[100], level = "sentences")
 #' @return A list of string matches an their context
 #' @export
 context <- function(string, var, level = c("sentences", "words", "paragraph")) {
