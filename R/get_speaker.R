@@ -12,7 +12,7 @@
 #' @importFrom stats setNames aggregate
 #' @return All text aggregated by speaker.
 #' @source https://stackoverflow.com/questions/41100482/split-speaker-and-dialogue-in-rstudio
-#' The function described was used as a reference.
+#' The solution described in the forum was used as a reference.
 #' @export
 get_speakers <- function(textvec, splitsign, speakermark) {
 

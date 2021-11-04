@@ -5,7 +5,7 @@
 \title{Split text by speakers}
 \source{
 https://stackoverflow.com/questions/41100482/split-speaker-and-dialogue-in-rstudio
-The function described was used as a reference.
+The solution described in the forum was used as a reference.
 }
 \usage{
 get_speakers(textvec, splitsign, speakermark)

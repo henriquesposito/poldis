@@ -13,7 +13,7 @@ issues](https://img.shields.io/github/issues-raw/henriquesposito/poldis)
 discourses in time with R.
 
 Political discourse data comes in many types. While it is easier to
-analyze data from official speeches, where there is one speaker, with
+analyse data from official speeches, where there is one speaker, with
 the available R packages, this only tells a portion of the story of
 what, how, and where politics gets done. For most other settings in
 which political discourse appears as debates, interviews, news
@@ -27,7 +27,15 @@ the context of a string matches is wanted… It is exactly these tasks
 A lot more is yet to come, keep your eyes open for it, but I hope the
 first few functions available are helpful to you\!
 
-If you are using ´{poldis}´, do not forget to cite us ;)
+To download the latest version of ´{poldis}´ from GitHub and use it
+locally you can use:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("henriquesposito/poldis")
+```
+
+Lastly, if you are using ´{poldis}´, please do not forget to cite us ;)
 
 ``` r
 citation("poldis")
