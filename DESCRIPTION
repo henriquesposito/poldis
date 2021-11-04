@@ -1,7 +1,8 @@
 Package: poldis
 Type: Package
 Title: Tools for analyzing political discourse
-Version: 0.0.0
+Version: 0.0.1
+Date: 2021-04-11
 Author: person(given = "Henrique",
            family = "Sposito", 
            role = c("cre", "aut", "ctb"),
@@ -10,18 +11,18 @@ Author: person(given = "Henrique",
 Maintainer: Henrique Sposito <henrique.sposito@graduateinstitute.ch>
 Description: Tools for analyzing political discourse beyond official speeches.
 License: MIT + file LICENSE
-Encoding: UTF-8
-LazyData: true
-Suggests: 
-    testthat (>= 3.0.0),
-Config/testthat/edition: 3
-Imports: 
-    rvest,
+Imports:
     dplyr,
     usethis,
     stringr,
     purrr,
-    stringi
+    stringi,
+    testthat
+Suggests:
+    remotes,
+    rvest
 RoxygenNote: 7.1.2
+Encoding: UTF-8
+LazyData: true
 Depends: 
     R (>= 2.10)
