@@ -11,7 +11,8 @@ split_text(text, splitsign = "\\\\.")
 
 \item{splitsign}{Where do you want to split?
 By default sentences (".").
-This can also be words}
+This can also be words, signals or other markers you want.
+For special characters, please use escape sign before (i.e. "\\").}
 }
 \value{
 A splitted list for each row

@@ -143,7 +143,8 @@ extract_location <- function(v) {
 #' @param text text variable
 #' @param splitsign Where do you want to split?
 #' By default sentences (".").
-#' This can also be words
+#' This can also be words, signals or other markers you want.
+#' For special characters, please use escape sign before (i.e. "\\").
 #' @return A splitted list for each row
 #' @examples
 #' text <- "This is the first sentence. This is the second sentence."
