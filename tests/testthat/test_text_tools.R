@@ -13,7 +13,7 @@ test_that("Titles are extracted properly", {
 })
 
 test_that("Locations are extracted properly", {
-  expect_equal(extract_location(text), c(NA, NA, NA, "United States of America", "Sao Paulo"))
+  expect_equal(extract_location(text), c("NA", "NA", "NA", "United States of America", "Sao Paulo"))
 })
 
 test_that("Text is properly split", {
