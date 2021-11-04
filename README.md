@@ -31,3 +31,23 @@ of publicly available tools for for wrangling and analysing political
 discourses.
 
 Keep your eyes open for it\!
+
+If you are using ´{poldis}´, please cite us.
+
+``` r
+citation("poldis")
+```
+
+    ## 
+    ## To cite poldis in publications use:
+    ## 
+    ##   H. Sposito. poldis: Tools for analyzing political discourse. 2021.
+    ## 
+    ## A BibTeX entry for LaTeX users is
+    ## 
+    ##   @Manual{,
+    ##     title = {poldis: Tools for analyzing political discourse},
+    ##     author = {Henrique Sposito},
+    ##     year = {2021},
+    ##     url = {https://github.com/henriquesposito/poldis},
+    ##   }

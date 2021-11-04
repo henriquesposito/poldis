@@ -29,3 +29,9 @@ tools for for wrangling and
 analysing political discourses.
 
 Keep your eyes open for it!
+
+If you are using ´{poldis}´, please cite us.
+
+``` {r cites}
+citation("poldis")
+```
