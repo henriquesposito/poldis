@@ -14,21 +14,21 @@ discourses in time with R.
 
 Political discourse data comes in many types. While it is easier to
 analyse data from official speeches, where there is one speaker, with
-the available R packages, this only tells a portion of the story of
+other available R packages, this only tells a portion of the story of
 what, how, and where politics gets done. For most other settings in
 which political discourse appears as debates, interviews, news
 conferences, or campaign rallies, where there may be multiple speakers,
-working with large amounts of text programmatically becomes tricky (to
-say the least). For example, large amounts of text might need to be
-separated by speakers, or have questions removed for analysis, or only
-the context of a string matches is wanted… It is exactly these tasks
-`{poldis}` aims at making easier.
+questions, and other “noise”, working with large amounts of text
+programmatically becomes tricky (to say the least). For example, large
+amounts of text might need to be separated by speakers, or have
+questions removed for analysis, or only the context of a string matches
+is wanted… It is exactly these tasks `{poldis}` aims at making easier.
 
 A lot more is yet to come, keep your eyes open for it, but I hope the
 first few functions available are helpful to you\!
 
 To download the latest version of ´{poldis}´ from GitHub and use it
-locally you can use:
+locally:
 
 ``` r
 # install.packages("remotes")
