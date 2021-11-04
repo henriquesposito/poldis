@@ -1,0 +1,11 @@
+citHeader("To cite poldis in publications use:")
+
+citEntry(
+  entry    = "Manual",
+  title    = "poldis: Tools for analyzing political discourse",
+  author   = "Henrique Sposito",
+  year     = "2021",
+  url      = "https://github.com/henriquesposito/poldis",
+  textVersion = paste("H. Sposito. poldis: Tools for analyzing political discourse. 2021."
+  )
+)
