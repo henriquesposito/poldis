@@ -1,7 +1,7 @@
 text <- c("This function was created on the 29 September 2021",
           "Today is October 12, 2021",
           "This is the first sentence. This is the second sentence.",
-          "This is the U.S.",
+          "This is the United States",
           "This is Sao Paulo")
 
 test_that("Dates are extracted properly", {
@@ -14,6 +14,8 @@ test_that("Titles are extracted properly", {
 
 test_that("Locations are extracted properly", {
   expect_equal(extract_location(text), c("NA", "NA", "NA", "United States of America", "Sao Paulo"))
+  expect_equal(extract_location(c("Varginha/MG", "Varginha-MG", "Varginha, MG,")),
+                                c("Minas Gerais", "Minas Gerais", "Minas Gerais"))
 })
 
 test_that("Text is properly split", {
