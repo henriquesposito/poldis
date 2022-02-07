@@ -17,6 +17,10 @@ Extracts location from strings.
 For now, only works for Brasilian states and other
 countries/Unions.
 }
+\details{
+If more than one location is found,
+returns only the first match.
+}
 \examples{
 text <- c("This is the United States", "This is Sao Paulo",
 "I was in Rio de Janeiro and Sao Paulo, then back to the United States")

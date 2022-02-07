@@ -117,6 +117,8 @@ extract_title <- function(v) {
 #' @importFrom stringr str_extract
 #' @importFrom purrr map_chr
 #' @return A list of the first locations
+#' @details If more than one location is found,
+#' returns only the first match.
 #' @examples
 #' text <- c("This is the United States", "This is Sao Paulo",
 #' "I was in Rio de Janeiro and Sao Paulo, then back to the United States")
