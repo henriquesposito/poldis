@@ -2,62 +2,23 @@
 #'
 #' Sometimes dates can be contained in text,
 #' this function extracts those dates from text.
-#' @param v Text variable/object
+#' Please also see `messydates::as_messydate()` for more on dates extraction
+#' from texts.
+#' @param v Text vector
 #' @return A list of dates
-#' @import stringr
+#' @importFrom  stringr str_squish str_remove_all str_extract str_replace_all
+#' @importFrom messydates as_messydate
 #' @examples
-#' text <- c("This function was created on the 29 September 2021",
-#' "Today is October 12, 2021")
-#' extract_date(text)
+#' extract_date("This function was created on the 29 September 2021")
 #' @export
 extract_date <- function(v) {
   # make all lower case
   out <- tolower(v)
   # remove commas
-  out <- gsub(",", "", out)
+  out <- gsub("\\,|\\-|\\.|\\/", " ", out)
   # remove ordinal signs and date related articles
-  out <- stringr::str_remove_all(out, "de |of |st |nd |rd |th ")
-  # correct double white space left
-  out <- stringr::str_squish(out)
-  # get the first date per row
-  out <- stringr::str_extract(out,
-  "[:digit:]{2}\\s[:alpha:]{3}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{4}\\s[:digit:]{4}|
-  |[:digit:]{2}\\s[:alpha:]{5}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{6}\\s[:digit:]{4}|
-  |[:digit:]{2}\\s[:alpha:]{7}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{8}\\s[:digit:]{4}|
-  |[:digit:]{2}\\s[:alpha:]{9}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{3}\\s[:digit:]{4}|
-  |[:digit:]{1}\\s[:alpha:]{4}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{5}\\s[:digit:]{4}|
-  |[:digit:]{1}\\s[:alpha:]{6}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{7}\\s[:digit:]{4}|
-  |[:digit:]{1}\\s[:alpha:]{8}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{9}\\s[:digit:]{4}|
-  |[:alpha:]{3}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{4}\\s[:digit:]{2}\\s[:digit:]{4}|
-  |[:alpha:]{5}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{6}\\s[:digit:]{2}\\s[:digit:]{4}|
-  |[:alpha:]{7}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{8}\\s[:digit:]{2}\\s[:digit:]{4}|
-  |[:alpha:]{9}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{3}\\s[:digit:]{1}\\s[:digit:]{4}|
-  |[:alpha:]{4}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{5}\\s[:digit:]{1}\\s[:digit:]{4}|
-  |[:alpha:]{6}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{7}\\s[:digit:]{1}\\s[:digit:]{4}|
-  |[:alpha:]{8}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{9}\\s[:digit:]{1}\\s[:digit:]{4}|
-  |[:digit:]{2}-[:digit:]{2}-[:digit:]{4}|[:digit:]{1}-[:digit:]{2}-[:digit:]{4}|
-  |[:digit:]{2}-[:digit:]{2}-[:digit:]{2}|[:digit:]{1}-[:digit:]{2}-[:digit:]{2}|
-  |[:digit:]{2}-[:digit:]{1}-[:digit:]{4}|[:digit:]{1}-[:digit:]{1}-[:digit:]{4}|
-  |[:digit:]{2}-[:digit:]{1}-[:digit:]{2}|[:digit:]{1}-[:digit:]{1}-[:digit:]{2}|
-  |[:digit:]{4}-[:digit:]{2}-[:digit:]{2}|[:digit:]{4}-[:digit:]{2}-[:digit:]{1}|
-  |[:digit:]{4}-[:digit:]{1}-[:digit:]{2}|[:digit:]{4}-[:digit:]{1}-[:digit:]{1}|
-  |[:digit:]{2}/[:digit:]{2}/[:digit:]{4}|[:digit:]{1}/[:digit:]{2}/[:digit:]{4}|
-  |[:digit:]{2}/[:digit:]{2}/[:digit:]{2}|[:digit:]{1}/[:digit:]{2}/[:digit:]{2}|
-  |[:digit:]{2}/[:digit:]{1}/[:digit:]{4}|[:digit:]{1}/[:digit:]{1}/[:digit:]{4}|
-  |[:digit:]{2}/[:digit:]{1}/[:digit:]{2}|[:digit:]{1}/[:digit:]{1}/[:digit:]{2}|
-  |[:digit:]{4}/[:digit:]{2}/[:digit:]{2}|[:digit:]{4}/[:digit:]{2}/[:digit:]{1}|
-  |[:digit:]{4}/[:digit:]{1}/[:digit:]{2}|[:digit:]{4}/[:digit:]{1}/[:digit:]{1}|
-  |[:digit:]{3}\\s[:alpha:]{4}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{4}\\s[:digit:]{2}|
-  |[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{2}|
-  |[:digit:]{4}\\s[:alpha:]{6}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{7}\\s[:digit:]{2}|
-  |[:digit:]{4}\\s[:alpha:]{8}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{9}\\s[:digit:]{2}|
-  |[:digit:]{3}\\s[:alpha:]{4}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{4}\\s[:digit:]{1}|
-  |[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{1}|
-  |[:digit:]{4}\\s[:alpha:]{6}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{7}\\s[:digit:]{1}|
-  |[:digit:]{4}\\s[:alpha:]{8}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{9}\\s[:digit:]{1}")
-  # re-order dates if necessary
-  out <- lapply(out, re_order)
-  # get the months into numeric form
+  out <- stringr::str_squish(stringr::str_remove_all(out, "de |of |st |nd |rd |th "))
+  # sub months to dates
   months <- as.data.frame(months)
   for (k in seq_len(nrow(months))) {
     out <- gsub(paste0(months$months[k]),
@@ -65,42 +26,30 @@ extract_date <- function(v) {
                 out, ignore.case = TRUE,
                 perl = T)
   }
+  # get the first date per row
+  out <- stringr::str_extract(out,
+  "[:digit:]{2}\\s[:digit:]{2}\\s[:digit:]{4}|[:digit:]{1}\\s[:digit:]{2}\\s[:digit:]{4}|
+  |[:digit:]{2}\\s[:digit:]{2}\\s[:digit:]{2}|[:digit:]{1}\\s[:digit:]{2}\\s[:digit:]{2}|
+  |[:digit:]{2}\\s[:digit:]{1}\\s[:digit:]{4}|[:digit:]{1}\\s[:digit:]{1}\\s[:digit:]{4}|
+  |[:digit:]{2}\\s[:digit:]{1}\\s[:digit:]{2}|[:digit:]{1}\\s[:digit:]{1}\\s[:digit:]{2}|
+  |[:digit:]{4}\\s[:digit:]{2}\\s[:digit:]{2}|[:digit:]{4}\\s[:digit:]{2}\\s[:digit:]{1}|
+  |[:digit:]{4}\\s[:digit:]{1}\\s[:digit:]{2}|[:digit:]{4}\\s[:digit:]{1}\\s[:digit:]{1}|
+  |[:digit:]{2}\\s[:digit:]{2}\\s[:digit:]{4}|[:digit:]{1}/[:digit:]{2}/[:digit:]{4}")
   # standardize separators
-  out <- stringr::str_replace_all(out, " |/", "-")
-  out <- stringr::str_replace_all(out, "[a-z]|[A-Z]", "?")
-  out <- as.character(ifelse(out == "", NA, out))
+  out <- stringr::str_replace_all(out, " ", "-")
+  out <- as.character(ifelse(out == "", NA_character_, messydates::as_messydate(out)))
   out
 }
 
-#' Helper function for re-ordering dates
-#'
-#' Helper function for re-ordering character dates for consistency.
-#' Default is DMY.
-#' @param l List of dates
-#' @import stringr
-#' @return A list of dates of the same lenghte but re-ordered, if necessary.
-re_order <- function(l) {
-  l <- stringr::str_squish(l)
-  st <- stringr::word(l, 1)
-  mi <- stringr::word(l, 2)
-  ed <- stringr::word(l, 3)
-  out <- ifelse(stringr::str_starts(l, "[:digit:]{4}"), paste0(ed, "-", mi, "-", st), l)
-  out <- ifelse(stringr::str_starts(out, "[:alpha:]"), paste0(mi, "-", st, "-", ed), out)
-  out <- stringr::str_remove_all(out, "-NA|NA-|NA")
-  out
-}
-
-#' Extract title from text
+#' Extract first sentence from text
 #'
 #' A lot of information is contained in the first sentence of a text.
-#' For political texts, dates and locations are often contained in the
-#' first sentence.
-#' This function extracts the first sentence of text.
-#' @param v Text variable/object
+#' In political texts, for example, dates and locations are often contained
+#' in the first sentence of the text.
+#' @param v Text vector
 #' @return A list of the first sentences
 #' @examples
-#' text <- "This is the first sentence. This is the second sentence."
-#' extract_title(text)
+#' extract_title("This is the first sentence. This is the second sentence.")
 #' @export
 extract_title <- function(v) {
   out <- gsub("([a-z0-9][?!.])\\s.*", "\\1", v)
@@ -110,8 +59,8 @@ extract_title <- function(v) {
 #' Extract location from strings
 #'
 #' Extracts location from strings.
-#' For now, only works for Brasilian states and other
-#' countries/Unions.
+#' Works for Brasilian states and other countries.
+#' Texts must be in english or portuguese.
 #' @param v Text variable/object
 #' @importFrom stringi stri_trans_general
 #' @importFrom stringr str_extract
@@ -153,7 +102,6 @@ extract_location <- function(v) {
 #' split_text(text)
 #' @export
 split_text <- function(text, splitsign = "\\.") {
-
   t <-  strsplit(as.character(text), splitsign)
   # Add attribute for the number of divisions
   for(i in seq_len(length(t))) {
@@ -170,7 +118,7 @@ split_text <- function(text, splitsign = "\\.") {
 #' For multiple words, please use "|" to divide them.
 #' @param invert Do you want texts without certain matches to be returned?
 #' By default FALSE.
-#' @param ignore.case Shoud case be ignored?
+#' @param ignore.case Should case be ignored?
 #' By default, TRUE.
 #' @importFrom purrr map_chr
 #' @return A list of matches of the same length as text variable
@@ -180,7 +128,6 @@ split_text <- function(text, splitsign = "\\.") {
 #' text_match(text, "October")
 #' @export
 text_match <- function(text, match, invert = FALSE, ignore.case = TRUE) {
-
   if (invert == TRUE & ignore.case == FALSE) {
     t <- lapply(text, function(x) grep(match, x, value = TRUE, ignore.case = FALSE, invert = TRUE))
   } else if (invert == TRUE & ignore.case == TRUE) {
