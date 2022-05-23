@@ -7,13 +7,15 @@
 #' @param level At which text level do you want matches to be returned?
 #' Options are sentences, words, and paragraph.
 #' @param n Number of sentences or words matched before and after string match.
-#' For paragraphs, n is always set to one.
 #' 1 by default.
 #' That is, one word or one sentence before, and after, string match.
+#' For paragraphs, n is always set to one.
 #' @importFrom stringr str_detect str_extract_all
 #' @examples
 #' context(match = "war|weapons of mass destruction|conflict|NATO|peace",
-#' textvar = US_News_Conferences_1960_1980$text[100], level = "sentences")
+#' textvar = US_News_Conferences_1960_1980$text[100],
+#' level = "sentences",
+#' n = 2)
 #' @return A list of string matches an their context
 #' @export
 context <- function(match, textvar,
@@ -22,12 +24,10 @@ context <- function(match, textvar,
     stop("Please declare the level of the text to be returned, option are sentences, words or paragraph")
   }
   if (level == "sentences") {
-    word <- paste0("([^.]+\\.){0,", "n", "}[^.]+(", match, ").*?\\.([^.]+\\.){0,1}")
-    s <- stringr::str_extract_all(textvar, word)
+    s <- stringr::str_extract_all(textvar, paste0("([^.]+\\.){0,", n, "}[^.]+(", match, ").*?\\.([^.]+\\.){0,", n, "}"))
   }
   if (level == "words") {
-    sentence <- paste0("(\\w+){", n, "}", match, "(\\w+){", "n", "}")
-    s <- stringr::str_extract_all(textvar, sentence)
+    s <- stringr::str_extract_all(textvar, paste0("([^\\s]+\\s+){", n,"}", match, "(\\s+[^\\s]+){", n, "}"))
   }
   if (level == "paragraph") {
     if (stringr::str_detect(textvar, "\\.\n", negate = TRUE))
