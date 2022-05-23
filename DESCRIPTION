@@ -16,8 +16,6 @@ Imports:
     stringr,
     purrr,
     stringi,
-    translateR,
-    cld2,
     messydates
 Suggests:
     remotes,

@@ -6,6 +6,7 @@
 
 * Updated `context()` function to make it more flexible for users
 * Updated `get_speaker()` function to be more intuitive for users
+* Removed `str_translate()` function for translating strings
 
 # poldis 0.0.2
 
