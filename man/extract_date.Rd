@@ -7,7 +7,7 @@
 extract_date(v)
 }
 \arguments{
-\item{v}{Text variable/object}
+\item{v}{Text vector}
 }
 \value{
 A list of dates
@@ -15,9 +15,9 @@ A list of dates
 \description{
 Sometimes dates can be contained in text,
 this function extracts those dates from text.
+Please also see `messydates::as_messydate()` for more on dates extraction
+from texts.
 }
 \examples{
-text <- c("This function was created on the 29 September 2021",
-"Today is October 12, 2021")
-extract_date(text)
+extract_date("This function was created on the 29 September 2021")
 }

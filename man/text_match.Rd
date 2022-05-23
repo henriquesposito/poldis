@@ -15,7 +15,7 @@ For multiple words, please use "|" to divide them.}
 \item{invert}{Do you want texts without certain matches to be returned?
 By default FALSE.}
 
-\item{ignore.case}{Shoud case be ignored?
+\item{ignore.case}{Should case be ignored?
 By default, TRUE.}
 }
 \value{

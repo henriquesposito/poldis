@@ -5,25 +5,32 @@
 \title{Split text by speakers}
 \source{
 https://stackoverflow.com/questions/41100482/split-speaker-and-dialogue-in-rstudio
-The solution described in the forum was used as a reference.
+The above was used as a reference.
 }
 \usage{
-get_speakers(textvec, splitsign, speakermark)
+get_speakers(textvec, splitsign = "\\\\.", speakermark = ":")
 }
 \arguments{
 \item{textvec}{text vector}
 
 \item{splitsign}{sign or string used to split text vector.
-Often these are line spaces ("/n") but depending on text different
-or even string can be chosen (i.e. ",.")}
+Line markers ("/n") by default.
+Often these are line spaces but depending on text different signs
+or even string can be chosen.}
 
 \item{speakermark}{speaker marker sign.
-Often these are colon (":") but depending on text different
-or even string can be chosen (i.e. "Thank you" or "I").}
+Colon (":") by default.
+Often these are colon but depending on text different
+or even string can be chosen (i.e. "Thank you").}
 }
 \value{
 All text aggregated by speaker.
 }
 \description{
 Split text by speakers
+}
+\details{
+This is an interactive function.
+It asks users which speakers are legit, or not.
+For legit speakers, text is aggregated altogether in one vector.
 }

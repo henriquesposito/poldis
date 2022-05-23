@@ -4,16 +4,21 @@
 \alias{context}
 \title{Context to string matches}
 \usage{
-context(string, var, level = c("sentences", "words", "paragraph"))
+context(match, textvar, level = c("sentences", "words", "paragraph"), n = 1)
 }
 \arguments{
-\item{string}{Character string to be matched.
+\item{match}{Character string to be matched.
 For multiple strings, please use "|" as a separator.}
 
-\item{var}{Text variable}
+\item{textvar}{Text variable.}
 
 \item{level}{At which text level do you want matches to be returned?
 Options are sentences, words, and paragraph.}
+
+\item{n}{Number of sentences or words matched before and after string match.
+1 by default.
+That is, one word or one sentence before, and after, string match.
+For paragraphs, n is always set to one.}
 }
 \value{
 A list of string matches an their context
@@ -21,13 +26,9 @@ A list of string matches an their context
 \description{
 A function for getting string matches and the context in which they occur.
 }
-\details{
-For sentences, the sentence before and the sentence after match are returned.
-For words, 3 words before and 3 words after match are returned.
-For paragraph, the whole paragraph of the match is returned.
-For paragraph to work properly, please make sure paragraph marks are present in text.
-}
 \examples{
-context(string = "war|weapons of mass destruction|conflict|NATO|peace",
-var = US_News_Conferences_1960_1980$text[100], level = "sentences")
+context(match = "war|weapons of mass destruction|conflict|NATO|peace",
+textvar = US_News_Conferences_1960_1980$text[100],
+level = "sentences",
+n = 2)
 }

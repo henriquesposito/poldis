@@ -1,9 +1,6 @@
 text <- US_News_Conferences_1960_1980$text[100]
-
-sentences <- context(string = "war", var = text, level = "sentences")
-
-words <- context(string = "warning", var = text, level = "words")
-
+sentences <- context(match = "war", textvar = text, level = "sentences", n = 1)
+words <- context(match = "warning", textvar = text, level = "words", n = 3)
 test_that("Sentences before and after are extracted correctly", {
   expect_length(sentences, 1)
   expect_true(is.list(sentences))
@@ -16,10 +13,3 @@ test_that("Words before and after are extracted correctly", {
   expect_true(is.list(words))
   expect_equal(words [[1]][1], "some economists are warning that consumers are")
 })
-
-# test_that("Paragraph warnings appear", {
-#   expect_error(context(string = "war|weapons of mass destruction|conflict|NATO|peace",
-#                                     var = text, level = "paragraph"),
-#                "No paragraph were found in text, please set level to sentences or words")
-#
-# })

@@ -2,23 +2,25 @@
 % Please edit documentation in R/str_translate.R
 \name{str_translate}
 \alias{str_translate}
-\title{Translate Strings}
+\title{Translate text}
 \usage{
-str_translate(s, target_lang, API)
+str_translate(v, target_lang, API)
 }
 \arguments{
-\item{s}{A character string}
+\item{v}{A text vector}
 
 \item{target_lang}{Which language would you like this translated to?
 Please provide a two letter language abbreviation (e.g. "en" or "pt")}
 
 \item{API}{Google API key.
-For more information please go to: https://cloud.google.com/translate/docs/setup}
+For more information please go to:
+https://cloud.google.com/translate/docs/setup}
 }
 \value{
 A character vector of the same length of original.
 }
 \description{
-The function automacally identifies language from strings by rows,
-this allows for text in multiple languages to be tranlated to a target language.
+The function automatically identifies language by rows,
+this allows for text in multiple languages to be translated to a
+target language.
 }
