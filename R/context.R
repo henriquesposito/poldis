@@ -1,44 +1,41 @@
 #' Context to string matches
 #'
 #' A function for getting string matches and the context in which they occur.
-#' @param string Character string to be matched.
+#' @param match Character string to be matched.
 #' For multiple strings, please use "|" as a separator.
-#' @param var Text variable
+#' @param textvar Text variable.
 #' @param level At which text level do you want matches to be returned?
 #' Options are sentences, words, and paragraph.
+#' @param n Number of sentences or words matched before and after string match.
+#' For paragraphs, n is always set to one.
+#' 1 by default.
+#' That is, one word or one sentence before, and after, string match.
 #' @importFrom stringr str_detect str_extract_all
-#' @details For sentences, the sentence before and the sentence after match are returned.
-#' For words, 3 words before and 3 words after match are returned.
-#' For paragraph, the whole paragraph of the match is returned.
-#' For paragraph to work properly, please make sure paragraph marks are present in text.
 #' @examples
-#' context(string = "war|weapons of mass destruction|conflict|NATO|peace",
-#' var = US_News_Conferences_1960_1980$text[100], level = "sentences")
+#' context(match = "war|weapons of mass destruction|conflict|NATO|peace",
+#' textvar = US_News_Conferences_1960_1980$text[100], level = "sentences")
 #' @return A list of string matches an their context
 #' @export
-context <- function(string, var, level = c("sentences", "words", "paragraph")) {
-
+context <- function(match, textvar,
+                    level = c("sentences", "words", "paragraph"), n = 1) {
   if (is.null(level)) {
     stop("Please declare the level of the text to be returned, option are sentences, words or paragraph")
   }
   if (level == "sentences") {
-    # sentence before and after string match
-    match <- paste0("([^.]+\\.){0,1}[^.]+(", string, ").*?\\.([^.]+\\.){0,1}")
-    s <- stringr::str_extract_all(var, match)
+    word <- paste0("([^.]+\\.){0,", "n", "}[^.]+(", match, ").*?\\.([^.]+\\.){0,1}")
+    s <- stringr::str_extract_all(textvar, word)
   }
   if (level == "words") {
-    # three words before and after string match
-    match <- paste0("\\w+ \\w+ \\w+ ", string, " \\w+ \\w+ \\w+")
-    s <- stringr::str_extract_all(var, match)
+    sentence <- paste0("(\\w+){", n, "}", match, "(\\w+){", "n", "}")
+    s <- stringr::str_extract_all(textvar, sentence)
   }
   if (level == "paragraph") {
-    # whole paragraph match
-    if (stringr::str_detect(var, "\\.\n", negate = TRUE))
+    if (stringr::str_detect(textvar, "\\.\n", negate = TRUE))
     {
       stop("No paragraph markings were found in text variable, please set level to sentences or words")
     }
-    paragraph <- strsplit(var, "\\.\n")
-    s <- ifelse(stringr::str_detect(string, paragraph), paragraph, "")
+    paragraph <- strsplit(textvar, "\\.\n")
+    s <- ifelse(stringr::str_detect(match, paragraph), paragraph, "")
   }
   s
 }
