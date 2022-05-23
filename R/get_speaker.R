@@ -2,26 +2,28 @@
 #'
 #' @param textvec text vector
 #' @param splitsign sign or string used to split text vector.
-#' Often these are line spaces ("/n") but depending on text different
-#' or even string can be chosen (i.e. ",.")
+#' Line markers ("/n") by default.
+#' Often these are line spaces but depending on text different signs
+#' or even string can be chosen.
 #' @param speakermark speaker marker sign.
-#' Often these are colon (":") but depending on text different
-#' or even string can be chosen (i.e. "Thank you" or "I").
+#' Colon (":") by default.
+#' Often these are colon but depending on text different
+#' or even string can be chosen (i.e. "Thank you").
 #' @import dplyr
 #' @import stringr
 #' @importFrom stats setNames aggregate
 #' @return All text aggregated by speaker.
+#' @details This is an interactive function.
+#' It asks users which speakers are legit, or not.
+#' For legit speakers, text is aggregated altogether in one vector.
 #' @source https://stackoverflow.com/questions/41100482/split-speaker-and-dialogue-in-rstudio
-#' The solution described in the forum was used as a reference.
+#' The above was used as a reference.
 #' @export
-get_speakers <- function(textvec, splitsign, speakermark) {
-
+get_speakers <- function(textvec, splitsign = "\\.", speakermark = ":") {
   # initialize vectors
   . <- speaker <- text <- speakingGroup <- NULL
-
   # split text with split sign
-  splitText <- strsplit(textvec, paste0(splitsign))
-
+  splitText <- strsplit(as.character(textvec), as.character(splitsign))
   # get speakers by marker sign
   allSpeakers <- lapply(splitText, function(thisText){
     grep(paste0(speakermark), thisText, value = TRUE) %>%
@@ -30,13 +32,10 @@ get_speakers <- function(textvec, splitsign, speakermark) {
   }) %>%
     unlist() %>%
     unique()
-
   # Check lengths and reduce sizes of strings to avoid warnings
   allSpeakers <- ifelse(lengths(gregexpr("\\W+", allSpeakers)) > 5, substr(allSpeakers, 0, 20), allSpeakers)
-
   # initialize data frame
   notlegit <- data.frame()
-
   # get non legit speakers by asking users
   for (i in 1:length(allSpeakers)) {
     if (utils::askYesNo(paste(allSpeakers[i], "-", "is this speaker legit?")) == FALSE) {
@@ -44,7 +43,6 @@ get_speakers <- function(textvec, splitsign, speakermark) {
       notlegit = rbind(notlegit, nlegit)
     }
   }
-
   # if all speakers are legit
   if(nrow(notlegit) == 0) {
     legitSpeakers <- allSpeakers
@@ -59,25 +57,20 @@ get_speakers <- function(textvec, splitsign, speakermark) {
       n <- paste0(allSpeakers[i])
       nn = rbind(nn, n)
     }
-
     # rename column and bind data frames
     colnames(nn)[1] <- "speakers"
     nn <- cbind(nn, notlegit)
-
     # get the same dataset for all speakers
     ss <- data.frame(speakers = allSpeakers, num = as.character(1:length(allSpeakers)))
     # perform and anti_join
     lspeakers <- dplyr::anti_join(ss, nn, by = 'num')
     legitSpeakers <- lspeakers$speakers
   }
-
   # get text
   speechText <- lapply(splitText, function(thisText){
-
   # Remove applause and interjections (things in parentheses)
   cleanText <- grep("(^\\(.*\\)$)|(^$)", thisText, value = TRUE, invert = TRUE)
-
-  # Split each line by a semicolor
+  # Split each line
   strsplit(cleanText, paste(speakermark)) %>%
     lapply(function(x){
       # Check if the first element is a legit speaker
@@ -105,6 +98,6 @@ get_speakers <- function(textvec, splitsign, speakermark) {
   sp <- as.data.frame(speechText)
   # Aggregate by speaker and see
   ss <- stats::aggregate(sp$fullText, list(sp$speaker), paste, collapse =" ")
-  # return data frame without punctuations but aphostrophe
+  # return data frame without punctuations
   ss
 }
