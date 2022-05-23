@@ -27,14 +27,18 @@ extract_date <- function(v) {
                 perl = T)
   }
   # get the first date per row
-  out <- stringr::str_extract(out,
-  "[:digit:]{2}\\s[:digit:]{2}\\s[:digit:]{4}|[:digit:]{1}\\s[:digit:]{2}\\s[:digit:]{4}|
-  |[:digit:]{2}\\s[:digit:]{2}\\s[:digit:]{2}|[:digit:]{1}\\s[:digit:]{2}\\s[:digit:]{2}|
-  |[:digit:]{2}\\s[:digit:]{1}\\s[:digit:]{4}|[:digit:]{1}\\s[:digit:]{1}\\s[:digit:]{4}|
-  |[:digit:]{2}\\s[:digit:]{1}\\s[:digit:]{2}|[:digit:]{1}\\s[:digit:]{1}\\s[:digit:]{2}|
-  |[:digit:]{4}\\s[:digit:]{2}\\s[:digit:]{2}|[:digit:]{4}\\s[:digit:]{2}\\s[:digit:]{1}|
-  |[:digit:]{4}\\s[:digit:]{1}\\s[:digit:]{2}|[:digit:]{4}\\s[:digit:]{1}\\s[:digit:]{1}|
-  |[:digit:]{2}\\s[:digit:]{2}\\s[:digit:]{4}|[:digit:]{1}/[:digit:]{2}/[:digit:]{4}")
+  out <- stringr::str_extract(out, "[:digit:]{2}\\s[:digit:]{2}\\s[:digit:]{4}|
+  |[:digit:]{1}\\s[:digit:]{2}\\s[:digit:]{4}|
+  |[:digit:]{2}\\s[:digit:]{2}\\s[:digit:]{2}|
+  |[:digit:]{1}\\s[:digit:]{2}\\s[:digit:]{2}|
+  |[:digit:]{2}\\s[:digit:]{1}\\s[:digit:]{4}|
+  |[:digit:]{1}\\s[:digit:]{1}\\s[:digit:]{4}|
+  |[:digit:]{2}\\s[:digit:]{1}\\s[:digit:]{2}|
+  |[:digit:]{1}\\s[:digit:]{1}\\s[:digit:]{2}|
+  |[:digit:]{4}\\s[:digit:]{2}\\s[:digit:]{2}|
+  |[:digit:]{4}\\s[:digit:]{2}\\s[:digit:]{1}|
+  |[:digit:]{4}\\s[:digit:]{1}\\s[:digit:]{2}|
+                              |[:digit:]{4}\\s[:digit:]{1}\\s[:digit:]{1}")
   # standardize separators
   out <- stringr::str_replace_all(out, " ", "-")
   out <- as.character(ifelse(out == "", NA_character_, messydates::as_messydate(out)))
