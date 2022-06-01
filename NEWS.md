@@ -1,11 +1,11 @@
 # poldis 0.0.3
 
-2022-05-23
+2022-06-01
 
 ## Package
 
 * Closed #6 by updating `context()` function to make it more flexible for users
-* Closed # `get_speaker()` function to be more intuitive for users
+* Updated `get_speaker()` function to be more intuitive for users
 * Closed #5 by removing `str_translate()` function for translating strings
 * Closed #4 by removing `str_translate()` function for translating strings
 
