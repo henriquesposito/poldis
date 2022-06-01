@@ -1,11 +1,11 @@
-text <- c("This function was created on the 29 September 2021",
+text <- c("This function was created on the 2021 September 9",
           "Today is 12, October, 2021",
           "This is the first sentence. This is the second sentence.",
           "This is the United States",
           "This is Sao Paulo")
 
 test_that("Dates are extracted properly", {
-  expect_equal(extract_date(text), c("29-09-2021", "2021-10-12", NA, NA, NA))
+  expect_equal(extract_date(text), c("2021-09-09", "2021-10-12", NA, NA, NA))
 })
 
 test_that("Titles are extracted properly", {
