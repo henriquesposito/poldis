@@ -2,7 +2,7 @@ Package: poldis
 Type: Package
 Title: Tools for analyzing political discourse
 Version: 0.0.3
-Date: 2022-06-01
+Date: 2022-09-25
 Author: person(given = "Henrique",
            family = "Sposito", 
            role = c("cre", "aut", "ctb"),
@@ -17,7 +17,9 @@ Imports:
     purrr,
     stringi,
     messydates,
-    remotes
+    remotes,
+    stringdist,
+    entity
 Suggests:
     rmarkdown,
     testthat,
