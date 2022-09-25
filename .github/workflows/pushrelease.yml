@@ -28,52 +28,25 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@master
+      - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
-      - uses: r-lib/actions/setup-pandoc@master
 
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
+      - uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Cache R packages
-        if: runner.os != 'Windows'
-        uses: actions/cache@v1
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+          cache-version: 2
+          extra-packages: |
+            any::rcmdcheck
+            any::remotes
+          needs: check
 
-      - name: Install system dependencies
-        if: runner.os == 'Linux'
-        run: |
-          while read -r cmd
-          do
-            eval sudo $cmd
-          done < <(Rscript -e 'cat(remotes::system_requirements("ubuntu", "20.04"), sep = "\n")')
-
-      - name: Install dependencies
-        run: |
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
-        shell: Rscript {0}
-
-      - name: Check
+      - uses: r-lib/actions/check-r-package@v2
         env:
-          _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran", '--ignore-vignettes'), build_args = '--no-build-vignettes', error_on = "warning", check_dir = "check")
-        shell: Rscript {0}
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@main
+          _R_CHECK_FORCE_SUGGESTS_: false
         with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: check
+          upload-snapshots: true
 
       - name: Binary
         run: |
@@ -92,30 +65,32 @@ jobs:
   release:
     name: Bump version and release
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout one
         uses: actions/checkout@master
         with:
           fetch-depth: '0'
+
       - name: Bump version and push tag
         id: newtag
-        uses: anothrNick/github-tag-action@1.17.2
+        uses: anothrNick/github-tag-action@1.39.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
-          RELEASE_BRANCHES: main
+
       - name: Checkout two
         uses: actions/checkout@v2
+
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.newtag.outputs.tag }}
-          release_name: Release ${{ steps.newtag.outputs.tag }}
+          tag: ${{ steps.newtag.outputs.tag }}
+          name: Release ${{ steps.newtag.outputs.tag }}
           draft: false
           prerelease: false
 
@@ -126,7 +101,7 @@ jobs:
         run: ls -R
 
       - name: Rename Mac release
-        run: mv ./macOS/*.tgz poldis_macOS.tgz
+        run: mv ./macOS/*.tgz pkg_macOS.tgz
 
       - name: Upload Mac binary
         id: upload-mac
@@ -134,13 +109,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: poldis_macOS.tgz
-          asset_name: poldis_macOS.tgz
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: pkg_macOS.tgz
+          asset_name: pkg_macOS.tgz
           asset_content_type: application/zip
 
       - name: Rename Linux release
-        run: mv ./linuxOS/*.tar.gz poldis_linuxOS.tar.gz
+        run: mv ./linuxOS/*.tar.gz pkg_linuxOS.tar.gz
 
       - name: Upload Linux binary
         id: upload-lin
@@ -148,13 +123,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: poldis_linuxOS.tar.gz
-          asset_name: poldis_linuxOS.tar.gz
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: pkg_linuxOS.tar.gz
+          asset_name: pkg_linuxOS.tar.gz
           asset_content_type: application/zip
 
       - name: Rename Windows release
-        run: mv ./winOS/*.zip poldis_winOS.zip
+        run: mv ./winOS/*.zip pkg_winOS.zip
 
       - name: Upload Windows binary
         id: upload-win
@@ -162,9 +137,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: poldis_winOS.zip
-          asset_name: poldis_winOS.zip
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: pkg_winOS.zip
+          asset_name: pkg_winOS.zip
           asset_content_type: application/zip
 
   render:
@@ -172,37 +147,24 @@ jobs:
     needs: build
     runs-on: macOS-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - uses: r-lib/actions/setup-r@v1
+
+      - uses: r-lib/actions/setup-r@v2
+
       - uses: r-lib/actions/setup-pandoc@v1
 
-      # Query and install dependencies as well as rmarkdown package since its a new runner for each job
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: 2
+          needs: check
 
-      - name: Install dependencies
-        run: |
-          remotes::install_deps(dependencies = TRUE)
-          install.packages("rmarkdown", type = "binary")
-        shell: Rscript {0}
-
-      # install packages needed
-      - name: install required packages
-        run: Rscript -e 'install.packages("rmarkdown")'
-
-      # Install Package
       - name: Install package
         run: R CMD INSTALL .
 
       # Render README.md using rmarkdown
       - name: render README
         run: Rscript -e 'rmarkdown::render("README.Rmd", output_format = "md_document")'
-
+      # Add man/figures/README-* to the git add call if plots are generated
       - name: commit rendered README
         run: |
           git add README.md
