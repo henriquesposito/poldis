@@ -50,7 +50,9 @@ extract_context <- function(match,
 #' @importFrom entity person_entity
 #' @return A list of speakers.
 #' @examples
+#' \dontrun{
 #' extract_speaker(US_News_Conferences_1960_1980[600, 3])
+#' }
 #' @export
 extract_speaker <- function(v) {
   # get speakers

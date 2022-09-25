@@ -24,9 +24,9 @@ text <- c("This function was created on the 2021 September 9. I am Henrique",
           "This is the United States",
           "This is Sao Paulo")
 
-test_that("Speakers are extracted properly", {
-  expect_message(extract_speaker(text), "No speakers were found in text...")
-})
+# test_that("Speakers are extracted properly", {
+#   expect_message(extract_speaker(text), "No speakers were found in text...")
+# })
 
 test_that("Titles are extracted properly", {
   expect_equal(extract_title(text)[3], c("This is the first sentence."))

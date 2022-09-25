@@ -16,5 +16,7 @@ A list of speakers.
 Extract a list of the speakers in texts
 }
 \examples{
+\dontrun{
 extract_speaker(US_News_Conferences_1960_1980[600, 3])
+}
 }
