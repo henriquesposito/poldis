@@ -1,13 +1,14 @@
 # poldis 0.0.3
 
-2022-06-01
+2022-09-25
 
 ## Package
 
-* Closed #6 by updating `context()` function to make it more flexible for users
-* Updated `get_speaker()` function to be more intuitive for users
-* Closed #5 by removing `str_translate()` function for translating strings
-* Closed #4 by removing `str_translate()` function for translating strings
+* Renamed all functions to consistently start with `extract_*`
+* Made the package smaller and more concise by removing `extract_dates()` and additional commented codes
+* Closed #6 by updating `extract_context()` function to make it more flexible for users
+* Updated `extract_speaker()` to only return a list of speakers for texts
+* Closed #4 and #5 by removing `str_translate()` function for translating strings
 
 # poldis 0.0.2
 
