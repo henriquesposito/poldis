@@ -1,8 +1,8 @@
 Package: poldis
 Type: Package
-Title: Tools for analyzing political discourse
-Version: 0.0.2
-Date: 2022-02-07
+Title: Tools for Analyzing Political Discourse
+Version: 0.0.3
+Date: 2022-09-25
 Author: person(given = "Henrique",
            family = "Sposito", 
            role = c("cre", "aut", "ctb"),
@@ -13,17 +13,20 @@ Description: Tools for analyzing political discourse beyond official speeches.
 License: MIT + file LICENSE
 Imports:
     dplyr,
-    usethis,
     stringr,
     purrr,
     stringi,
-    testthat,
-    translateR,
-    cld2
-Suggests:
+    messydates,
     remotes,
-    rmarkdown
-RoxygenNote: 7.1.2
+    stringdist,
+    entity
+Suggests:
+    rmarkdown,
+    testthat,
+    covr
+Remotes:
+    trinker/entity
+RoxygenNote: 7.2.0
 Encoding: UTF-8
 LazyData: True
 Depends: 

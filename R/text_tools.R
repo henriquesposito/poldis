@@ -1,106 +1,90 @@
-#' Extract dates from text
+#' Extract context for string matches
 #'
-#' Sometimes dates can be contained in text,
-#' this function extracts those dates from text.
-#' @param v Text variable/object
-#' @return A list of dates
-#' @import stringr
+#' A function for getting string matches and the context in which they occur.
+#' @param match Character string to be matched.
+#' For multiple strings, please use "|" as a separator.
+#' @param v Text vector.
+#' @param level At which text level do you want matches to be returned?
+#' Options are sentences, words, and paragraph.
+#' @param n Number of sentences or words matched before and after string match.
+#' 1 by default.
+#' That is, one word or one sentence before, and after, string match.
+#' For paragraphs, n is always set to one.
+#' @importFrom stringr str_detect str_extract_all
 #' @examples
-#' text <- c("This function was created on the 29 September 2021",
-#' "Today is October 12, 2021")
-#' extract_date(text)
+#' extract_context(match = "war|weapons of mass destruction|conflict|NATO|peace",
+#' v = US_News_Conferences_1960_1980$text[100],
+#' level = "sentences",
+#' n = 2)
+#' @return A list of string matches an their context
 #' @export
-extract_date <- function(v) {
-  # make all lower case
-  out <- tolower(v)
-  # remove commas
-  out <- gsub(",", "", out)
-  # remove ordinal signs and date related articles
-  out <- stringr::str_remove_all(out, "de |of |st |nd |rd |th ")
-  # correct double white space left
-  out <- stringr::str_squish(out)
-  # get the first date per row
-  out <- stringr::str_extract(out,
-  "[:digit:]{2}\\s[:alpha:]{3}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{4}\\s[:digit:]{4}|
-  |[:digit:]{2}\\s[:alpha:]{5}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{6}\\s[:digit:]{4}|
-  |[:digit:]{2}\\s[:alpha:]{7}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{8}\\s[:digit:]{4}|
-  |[:digit:]{2}\\s[:alpha:]{9}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{3}\\s[:digit:]{4}|
-  |[:digit:]{1}\\s[:alpha:]{4}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{5}\\s[:digit:]{4}|
-  |[:digit:]{1}\\s[:alpha:]{6}\\s[:digit:]{4}|[:digit:]{1}\\s[:alpha:]{7}\\s[:digit:]{4}|
-  |[:digit:]{1}\\s[:alpha:]{8}\\s[:digit:]{4}|[:digit:]{2}\\s[:alpha:]{9}\\s[:digit:]{4}|
-  |[:alpha:]{3}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{4}\\s[:digit:]{2}\\s[:digit:]{4}|
-  |[:alpha:]{5}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{6}\\s[:digit:]{2}\\s[:digit:]{4}|
-  |[:alpha:]{7}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{8}\\s[:digit:]{2}\\s[:digit:]{4}|
-  |[:alpha:]{9}\\s[:digit:]{2}\\s[:digit:]{4}|[:alpha:]{3}\\s[:digit:]{1}\\s[:digit:]{4}|
-  |[:alpha:]{4}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{5}\\s[:digit:]{1}\\s[:digit:]{4}|
-  |[:alpha:]{6}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{7}\\s[:digit:]{1}\\s[:digit:]{4}|
-  |[:alpha:]{8}\\s[:digit:]{1}\\s[:digit:]{4}|[:alpha:]{9}\\s[:digit:]{1}\\s[:digit:]{4}|
-  |[:digit:]{2}-[:digit:]{2}-[:digit:]{4}|[:digit:]{1}-[:digit:]{2}-[:digit:]{4}|
-  |[:digit:]{2}-[:digit:]{2}-[:digit:]{2}|[:digit:]{1}-[:digit:]{2}-[:digit:]{2}|
-  |[:digit:]{2}-[:digit:]{1}-[:digit:]{4}|[:digit:]{1}-[:digit:]{1}-[:digit:]{4}|
-  |[:digit:]{2}-[:digit:]{1}-[:digit:]{2}|[:digit:]{1}-[:digit:]{1}-[:digit:]{2}|
-  |[:digit:]{4}-[:digit:]{2}-[:digit:]{2}|[:digit:]{4}-[:digit:]{2}-[:digit:]{1}|
-  |[:digit:]{4}-[:digit:]{1}-[:digit:]{2}|[:digit:]{4}-[:digit:]{1}-[:digit:]{1}|
-  |[:digit:]{2}/[:digit:]{2}/[:digit:]{4}|[:digit:]{1}/[:digit:]{2}/[:digit:]{4}|
-  |[:digit:]{2}/[:digit:]{2}/[:digit:]{2}|[:digit:]{1}/[:digit:]{2}/[:digit:]{2}|
-  |[:digit:]{2}/[:digit:]{1}/[:digit:]{4}|[:digit:]{1}/[:digit:]{1}/[:digit:]{4}|
-  |[:digit:]{2}/[:digit:]{1}/[:digit:]{2}|[:digit:]{1}/[:digit:]{1}/[:digit:]{2}|
-  |[:digit:]{4}/[:digit:]{2}/[:digit:]{2}|[:digit:]{4}/[:digit:]{2}/[:digit:]{1}|
-  |[:digit:]{4}/[:digit:]{1}/[:digit:]{2}|[:digit:]{4}/[:digit:]{1}/[:digit:]{1}|
-  |[:digit:]{3}\\s[:alpha:]{4}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{4}\\s[:digit:]{2}|
-  |[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{2}|
-  |[:digit:]{4}\\s[:alpha:]{6}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{7}\\s[:digit:]{2}|
-  |[:digit:]{4}\\s[:alpha:]{8}\\s[:digit:]{2}|[:digit:]{4}\\s[:alpha:]{9}\\s[:digit:]{2}|
-  |[:digit:]{3}\\s[:alpha:]{4}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{4}\\s[:digit:]{1}|
-  |[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{5}\\s[:digit:]{1}|
-  |[:digit:]{4}\\s[:alpha:]{6}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{7}\\s[:digit:]{1}|
-  |[:digit:]{4}\\s[:alpha:]{8}\\s[:digit:]{1}|[:digit:]{4}\\s[:alpha:]{9}\\s[:digit:]{1}")
-  # re-order dates if necessary
-  out <- lapply(out, re_order)
-  # get the months into numeric form
-  months <- as.data.frame(months)
-  for (k in seq_len(nrow(months))) {
-    out <- gsub(paste0(months$months[k]),
-                paste0(months$number[k]),
-                out, ignore.case = TRUE,
-                perl = T)
+extract_context <- function(match,
+                            v,
+                            level = c("sentences", "words", "paragraph"),
+                            n = 1) {
+  if (is.null(level)) {
+    stop("Please declare the level of the text to be returned, option are sentences, words or paragraph")
   }
-  # standardize separators
-  out <- stringr::str_replace_all(out, " |/", "-")
-  out <- stringr::str_replace_all(out, "[a-z]|[A-Z]", "?")
-  out <- as.character(ifelse(out == "", NA, out))
-  out
+  if (level == "sentences") {
+    s <- stringr::str_extract_all(v, paste0("([^.]+\\.){0,", n, "}[^.]+(", match, ").*?\\.([^.]+\\.){0,", n, "}"))
+  }
+  if (level == "words") {
+    s <- stringr::str_extract_all(v, paste0("([^\\s]+\\s+){", n,"}", match, "(\\s+[^\\s]+){", n, "}"))
+  }
+  if (level == "paragraph") {
+    if (stringr::str_detect(v, "\\.\n", negate = TRUE))
+    {
+      stop("No paragraph markings were found in text variable, please set level to sentences or words")
+    }
+    paragraph <- strsplit(v, "\\.\n")
+    s <- ifelse(stringr::str_detect(match, paragraph), paragraph, "")
+  }
+  s
 }
 
-#' Helper function for re-ordering dates
+#' Extract a list of the speakers in texts
 #'
-#' Helper function for re-ordering character dates for consistency.
-#' Default is DMY.
-#' @param l List of dates
-#' @import stringr
-#' @return A list of dates of the same lenghte but re-ordered, if necessary.
-re_order <- function(l) {
-  l <- stringr::str_squish(l)
-  st <- stringr::word(l, 1)
-  mi <- stringr::word(l, 2)
-  ed <- stringr::word(l, 3)
-  out <- ifelse(stringr::str_starts(l, "[:digit:]{4}"), paste0(ed, "-", mi, "-", st), l)
-  out <- ifelse(stringr::str_starts(out, "[:alpha:]"), paste0(mi, "-", st, "-", ed), out)
-  out <- stringr::str_remove_all(out, "-NA|NA-|NA")
-  out
+#' @param v A text vector.
+#' @importFrom dplyr distinct
+#' @importFrom stringdist stringsimmatrix
+#' @importFrom entity person_entity
+#' @return A list of speakers.
+#' @examples
+#' \dontrun{
+#' extract_speaker(US_News_Conferences_1960_1980[600, 3])
+#' }
+#' @export
+extract_speaker <- function(v) {
+  # get speakers
+  allSpeakers <- unique(unlist(lapply(v, function(x)
+    unique(unlist(entity::person_entity(x))))))
+  if (is.null(allSpeakers)) {
+    message("No speakers were found in text...")
+  } else {
+    # check if similar names are the same person
+    s <- stringdist::stringsimmatrix(allSpeakers, allSpeakers)
+    s <- ifelse(s == 1, 0, s)
+    rownames(s) <- allSpeakers
+    colnames(s) <- allSpeakers
+    s <- ifelse(s > 0.8, rownames(s), 0)
+    s <- data.frame(match1 = colnames(s)[row(s)],
+                    match2 = as.character(c(t(s))),
+                    stringsAsFactors = FALSE)
+    s <- dplyr::distinct(s)
+    s <- ifelse(s$match2 == 0, s$match1, paste(s$match1, " - ", s$match2))
+    s
+  }
 }
 
-#' Extract title from text
+#' Extract first sentence from text
 #'
 #' A lot of information is contained in the first sentence of a text.
-#' For political texts, dates and locations are often contained in the
-#' first sentence.
-#' This function extracts the first sentence of text.
-#' @param v Text variable/object
+#' In political texts, for example, dates and locations are often contained
+#' in the first sentence of the text.
+#' @param v Text vector
 #' @return A list of the first sentences
 #' @examples
-#' text <- "This is the first sentence. This is the second sentence."
-#' extract_title(text)
+#' extract_title("This is the first sentence. This is the second sentence.")
 #' @export
 extract_title <- function(v) {
   out <- gsub("([a-z0-9][?!.])\\s.*", "\\1", v)
@@ -110,8 +94,8 @@ extract_title <- function(v) {
 #' Extract location from strings
 #'
 #' Extracts location from strings.
-#' For now, only works for Brasilian states and other
-#' countries/Unions.
+#' Works for Brasilian states and other countries.
+#' Texts must be in english or portuguese.
 #' @param v Text variable/object
 #' @importFrom stringi stri_trans_general
 #' @importFrom stringr str_extract
@@ -139,7 +123,7 @@ extract_location <- function(v) {
   v
 }
 
-#' Split Texts
+#' Extract splited texts
 #'
 #' Split texts into structured lists according to a split sign.
 #' @param text text variable
@@ -150,10 +134,9 @@ extract_location <- function(v) {
 #' @return A splitted list for each row
 #' @examples
 #' text <- "This is the first sentence. This is the second sentence."
-#' split_text(text)
+#' extract_split(text)
 #' @export
-split_text <- function(text, splitsign = "\\.") {
-
+extract_split <- function(text, splitsign = "\\.") {
   t <-  strsplit(as.character(text), splitsign)
   # Add attribute for the number of divisions
   for(i in seq_len(length(t))) {
@@ -162,7 +145,7 @@ split_text <- function(text, splitsign = "\\.") {
   t
 }
 
-#' Get text matches
+#' Extract text matches
 #'
 #' Get texts in which only certain "matches" occur.
 #' @param text A text variable
@@ -170,17 +153,16 @@ split_text <- function(text, splitsign = "\\.") {
 #' For multiple words, please use "|" to divide them.
 #' @param invert Do you want texts without certain matches to be returned?
 #' By default FALSE.
-#' @param ignore.case Shoud case be ignored?
+#' @param ignore.case Should case be ignored?
 #' By default, TRUE.
 #' @importFrom purrr map_chr
 #' @return A list of matches of the same length as text variable
 #' @examples
 #' text <- c("This function was created on the 29 September 2021",
 #' "Today is October 12, 2021")
-#' text_match(text, "October")
+#' extract_match(text, "October")
 #' @export
-text_match <- function(text, match, invert = FALSE, ignore.case = TRUE) {
-
+extract_match <- function(text, match, invert = FALSE, ignore.case = TRUE) {
   if (invert == TRUE & ignore.case == FALSE) {
     t <- lapply(text, function(x) grep(match, x, value = TRUE, ignore.case = FALSE, invert = TRUE))
   } else if (invert == TRUE & ignore.case == TRUE) {
