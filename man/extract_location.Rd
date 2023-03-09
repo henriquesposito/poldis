@@ -14,8 +14,8 @@ A list of the first locations
 }
 \description{
 Extracts location from strings.
-Works for Brasilian states and other countries.
-Texts must be in english or portuguese.
+Works for Brazilian states and other countries.
+Texts must be in English or Portuguese.
 }
 \details{
 If more than one location is found,

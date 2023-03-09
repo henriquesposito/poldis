@@ -49,6 +49,8 @@ extract_context <- function(match,
 #' @importFrom stringdist stringsimmatrix
 #' @importFrom entity person_entity
 #' @return A list of speakers.
+#' @details The function relies on NLP models and, therefore, results
+#' might not be accurate or consistent.
 #' @examples
 #' \dontrun{
 #' extract_speaker(US_News_Conferences_1960_1980[600, 3])
@@ -94,8 +96,8 @@ extract_title <- function(v) {
 #' Extract location from strings
 #'
 #' Extracts location from strings.
-#' Works for Brasilian states and other countries.
-#' Texts must be in english or portuguese.
+#' Works for Brazilian states and other countries.
+#' Texts must be in English or Portuguese.
 #' @param v Text variable/object
 #' @importFrom stringi stri_trans_general
 #' @importFrom stringr str_extract
@@ -123,9 +125,9 @@ extract_location <- function(v) {
   v
 }
 
-#' Extract splited texts
+#' Split texts
 #'
-#' Split texts into structured lists according to a split sign.
+#' Split texts into structured lists of lists according to a split sign.
 #' @param text text variable
 #' @param splitsign Where do you want to split?
 #' By default sentences (".").
@@ -134,9 +136,9 @@ extract_location <- function(v) {
 #' @return A splitted list for each row
 #' @examples
 #' text <- "This is the first sentence. This is the second sentence."
-#' extract_split(text)
+#' split_text(text)
 #' @export
-extract_split <- function(text, splitsign = "\\.") {
+split_text <- function(text, splitsign = "\\.") {
   t <-  strsplit(as.character(text), splitsign)
   # Add attribute for the number of divisions
   for(i in seq_len(length(t))) {
@@ -162,15 +164,20 @@ extract_split <- function(text, splitsign = "\\.") {
 #' "Today is October 12, 2021")
 #' extract_match(text, "October")
 #' @export
-extract_match <- function(text, match, invert = FALSE, ignore.case = TRUE) {
+extract_match <- function(text, match, invert = FALSE,
+                          ignore.case = TRUE) {
   if (invert == TRUE & ignore.case == FALSE) {
-    t <- lapply(text, function(x) grep(match, x, value = TRUE, ignore.case = FALSE, invert = TRUE))
+    t <- lapply(text, function(x) grep(match, x, value = TRUE,
+                                       ignore.case = FALSE, invert = TRUE))
   } else if (invert == TRUE & ignore.case == TRUE) {
-    t <- lapply(text, function(x) grep(match, x, value = TRUE, ignore.case = TRUE, invert = TRUE))
+    t <- lapply(text, function(x) grep(match, x, value = TRUE,
+                                       ignore.case = TRUE, invert = TRUE))
   } else if (invert == FALSE & ignore.case == FALSE) {
-    t <- lapply(text, function(x) grep(match, x, value = TRUE, ignore.case = FALSE))
+    t <- lapply(text, function(x) grep(match, x, value = TRUE,
+                                       ignore.case = FALSE))
   } else {
-    t <- lapply(text, function(x) grep(match, x, value = TRUE, ignore.case = TRUE))
+    t <- lapply(text, function(x) grep(match, x, value = TRUE,
+                                       ignore.case = TRUE))
   }
   t
 }

@@ -15,6 +15,10 @@ A list of speakers.
 \description{
 Extract a list of the speakers in texts
 }
+\details{
+The function relies on NLP models and, therefore, results
+might not be accurate or consistent.
+}
 \examples{
 \dontrun{
 extract_speaker(US_News_Conferences_1960_1980[600, 3])
