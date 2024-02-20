@@ -181,3 +181,45 @@ extract_match <- function(text, match, invert = FALSE,
   }
   t
 }
+
+#' #' Extract similarities and differences in treaties
+#' #'
+#' #' @param dataset A dataset in a datacube from one of the many packages.
+#' #' @param text_variable Text variable.
+#' #' @param comparison Would you like to extract similarities or differences
+#' #' between treaties?
+#' #' If not specified, defaults to "similarities".
+#' #' Alternatively, users can also get the "differences".
+#' #' @param method A method for checking similarities or differences.
+#' #' If chosen comparison are similarities, extracts "correlation" between
+#' #' treaty texts if not specified.
+#' #' Other similarity methods from `quanteda.textstats::textstat_simil()`
+#' #' include "cosine", "jaccard", "ejaccard", "dice", "edice",
+#' #' "simple matching", and "hamann".
+#' #' If chosen comparison are differences, extracts "euclidean" difference
+#' #' between treaty texts if not specified.
+#' #' Other difference methods from `quanteda.textstats::textstat_dist()` include
+#' #' "manhattan", "maximum", "canberra", and "minkowski".
+#' #' @examples
+#' #' @return
+#' #' `extract_treaties()` returns a matrix with the similarity or difference
+#' #' scores between all the agreements.
+#' #' @export
+#' extract_treaties <- function(dataset, text_variable,
+#'                              comparison, method) {
+#'   thisRequires("quanteda")
+#'   thisRequires("quanteda.textstats")
+#'   out <- quanteda::dfm(dataset[,variable])
+#'   if (missing(comparison) | comparison == "similarities") {
+#'     if(missing(method)) {
+#'       method = "correlation"
+#'     }
+#'     quanteda.textstats::textstat_simil(dfm, method = method)
+#'   } else {
+#'       if(missing(method)) {
+#'         method = "euclidean"
+#'       }
+#'       quanteda.textstats::textstat_dist(dfm, method = method)
+#'   }
+#'   #todo: add ploting function that plots treaties as a dendogram
+#' }
