@@ -39,7 +39,7 @@ test_that("Locations are extracted properly", {
 })
 
 test_that("Text is properly split", {
-  a <- extract_split(text)
+  a <- split_text(text)
   expect_length(a, 5)
 })
 

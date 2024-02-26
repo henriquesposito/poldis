@@ -17,16 +17,17 @@ Imports:
     purrr,
     stringi,
     messydates,
-    remotes,
     stringdist,
-    entity
+    pdftools,
+    quanteda,
+    quanteda.textstats,
+    spacyr
 Suggests:
     rmarkdown,
     testthat,
-    covr
-Remotes:
-    trinker/entity
-RoxygenNote: 7.2.3
+    covr,
+    tesseract
+RoxygenNote: 7.3.1
 Encoding: UTF-8
 LazyData: True
 Depends: 
