@@ -182,10 +182,9 @@ extract_match <- function(text, match, invert = FALSE,
   t
 }
 
-# #' Extract similarities and differences in treaties
+# #' Extract similarities and differences in texts
 # #'
-# #' @param dataset A dataset in a datacube from one of the many packages.
-# #' @param text_variable Text variable.
+# #' @param text Text variable.
 # #' @param comparison Would you like to extract similarities or differences
 # #' between treaties?
 # #' If not specified, defaults to "similarities".
@@ -201,15 +200,11 @@ extract_match <- function(text, match, invert = FALSE,
 # #' Other difference methods from `quanteda.textstats::textstat_dist()` include
 # #' "manhattan", "maximum", "canberra", and "minkowski".
 # #' @examples
-# #' @return
-# #' `extract_treaties()` returns a matrix with the similarity or difference
-# #' scores between all the agreements.
 # #' @export
-# extract_treaties <- function(dataset, text_variable,
-#                              comparison, method) {
+# extract_similarities <- function(text, comparison, method) {
 #   thisRequires("quanteda")
 #   thisRequires("quanteda.textstats")
-#   out <- quanteda::dfm(dataset[,variable])
+#   out <- quanteda::dfm(text)
 #   if (missing(comparison) | comparison == "similarities") {
 #     if(missing(method)) {
 #       method = "correlation"
