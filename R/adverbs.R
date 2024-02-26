@@ -28,3 +28,38 @@ freq_adverbs <- list(
                  "regularly")
 )
 
+time_adverbs <- list(
+  relative_timepoints = c("yesterday",
+                          "then",
+                          "now",
+                          "today",
+                          "tonight",
+                          "tomorrow"),
+  relational_timepoints = c("already",
+                            "daily",
+                            "last",
+                            "next",
+                            "previously",
+                            "after",
+                            "afterwards",
+                            "early",
+                            "late",
+                            "later",
+                            "since",
+                            "still",
+                            "just",
+                            "seldom",
+                            "before",
+                            "early",
+                            "earlier",
+                            "eventually",
+                            "finally",
+                            "first",
+                            "formerly",
+                            "just",
+                            "lately",
+                            "recently",
+                            "soon",
+                            "yet")
+)
+
