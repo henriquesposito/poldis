@@ -38,7 +38,6 @@ Lastly, if you are using ´{poldis}´, please do not forget to cite us ;)
 
     citation("poldis")
 
-    ## 
     ## To cite poldis in publications use:
     ## 
     ##   H. Sposito. poldis: Tools for analyzing political discourse. 2021.
