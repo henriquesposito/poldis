@@ -3,11 +3,20 @@ Type: Package
 Title: Tools for Analyzing Political Discourse
 Version: 0.0.3
 Date: 2022-09-25
-Author: person(given = "Henrique",
-           family = "Sposito", 
-           role = c("cre", "aut", "ctb"),
-           email = "henrique.sposito@graduateinstitute.ch",
-           ORDCID = "0000-0003-3420-6085")
+Author: c(person(given = "Henrique",
+                 family = "Sposito", 
+                 role = c("cre", "aut", "ctb"),
+                 email = "henrique.sposito@graduateinstitute.ch",
+                 ORDCID = c("IHEID", "0000-0003-3420-6085")),
+          person(given = "James",
+                 family = "Hollway",
+                 role = c("ctb"),
+                 email = "james.hollway@graduateinstitute.ch",
+                 comment = c("IHEID", ORCID = "0000-0002-8361-9647")),
+          person(given = "Jael",
+                 family = "Tan",
+                 role = "ctb",
+                 comment = c("IHEID", ORCID = "0000-0002-6234-9764")))
 Maintainer: Henrique Sposito <henrique.sposito@graduateinstitute.ch>
 Description: Tools for analyzing political discourse beyond official speeches.
 License: MIT + file LICENSE
