@@ -190,13 +190,13 @@ dfmt_urgent <- dfm_select(dfmt, dictu$en$urgent["main"])
 dfmt_urgent <- dfmt_urgent*
   as.integer(rowSums(dfm_select(dfmt, dictu$en$urgent["aux"])) > 0)
 dfmt_urgent <- dfmt_urgent*
-  as.integer(rowSums(dfm_select(dfmt, dictu$en$urgent["urgent"])) > 0)
+  as.integer(rowSums(dfm_select(dfmt, dictu$en$urgent["degree"])) > 0)
 colnames(dfmt_urgent) <- paste0(colnames(dfmt_urgent), "/urgent")
 dfmt_not_so_urgent <- dfm_select(dfmt, dictu$en$not_so_urgent["main"])
 dfmt_not_so_urgent <- dfmt_not_so_urgent*
   as.integer(rowSums(dfm_select(dfmt, dictu$en$not_so_urgent["aux"])) > 0)
 dfmt_not_so_urgent <- dfmt_not_so_urgent*
-  as.integer(rowSums(dfm_select(dfmt, dictu$en$not_so_urgent["urgent"])) > 0)
+  as.integer(rowSums(dfm_select(dfmt, dictu$en$not_so_urgent["degree"])) > 0)
 colnames(dfmt_not_so_urgent) <- paste0(colnames(dfmt_not_so_urgent), "/not_so_urgent")
 dfmt2u <- dfm_remove(dfmt, dictu$en)
 dfmt3u <- cbind(dfmt2u, dfmt_urgent, dfmt_not_so_urgent)

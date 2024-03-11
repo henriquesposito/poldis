@@ -1,25 +1,17 @@
 en:
     urgent:
-        aux: [will, shall, going to, have, has]
+        aux: [will, shall, going to, must]
         main: [be, have, do, say, get, make, go, know, take, see, come,
                 think, look, want, give, use, find, tell, ask, work, seem,
                 feel, try, leave, call, attempt, live, loose, fall, answer,
-                follow, write, talk, carry, show, realize, realise, read,
-                been, done, said, made, gone, known, taken, seen, come,
-               thought, looked, wanted, given, used, found, told, asked, worked, seemed,
-               felt, tried, left, called, attempted, lived, lost, fallen, answered,
-               followed, asked, written, talked, carried, shown, realized, realised, read]
-        urgent: [must, now, imperative, as soon as possible, urgent, immediately, urge,
-                 never, step, vigorously, any longer, had enough]
+                follow, write, talk, carry, show, realize, realize, read]
+        degree: [now, imperative, urgent, immediately, urge,
+                 never, step, vigorously, any, enough]
     not_so_urgent:
-        aux: [will, shall, going to, have, has]
+        aux: [will, shall, going to, should]
         main: [be, have, do, say, get, make, go, know, take, see, come,
                 think, look, want, give, use, find, tell, ask, work, seem,
                 feel, try, leave, call, attempt, live, loose, fall, answer,
-                follow, write, talk, carry, show, realize, realise, read,
-                been, done, said, made, gone, known, taken, seen, come,
-               thought, looked, wanted, given, used, found, told, asked, worked, seemed,
-               felt, tried, left, called, attempted, lived, lost, fallen, answered,
-               followed, asked, written, talked, carried, shown, realized, realised, read]
-        urgent: [should, more and more, ideally, soon, possible, in the future, plan,
-                 a key component of, strategic, advance, develop, accelerate, important, promote]
+                follow, write, talk, carry, show, realize, realize, read]
+        degree: [more, ideally, soon, possible, future, plan,
+                 component, strategic, advance, develop, accelerate, important, promote]
