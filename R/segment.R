@@ -1,5 +1,17 @@
 # Functions to help with text segmentation
 
+#' Extract future promises from political discourses
+#'
+#' @param v Text vector.
+#' @importFrom dplyr filter
+#' @export
+extract_promises <- function(v) {
+  tags <- tokens <- NULL
+  annotate_text(v, level = "sentences") |>
+    dplyr::filter(grepl(" MD ", tags) | grepl("going to", sentence))
+  # todo: extract sentences around promises and re-paste together
+}
+
 #' Extract context for string matches
 #'
 #' A function for getting string matches and the context in which they occur.
@@ -20,20 +32,15 @@
 #' n = 2)
 #' @return A list of string matches an their context
 #' @export
-extract_context <- function(match,
-                            v,
-                            level = c("sentences", "words", "paragraph"),
-                            n = 1) {
+extract_context <- function(match, v, level = c("sentences", "words", "paragraph"), n = 1) {
   if (is.null(level)) {
     stop("Please declare the level of the text to be returned, option are sentences, words or paragraph")
   }
   if (level == "sentences") {
     s <- stringr::str_extract_all(v, paste0("([^.]+\\.){0,", n, "}[^.]+(", match, ").*?\\.([^.]+\\.){0,", n, "}"))
-  }
-  if (level == "words") {
+  } else if (level == "words") {
     s <- stringr::str_extract_all(v, paste0("([^\\s]+\\s+){", n,"}", match, "(\\s+[^\\s]+){", n, "}"))
-  }
-  if (level == "paragraph") {
+  } else if (level == "paragraph") {
     if (stringr::str_detect(v, "\\.\n", negate = TRUE))
     {
       stop("No paragraph markings were found in text variable, please set level to sentences or words")

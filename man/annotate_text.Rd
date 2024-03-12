@@ -4,10 +4,12 @@
 \alias{annotate_text}
 \title{Parse text with NLP}
 \usage{
-annotate_text(v)
+annotate_text(v, level = "words")
 }
 \arguments{
 \item{v}{Text vector}
+
+\item{level}{Do you want to parse words or sentences? Words by default.}
 }
 \description{
 Wrapper for `spacyr::spacy_parse` function.
