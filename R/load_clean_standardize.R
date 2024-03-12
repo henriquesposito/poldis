@@ -24,12 +24,29 @@ load_pdf <- function(path) {
 #'
 #' Wrapper for `spacyr::spacy_parse` function.
 #' @param v Text vector
+#' @param level Do you want to parse words or sentences? Words by default.
 #' @import spacyr
+#' @importFrom dplyr group_by summarise ungroup
 #' @export
-annotate_text <- function(v) {
-  spacyr::spacy_initialize(model = "en_core_web_sm")
-  parse <-  spacyr::spacy_parse(v)
-  spacyr::spacy_finalize()
+annotate_text <- function(v, level = "words") {
+  doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- entity <- NULL
+  if (is.null(level)) {
+    stop("Please declare the level of the text to be returned, option are sentences, words or paragraph")
+  }
+  suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
+  parse <- spacyr::spacy_parse(v, tag = TRUE)
+  suppressWarnings(spacyr::spacy_finalize())
+  if (level == "sentences") {
+    parse <- group_by(parse, doc_id, sentence_id) |>
+      dplyr::summarise(ntoken = max(token_id),
+                       sentence = paste(token, collapse = " "),
+                       poss = paste(pos, collapse = " "),
+                       tags = paste(tag, collapse = " "),
+                       lemmas = paste(lemma, collapse = " "),
+                       entities = paste(ifelse(entity == "", NA, entity),
+                                        collapse = " ")) |>
+      dplyr::ungroup()
+  }
   parse
 }
 
