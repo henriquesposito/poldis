@@ -7,10 +7,59 @@
 #' @export
 extract_promises <- function(v) {
   tags <- tokens <- NULL
-  annotate_text(v, level = "sentences") |>
-    dplyr::filter(grepl(" MD ", tags) | grepl("going to", sentence))
-  # todo: extract sentences around promises and re-paste together
+  if (any(class(v) == "spacyr_parsed")) {
+    if ("token_id" %in% names(object))
+      stop("Please declare a text vector or a an annotated object at the sentence level.")
+  } else v <- annotate_text(v, level = "sentences")
+  v |> dplyr::filter(grepl(" MD ", tags) | grepl("going to", sentence))
+  # todo: extract related sentences around promises and re-paste together
 }
+
+#' Extract most frequent subjects from political discourses
+#'
+#' @param v Text vector.
+#' @param n Number of subjects
+#' @import dplyr
+#' @export
+extract_subjects <- function(v, n = 20) {
+  if (any(class(v) == "spacyr_parsed")) {
+    if ("ntoken" %in% names(object))
+      stop("Please declare a text vector or a an annotated object at the word level.")
+  } else v <- annotate_text(v)
+  out <- spacyr::entity_extract(v) |>
+    group_by(doc_id, sentence_id) |>
+    mutate(duplicated = n() > 1,
+           entity = stringr::str_squish(
+             tm::removePunctuation(tm::removeWords(
+             stringr::str_replace_all(tolower(entity), "_", " "),
+             tm::stopwords())))) |>
+    filter(duplicated == FALSE) |>
+    ungroup()
+  purrr::map_dfr(out$entity, ~ {
+    i <- which(stringdist::stringdist(., out$entity, "lv") < 2)
+    tibble(index = i, subjects = out$entity[i])
+  }, .id = "group") |>
+    distinct(index, .keep_all = T) |>
+    group_by(group) |>
+    summarize(subjects = paste(unique(subjects), collapse = "|"),
+              count = n()) |>
+    arrange(-count) |>
+    ungroup() |>
+    filter(subjects != "") |>
+    select(subjects) |>
+    slice_head(n = n)
+  # todo: exclude small words
+}
+
+# assign_subjects <- function(v, subjects) {
+#   if (any(class(v) == "spacyr_parsed")) {
+#     if ("token_id" %in% names(object))
+#       stop("Please declare a text vector or a an annotated object at the sentence level.")
+#   } else v <- annotate_text(v, level = "sentences")
+#   # get subjects
+#   # get similar words
+#   # match in sentences
+# }
 
 #' Extract context for string matches
 #'

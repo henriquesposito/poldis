@@ -1,5 +1,16 @@
 # Urgency Analysis
 
+extract_urgency <- function(.data, subjects, n = 20) {
+  # get promises
+  # get subject
+  # assign subjects to texts
+  # get/score ordinal
+  # get/score frequency
+  # get/score time
+  # get/score degree
+  # weight and acore sentences according ot subject
+}
+
 # Dictionaries
 freq_adverbs <- list(definite = c("once", "twice", "annually", "daily",
                                   "fortnightly", "hourly", "monthly", "nightly",
