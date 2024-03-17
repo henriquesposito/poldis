@@ -4,14 +4,15 @@
 #'
 #' @param v Text vector.
 #' @importFrom dplyr filter
+#' @importFrom stringr str_detect
 #' @export
 extract_promises <- function(v) {
-  tags <- tokens <- NULL
-  if (any(class(v) == "spacyr_parsed")) {
-    if ("token_id" %in% names(object))
-      stop("Please declare a text vector or a an annotated object at the sentence level.")
+  tags <- tokens <- sentence <- NULL
+  if (any(class(v) == "data.frame")) {
+    if ("token_id" %in% names(v))
+      stop("Please declare a text vector or a an annotated object at the word level.")
   } else v <- annotate_text(v, level = "sentences")
-  v |> dplyr::filter(grepl(" MD ", tags) | grepl("going to", sentence))
+  v |> dplyr::filter(stringr::str_detect(tags, " MD ") | stringr::str_detect(sentence, "going to"))
   # todo: extract related sentences around promises and re-paste together
 }
 
@@ -20,10 +21,12 @@ extract_promises <- function(v) {
 #' @param v Text vector.
 #' @param n Number of subjects
 #' @import dplyr
+#' @importFrom purrr map_dfr
 #' @export
 extract_subjects <- function(v, n = 20) {
-  if (any(class(v) == "spacyr_parsed")) {
-    if ("ntoken" %in% names(object))
+  sentence_id <- doc_id <- entity <- group <- subjects <- subject <- NULL
+  if (any(class(v) == "data.frame")) {
+    if ("ntoken" %in% names(v))
       stop("Please declare a text vector or a an annotated object at the word level.")
   } else v <- annotate_text(v)
   out <- spacyr::entity_extract(v) |>
@@ -36,30 +39,69 @@ extract_subjects <- function(v, n = 20) {
     filter(duplicated == FALSE) |>
     ungroup()
   purrr::map_dfr(out$entity, ~ {
-    i <- which(stringdist::stringdist(., out$entity, "lv") < 2)
+    i <- which(stringdist::stringdist(., out$entity, "lv") < 2 &
+                 nchar(out$entity) > 3)
     tibble(index = i, subjects = out$entity[i])
   }, .id = "group") |>
     distinct(index, .keep_all = T) |>
     group_by(group) |>
-    summarize(subjects = paste(unique(subjects), collapse = "|"),
+    summarize(subject = paste(unique(subjects), collapse = "|"),
               count = n()) |>
     arrange(-count) |>
     ungroup() |>
-    filter(subjects != "") |>
-    select(subjects) |>
-    slice_head(n = n)
-  # todo: exclude small words
+    filter(subject != "") |>
+    select(subject) |>
+    slice_head(n = n) |>
+    unlist()
+  # todo: exclude small words but sill count them
+  # todo: get it working for sentences to extract subjects from promises
 }
 
-# assign_subjects <- function(v, subjects) {
-#   if (any(class(v) == "spacyr_parsed")) {
-#     if ("token_id" %in% names(object))
-#       stop("Please declare a text vector or a an annotated object at the sentence level.")
-#   } else v <- annotate_text(v, level = "sentences")
-#   # get subjects
-#   # get similar words
-#   # match in sentences
-# }
+#' Extract terms related to subjects
+#'
+#' @param v Text vector.
+#' @param subjects List of subjects.
+#' @param n Number of terms.
+#' @import LSX
+#' @import quanteda
+#' @export
+extract_related_terms <- function(v, subjects, n = 5) {
+  corp <- quanteda::corpus(v) |>
+    quanteda::corpus_reshape(to = "sentences") # sentences
+  toks <- quanteda::tokens(corp, remove_punct = TRUE, remove_symbols = TRUE,
+                           remove_numbers = TRUE, remove_url = TRUE) # tokens
+  dfmt <- quanteda::dfm(toks) |>
+    quanteda::dfm_remove(quanteda::stopwords("en")) # document feature matrix
+  dict <- .as_dictionary(subjects) # set subjects
+  out <- list()
+  for (i in 1:length(dict)) out[[i]] <- quanteda::dfm_select(dfmt, dict[[i]])
+  dfmts <- quanteda::dfm_remove(dfmt, dict) |> cbind(do.call(cbind, out))
+  lss <- LSX::textmodel_lss(dfmts, seeds = dict, k = 300) # model
+  terms <- LSX::bootstrap_lss(lss, mode = "terms")[1:n,]
+  out <- list()
+  for (i in 1:length(dict)) {
+    out[[names(dict)[i]]] <- c(terms[,c(colnames(terms) %in% dict[[i]])])
+  }
+  out <- ifelse(lapply(out, rlang::is_empty), names(out), out)
+  names(out) <- names(dict)
+  un <- unlist(out)
+  out <- Map(`[`, out, utils::relist(!duplicated(un), skeleton = out))
+  # remove duplicate words
+  out
+  # todo: fix issue with multiple word subjects
+}
+
+# helper function
+.as_dictionary <- function(a) {
+  names(a) <- ifelse(stringr::str_detect(a, "\\|"),
+                     stringr::str_split_i(a, "\\|", i = 1), a)
+  out <- list()
+  for (i in names(a)) {
+    out[[i]] <- ifelse(stringr::str_detect(a[[i]], "\\|"),
+                       stringr::str_split(a[[i]], "\\|"), a[[i]])
+  }
+  quanteda::dictionary(out)
+}
 
 #' Extract context for string matches
 #'
