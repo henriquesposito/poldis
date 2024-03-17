@@ -1,0 +1,24 @@
+---
+title: "Urgency - Memo 2"
+author: "Henrique Sposito"
+date: "2024-03-17"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+sample_text <- read_csv("sample_text.csv")
+# annotate text at the word level
+words <- annotate_text(sample_text$text)
+# annotate text at the sentence level
+sentences <- annotate_text(sample_text$text, level = "sentences")
+promises <- extract_promises(sentences)
+subjects <- extract_subjects(words)
+related_terms <- extract_related_terms(v, subjects)
+urgency <- get_urgency(sample_text$v)
+head(urgency$sentence, n = 10)
+```
+
