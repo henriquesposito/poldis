@@ -30,7 +30,10 @@ Imports:
     pdftools,
     quanteda,
     quanteda.textstats,
-    spacyr
+    spacyr, 
+    LSX,
+    tm,
+    rlang
 Suggests:
     rmarkdown,
     testthat,
