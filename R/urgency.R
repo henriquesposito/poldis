@@ -77,16 +77,19 @@ get_urgency <- function(v, n = 20) {
 
 .assign_time <- function(promises) {
   short_term <- long_term <- NULL
-  # time_adverbs <- list(relative_timepoints = c("yesterday", "then", "now",
-  #                                              "today", "tonight", "tomorrow"),
-  #                      relational_timepoints = c("already", "daily", "last", "next",
-  #                                                "previously", "after", "afterwards",
-  #                                                "early", "late", "later", "since",
-  #                                                "still", "just", "seldom", "before",
-  #                                                "early", "earlier", "eventually",
-  #                                                "finally", "first", "formerly",
-  #                                                "just", "lately", "recently",
-  #                                                "soon", "yet"))
+  # time_adverbs <- list(relative_timepoints = list("last week" = -7, "yesterday" = -1,
+  #                                                 "then",
+  #                                                 "today" = 0, "now" = 0, "tonight" = 0.5,
+  #                                                 "tomorrow" = 1, "next week" = 7),
+  #                      relational_timepoints = list("formerly" = -8, "previously" = -5,
+  #                                                   "already" = -4, "since" = -4,
+  #                                                   "lately" = -3, "recently" = -2,
+  #                                                   "just" = -1, "still" = -1,
+  #                                                   "first" = 1, "next" = 2,
+  #                                                   "before" = 2.5, "early" = 3, "earlier" = 2.5,
+  #                                                   "soon" = 4, "after" = 4.5, "afterwards" = 4.5,
+  #                                                   "late" = 5, "later" = 5.5,
+  #                                                   "finally" = 6, "eventually" = 7, "at some stage" = 8))
   time_adverbs <- list(short_term = c("now", "today", "tonight", "tomorrow",
                                       "next", "early", "daily", "early", "earlier",
                                       "just", "first", "recently", "soon"),
