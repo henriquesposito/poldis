@@ -35,14 +35,24 @@ get_urgency <- function(v, n = 20) {
 
 .assign_frequencies <- function(promises) {
   frequently <- sometimes <- infrequently <- NULL
-  # freq_adverbs <- list(definite = c("once", "twice", "annually", "daily",
-  #                                   "fortnightly", "hourly", "monthly", "nightly",
-  #                                   "quarterly", "weekly", "yearly"),
-  #                      indefinite = c("always", "usually", "often", "sometimes",
-  #                                     "rarely", "never", "ever", "hardly ever",
-  #                                     "occasionally", "seldom", "generally",
-  #                                     "frequently", "normally", "constantly",
-  #                                     "infrequently", "regularly"))
+  # freq_adverbs <- list(definite = list("hourly" = 8765,
+  #                                      "daily|nightly" = 365,
+  #                                      "weekly" = 52,
+  #                                      "fortnightly" = 26,
+  #                                      "monthly" = 12,
+  #                                      "quarterly" = 4,
+  #                                      "annually|yearly" = 1),
+  #                      indefinite = list("always|constantly" = 1,
+  #                                        "usually|regularly" = 0.9,
+  #                                        "generally|normally" 0.8,
+  #                                        "often|frequently" = 0.7,
+  #                                        "sometimes" = 0.5,
+  #                                        "occasionally" = 0.3,
+  #                                        "seldom" = 0.2,
+  #                                        "infrequently" = 0.1,
+  #                                        "rarely" = 0.05,
+  #                                        "hardly ever" = 0.02,
+  #                                        "never" = 0))
   freq_adverbs <- list(frequently = c("daily", "fortnightly", "hourly", "nightly",
                                     "weekly", "always", "usually", "often",
                                     "generally", "frequently", "normally",
