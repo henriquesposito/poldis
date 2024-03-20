@@ -12,11 +12,8 @@ extract_promises <- function(v) {
     if ("token_id" %in% names(v))
       stop("Please declare a text vector or a an annotated object at the word level.")
   } else v <- annotate_text(v, level = "sentences")
-  v |> dplyr::filter(stringr::str_detect(tags, " MD ") | stringr::str_detect(sentence, "going to") |
-                       stringr::str_detect(sentence, "need to") | stringr::str_detect(sentence, "ready to") |
-                       stringr::str_detect(sentence, "is time to") | stringr::str_detect(sentence, "commit to") |
-                       stringr::str_detect(sentence, "intend to") | stringr::str_detect(sentence, "promise to") |
-                       stringr::str_detect(sentence, "let's"))
+  v |> dplyr::filter(stringr::str_detect(tags, " MD ") |
+                       stringr::str_detect(sentence, "going to|need to|ready to|is time to|commit to|promise to|intend to|let's"))
   # todo: extract related sentences around promises and re-paste together
 }
 
