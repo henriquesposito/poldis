@@ -6,7 +6,7 @@
 #' @import dplyr
 #' @export
 get_urgency <- function(v, n = 20) {
-  frequency <- timing <- topic <- degree <- urgency <- NULL
+  frequency <- timing <- topic <- degree <- urgency <- commit <- NULL
   if (any(class(v) == "data.frame")) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated object.")
@@ -20,7 +20,8 @@ get_urgency <- function(v, n = 20) {
                   frequency = .assign_frequencies(promises),
                   timing = .assign_time(promises),
                   degree = .assign_degree(promises),
-                  urgency = frequency + timing + degree) |>
+                  commit = .assign_commitment(promises),
+                  urgency = frequency + timing + degree + commit) |>
     dplyr::arrange(-urgency)
   # todo: adjust frequency, timing, and degree
 }
@@ -103,6 +104,17 @@ get_urgency <- function(v, n = 20) {
   for (i in names(unlist(unname(degr_adverbs)))) {
     out[[i]] <- stringr::str_count(promises[["sentence"]], i)*
       unlist(unname(degr_adverbs))[[i]]
+  }
+  rowSums(out[-1])
+}
+
+.assign_commitment <- function(promises) {
+  commit_level <- list(commited = c("will|must|going to|need to|ready to|is time to|commit to|promise to|intend to" = 1),
+                       not_as_commited = c("should|let's|want to" = 0.5))
+  out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
+  for (i in names(unlist(unname(commit_level)))) {
+    out[[i]] <- stringr::str_count(promises[["sentence"]], i)*
+      unlist(unname(commit_level))[[i]]
   }
   rowSums(out[-1])
 }
