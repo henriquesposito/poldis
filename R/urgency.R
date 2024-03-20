@@ -7,11 +7,14 @@
 #' @export
 get_urgency <- function(v, n = 20) {
   frequency <- timing <- topic <- degree <- urgency <- NULL
-  words <- annotate_text(v)
-  sentences <- annotate_text(v, "sentences")
-  promises <- extract_promises(sentences)
-  subjects <- extract_subjects(words, n = n) # todo: get subjects from sentences
-  similar_words <- extract_related_terms(v, subjects)
+  if (any(class(v) == "data.frame")) {
+    if (!"doc_id" %in% names(v)) {
+      stop("Please declare a text vector or an annotated object.")
+    }
+  }
+  promises <- extract_promises(v) # todo: find a way to check before running
+  subjects <- extract_subjects(promises, n = n) # todo: find a way to check before running
+  similar_words <- extract_related_terms(promises, subjects)
   promises |>
     dplyr::mutate(topic = .assign_subjects(promises, similar_words),
                   frequency = .assign_frequencies(promises),
