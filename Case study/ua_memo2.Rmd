@@ -13,19 +13,17 @@ library(poldis)
 
 ```{r}
 sample_text <- read_csv("sample_text.csv")
-# annotate text at the word level
-words <- annotate_text(sample_text$text)
 # annotate text at the sentence level
 sentences <- annotate_text(sample_text$text, level = "sentences")
 # get future promises
 promises <- extract_promises(sentences)
-# extract subjects (needs updating for sentences)
-subjects <- extract_subjects(words)
+# extract subjects
+subjects <- extract_subjects(promises)
 # get related terms to subjects
-related_terms <- extract_related_terms(sample_text$text, subjects)
+related_terms <- extract_related_terms(promises$sentence, subjects) # needs updating
 # code urgency
-urgency <- get_urgency(sample_text$text)
+urgency <- get_urgency(promises)
 head(urgency$sentence, n = 10)
-# Does it makes sense? Are these more urgent promises?
+# Are these more urgent promises?
 ```
 
