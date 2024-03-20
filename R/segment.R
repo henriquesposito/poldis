@@ -10,8 +10,8 @@ extract_promises <- function(v) {
   tags <- tokens <- sentence <- NULL
   if (any(class(v) == "data.frame")) {
     if ("token_id" %in% names(v))
-      stop("Please declare a text vector or a an annotated object at the word level.")
-  } else v <- annotate_text(v, level = "sentences")
+      stop("Please declare a text vector or an annotated data frame at the sentence level.")
+  } else v <- suppressMessages(annotate_text(v, level = "sentences"))
   v |> dplyr::filter(stringr::str_detect(tags, " MD ") |
                        stringr::str_detect(sentence, "going to|need to|ready to|is time to|commit to|promise to|intend to|let's"))
   # todo: extract related sentences around promises and re-paste together
@@ -27,9 +27,13 @@ extract_promises <- function(v) {
 extract_subjects <- function(v, n = 20) {
   sentence_id <- doc_id <- entity <- group <- subjects <- subject <- NULL
   if (any(class(v) == "data.frame")) {
-    if ("ntoken" %in% names(v))
-      stop("Please declare a text vector or a an annotated object at the word level.")
-  } else v <- annotate_text(v)
+    if (!"doc_id" %in% names(v)) {
+      stop("Please declare a text vector or an annotated data frame.")
+    }
+    if ("sentence" %in% names(v)) {
+      v <- suppressMessages(annotate_text(v[["sentence"]]))
+    }
+  } else v <- suppressMessages(annotate_text(v))
   out <- spacyr::entity_extract(v) |>
     group_by(doc_id, sentence_id) |>
     mutate(duplicated = n() > 1,
@@ -55,7 +59,8 @@ extract_subjects <- function(v, n = 20) {
     slice_head(n = n) |>
     unlist()
   # todo: exclude small words but sill count them
-  # todo: get it working for sentences to extract subjects from promises
+  # todo: change similarity method to get expressions together
+  #(e.g. united states and unites states america)
 }
 
 #' Extract terms related to subjects
@@ -67,6 +72,18 @@ extract_subjects <- function(v, n = 20) {
 #' @import quanteda
 #' @export
 extract_related_terms <- function(v, subjects, n = 5) {
+  doc_id <- token <- NULL
+  if (any(class(v) == "data.frame")) {
+    if (!"doc_id" %in% names(v)) {
+      stop("Please declare a text vector or an annotated data frame.")
+    }
+    if ("sentence" %in% names(v)) {
+      v <- v[["sentence"]]
+    } else if ("token_id" %in% names(v)) {
+      v <- group_by(doc_id) |>
+        dplyr::summarise(text = paste(token, collapse = " "))
+    }
+  }
   corp <- quanteda::corpus(v) |>
     quanteda::corpus_reshape(to = "sentences") # sentences
   toks <- quanteda::tokens(corp, remove_punct = TRUE, remove_symbols = TRUE,
@@ -89,6 +106,7 @@ extract_related_terms <- function(v, subjects, n = 5) {
   out <- Map(`[`, out, utils::relist(!duplicated(un), skeleton = out))
   # remove duplicate words
   out
+  # todo: make it work with annotated data frames
   # todo: fix issue with multiple word subjects
 }
 
