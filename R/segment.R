@@ -12,8 +12,18 @@ extract_promises <- function(v) {
     if ("token_id" %in% names(v))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
   } else v <- suppressMessages(annotate_text(v, level = "sentences"))
+  v <- v |>
+    dplyr::mutate(segment_id = cumsum(grepl("First|Second|Third|Fourth|Fifth|\\?|begin by|start by|begin with|Let",
+                                            v$sentence))) |> # assign segment IDs for merging text that belong together
+    dplyr::select(-c(sentence_id, ntoken)) |>
+    dplyr::group_by(doc_id, segment_id) |>
+    dplyr::reframe(text = stringr::str_c(sentence),
+                     poss = stringr::str_c(poss),
+                     tags = stringr::str_c(tags),
+                     lemmas = stringr::str_c(lemmas),
+                     entities = stringr::str_c(entities))
   v <- v |> dplyr::filter(stringr::str_detect(tags, " MD ") |
-                       stringr::str_detect(sentence, "going to|need to|ready to|is time to|commit to|promise to|intend to|let's"))
+                       stringr::str_detect(text, "going to|need to|ready to|is time to|commit to|promise to|intend to|let's"))
   class(v) <- c("promises", class(v))
   v
   # todo: extract related sentences around promises and re-paste together
