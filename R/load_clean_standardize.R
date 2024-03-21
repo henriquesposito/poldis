@@ -1,5 +1,3 @@
-# Load, clean, and standardise texts
-
 #' Load text from PDFs
 #'
 #' @param path The path to a PDF file or a folder containing multiple PDFs.
@@ -27,6 +25,10 @@ load_pdf <- function(path) {
 #' @param level Do you want to parse words or sentences? Words by default.
 #' @import spacyr
 #' @importFrom dplyr group_by summarise ungroup
+#' @examples
+#' \donttest{
+#' annotate_text(US_News_Conferences_1960_1980[1:2, 3])
+#' }
 #' @export
 annotate_text <- function(v, level = "words") {
   doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- entity <- NULL
