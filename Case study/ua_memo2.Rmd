@@ -22,7 +22,7 @@ subjects <- extract_subjects(promises)
 # get related terms to subjects
 related_terms <- extract_related_terms(promises$sentence, subjects) # needs updating
 # code urgency
-urgency <- get_urgency(promises)
+urgency <- get_urgency(promises, related_terms)
 head(urgency$sentence, n = 10)
 # Are these more urgent promises?
 ```

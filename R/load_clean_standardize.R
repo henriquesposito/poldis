@@ -48,6 +48,7 @@ annotate_text <- function(v, level = "words") {
       dplyr::ungroup()
   }
   parse
+  # todo: add more informative messages/warnings for users
 }
 
 # Helper function for checking and downloading packages
