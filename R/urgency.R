@@ -5,23 +5,31 @@
 #' @return A scored data frame.
 #' @import dplyr
 #' @export
-get_urgency <- function(v, n = 20) {
+get_urgency <- function(v, subjects) {
   frequency <- timing <- topic <- degree <- urgency <- commit <- NULL
   if (any(class(v) == "data.frame")) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated object.")
     }
   }
-  promises <- extract_promises(v) # todo: find a way to check before running
-  subjects <- extract_subjects(promises, n = n) # todo: find a way to check before running
-  similar_words <- extract_related_terms(promises, subjects)
+  if (any(class(v) == "promises")) {
+    promises <- v
+  } else promises <- extract_promises(v)
+  if (missing(subjects)) {
+    similar_words <- extract_related_terms(promises,
+                                           extract_subjects(promises, n = 20))
+  } else {
+    if ("subjects" %in% class(subjects)) {
+      similar_words <- extract_related_terms(promises, subjects)
+    } else similar_words <- subjects
+  }
   promises |>
     dplyr::mutate(topic = .assign_subjects(promises, similar_words),
                   frequency = .assign_frequencies(promises),
                   timing = .assign_time(promises),
                   degree = .assign_degree(promises),
                   commit = .assign_commitment(promises),
-                  urgency = frequency + timing + degree + commit) |>
+                  urgency = (frequency + timing + degree + commit)/median(ntoken)) |>
     dplyr::arrange(-urgency)
   # todo: adjust frequency, timing, and degree
 }
@@ -96,8 +104,8 @@ get_urgency <- function(v, n = 20) {
                                            |incredibly|enormously|entirely|intensely|perfectly|
                                            |positively|practically|purely|really|scarcely|
                                            |simply|strongly|terribly|thoroughly|totally|utterly|
-                                           |scarcely|virtually|hardly" = 1),
-                        important = c("lots|very|much|most|fully|far|enough" = 0.5),
+                                           |scarcely|virtually|hardly|urgently" = 1),
+                        important = c("lots|very|much|most|fully|far|enough|stand for" = 0.5),
                         unimportant = c("somewhat|barely|slightly|almost|least|less|
                                         |little|indeed|pretty|quite|rather|too" = 0.1))
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
@@ -109,8 +117,9 @@ get_urgency <- function(v, n = 20) {
 }
 
 .assign_commitment <- function(promises) {
-  commit_level <- list(commited = c("will|must|going to|need to|ready to|is time to|commit to|promise to|intend to" = 1),
-                       not_as_commited = c("should|let's|want to" = 0.5))
+  commit_level <- list(commited = c("will|must|going to|need to|ready to|is time to|
+                                    |commit to|promise to|intend to|urge" = 0.2),
+                       not_as_commited = c("should|let's|want to|can|could" = 0.1))
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in names(unlist(unname(commit_level)))) {
     out[[i]] <- stringr::str_count(promises[["sentence"]], i)*
