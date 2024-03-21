@@ -1,9 +1,13 @@
 #' Urgency Analysis
 #'
-#' @param v Text vector.
-#' @param n Number of subjects.
+#' @param v Text vector or annotated data frame.
+#' @param subjects List of subjects.
 #' @return A scored data frame.
 #' @import dplyr
+#' @examples
+#' \donttest{
+#' get_urgency(US_News_Conferences_1960_1980[1:10,3])
+#' }
 #' @export
 get_urgency <- function(v, subjects) {
   frequency <- timing <- topic <- degree <- urgency <- commit <- NULL
@@ -29,9 +33,10 @@ get_urgency <- function(v, subjects) {
                   timing = .assign_time(promises),
                   degree = .assign_degree(promises),
                   commit = .assign_commitment(promises),
-                  urgency = (frequency + timing + degree + commit)/median(ntoken)) |>
+                  urgency = (frequency + timing + degree + commit)/stats::median(ntoken)) |>
     dplyr::arrange(-urgency)
   # todo: adjust frequency, timing, and degree
+  # todo: add time (i.e. what the function is doing) messages for users
 }
 
 .assign_subjects <- function(promises, subjects) {
