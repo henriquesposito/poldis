@@ -14,3 +14,8 @@ annotate_text(v, level = "words")
 \description{
 Wrapper for `spacyr::spacy_parse` function.
 }
+\examples{
+\donttest{
+annotate_text(US_News_Conferences_1960_1980[1:2, 3])
+}
+}

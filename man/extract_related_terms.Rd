@@ -7,7 +7,7 @@
 extract_related_terms(v, subjects, n = 5)
 }
 \arguments{
-\item{v}{Text vector.}
+\item{v}{Text vector or annotated data frame.}
 
 \item{subjects}{List of subjects.}
 
@@ -15,4 +15,10 @@ extract_related_terms(v, subjects, n = 5)
 }
 \description{
 Extract terms related to subjects
+}
+\examples{
+\donttest{
+extract_related_terms(US_News_Conferences_1960_1980[1:2, 3],
+                      subjects = c("kennedy", "military"))
+}
 }

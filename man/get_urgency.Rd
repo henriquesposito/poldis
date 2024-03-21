@@ -4,16 +4,21 @@
 \alias{get_urgency}
 \title{Urgency Analysis}
 \usage{
-get_urgency(v, n = 20)
+get_urgency(v, subjects)
 }
 \arguments{
-\item{v}{Text vector.}
+\item{v}{Text vector or annotated data frame.}
 
-\item{n}{Number of subjects.}
+\item{subjects}{List of subjects.}
 }
 \value{
 A scored data frame.
 }
 \description{
 Urgency Analysis
+}
+\examples{
+\donttest{
+get_urgency(US_News_Conferences_1960_1980[1:10,3])
+}
 }

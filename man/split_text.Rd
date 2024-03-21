@@ -4,10 +4,10 @@
 \alias{split_text}
 \title{Split texts}
 \usage{
-split_text(text, splitsign = "\\\\.")
+split_text(v, splitsign = "\\\\.")
 }
 \arguments{
-\item{text}{text variable}
+\item{v}{Text vector or annotated data frame.}
 
 \item{splitsign}{Where do you want to split?
 By default sentences (".").
@@ -21,6 +21,8 @@ A splitted list for each row
 Split texts into structured lists of lists according to a split sign.
 }
 \examples{
+\donttest{
 text <- "This is the first sentence. This is the second sentence."
 split_text(text)
+}
 }

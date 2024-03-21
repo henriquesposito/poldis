@@ -7,8 +7,13 @@
 extract_promises(v)
 }
 \arguments{
-\item{v}{Text vector.}
+\item{v}{Text vector or annotated data frame.}
 }
 \description{
 Extract future promises from political discourses
+}
+\examples{
+\donttest{
+extract_promises(US_News_Conferences_1960_1980[1:2,3])
+}
 }

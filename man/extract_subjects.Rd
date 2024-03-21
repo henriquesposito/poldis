@@ -4,13 +4,26 @@
 \alias{extract_subjects}
 \title{Extract most frequent subjects from political discourses}
 \usage{
-extract_subjects(v, n = 20)
+extract_subjects(v, n = 20, method = "cosine", level = 0.1)
 }
 \arguments{
-\item{v}{Text vector.}
+\item{v}{Text vector or annotated data frame.}
 
 \item{n}{Number of subjects}
+
+\item{method}{Method to match similar strings.
+Defaults to "cosine".
+For other methods available please refer to `stringdist::stringdist()`.}
+
+\item{level}{Maximum threshold to match strings.
+Defaults to 0.1.
+Possible values range from 0 to 1.}
 }
 \description{
 Extract most frequent subjects from political discourses
+}
+\examples{
+\donttest{
+extract_subjects(US_News_Conferences_1960_1980[1:2, 3])
+}
 }

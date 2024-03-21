@@ -4,10 +4,10 @@
 \alias{extract_match}
 \title{Extract text matches}
 \usage{
-extract_match(text, match, invert = FALSE, ignore.case = TRUE)
+extract_match(v, match, invert = FALSE, ignore.case = TRUE)
 }
 \arguments{
-\item{text}{A text variable}
+\item{v}{Text vector or annotated data frame.}
 
 \item{match}{A regex match for a word(s) or expression.
 For multiple words, please use "|" to divide them.}
@@ -25,7 +25,9 @@ A list of matches of the same length as text variable
 Get texts in which only certain "matches" occur.
 }
 \examples{
+\donttest{
 text <- c("This function was created on the 29 September 2021",
 "Today is October 12, 2021")
 extract_match(text, "October")
+}
 }
