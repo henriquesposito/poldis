@@ -12,8 +12,10 @@ extract_promises <- function(v) {
     if ("token_id" %in% names(v))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
   } else v <- suppressMessages(annotate_text(v, level = "sentences"))
-  v |> dplyr::filter(stringr::str_detect(tags, " MD ") |
+  v <- v |> dplyr::filter(stringr::str_detect(tags, " MD ") |
                        stringr::str_detect(sentence, "going to|need to|ready to|is time to|commit to|promise to|intend to|let's"))
+  class(v) <- c("promises", class(v))
+  v
   # todo: extract related sentences around promises and re-paste together
 }
 
@@ -43,7 +45,7 @@ extract_subjects <- function(v, n = 20) {
              tm::stopwords())))) |>
     filter(duplicated == FALSE) |>
     ungroup()
-  purrr::map_dfr(out$entity, ~ {
+  out <- purrr::map_dfr(out$entity, ~ {
     i <- which(stringdist::stringdist(., out$entity, "lv") < 2 &
                  nchar(out$entity) > 3)
     tibble(index = i, subjects = out$entity[i])
@@ -58,6 +60,8 @@ extract_subjects <- function(v, n = 20) {
     select(subject) |>
     slice_head(n = n) |>
     unlist()
+  class(out) <- c("subjects", class(out))
+  out
   # todo: exclude small words but sill count them
   # todo: change similarity method to get expressions together
   #(e.g. united states and unites states america)
@@ -105,6 +109,7 @@ extract_related_terms <- function(v, subjects, n = 5) {
   un <- unlist(out)
   out <- Map(`[`, out, utils::relist(!duplicated(un), skeleton = out))
   # remove duplicate words
+  class(out) <- c("related_subjects", class(out))
   out
   # todo: make it work with annotated data frames
   # todo: fix issue with multiple word subjects
