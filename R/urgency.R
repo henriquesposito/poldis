@@ -90,6 +90,7 @@ get_urgency <- function(v, subjects) {
                                                     "before" = 5.5/8,
                                                     "early|earlier" = 5.5/8,
                                                     "soon" = 4/8,
+                                                    "next" = 4/8,
                                                     "after|afterwards" = 3.5/8,
                                                     "late" = 3/8, "later" = 2.5/8,
                                                     "finally" = 2/8,
@@ -107,12 +108,13 @@ get_urgency <- function(v, subjects) {
   degr_adverbs <-  list(very_important = c("extremely|especially|exceptionally|absolutely|awfully|
                                            |badly|completely|decidedly|deeply|greatly|highly|
                                            |incredibly|enormously|entirely|intensely|perfectly|
-                                           |positively|practically|purely|really|scarcely|
+                                           |positively|practically|purely|really|
                                            |simply|strongly|terribly|thoroughly|totally|utterly|
-                                           |scarcely|virtually|hardly|urgently" = 1),
-                        important = c("lots|very|much|most|fully|far|enough|stand for" = 0.5),
+                                           |scarcely|virtually|urgently|quickly|obvious|serious|
+                                           |significant|major" = 1),
+                        important = c("lots|very|much|most|fully|far|enough|stand for|clearly" = 0.5),
                         unimportant = c("somewhat|barely|slightly|almost|least|less|
-                                        |little|indeed|pretty|quite|rather|too" = 0.1))
+                                        |little|indeed|pretty|quite|rather|too|hardly|scarcely" = 0.1))
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in names(unlist(unname(degr_adverbs)))) {
     out[[i]] <- stringr::str_count(promises[["sentence"]], i)*
@@ -124,7 +126,7 @@ get_urgency <- function(v, subjects) {
 .assign_commitment <- function(promises) {
   commit_level <- list(commited = c("will|must|going to|need to|ready to|is time to|
                                     |commit to|promise to|intend to|urge" = 0.2),
-                       not_as_commited = c("should|let's|want to|can|could" = 0.1))
+                       not_as_commited = c("should|let's|want to|can|could|may|might" = 0.1))
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in names(unlist(unname(commit_level)))) {
     out[[i]] <- stringr::str_count(promises[["sentence"]], i)*
