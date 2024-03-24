@@ -6,7 +6,8 @@
 #' @import dplyr
 #' @examples
 #' \donttest{
-#' get_urgency(US_News_Conferences_1960_1980[1:10,3])
+#' get_urgency(US_News_Conferences_1960_1980[1:10,3],
+#'             subjects = c("kennedy", "military"))
 #' }
 #' @export
 get_urgency <- function(v, subjects) {
@@ -23,9 +24,11 @@ get_urgency <- function(v, subjects) {
     similar_words <- extract_related_terms(promises,
                                            extract_subjects(promises, n = 20))
   } else {
-    if ("subjects" %in% class(subjects)) {
+    if ("related_subjects" %in% class(subjects)) {
+      similar_words <- subjects
+    } else {
       similar_words <- extract_related_terms(promises, subjects)
-    } else similar_words <- subjects
+    }
   }
   promises |>
     dplyr::mutate(topic = .assign_subjects(promises, similar_words),
@@ -37,6 +40,7 @@ get_urgency <- function(v, subjects) {
     dplyr::arrange(-urgency)
   # todo: adjust frequency, timing, and degree
   # todo: add time (i.e. what the function is doing) messages for users
+  # todo: fix how the function works for small numbers of text
 }
 
 .assign_subjects <- function(promises, subjects) {
@@ -93,7 +97,7 @@ get_urgency <- function(v, subjects) {
                                                     "next" = 4/8,
                                                     "after|afterwards" = 3.5/8,
                                                     "late" = 3/8, "later" = 2.5/8,
-                                                    "finally" = 2/8,
+                                                    "finally" = 2/8, # degree?
                                                     "eventually" = 1/8,
                                                     "at some stage" = 0.5/8))
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))

@@ -30,6 +30,8 @@ extract_promises <- function(v) {
   class(v) <- c("promises", class(v))
   v
   # todo: extract related sentences around promises and re-paste together
+  # todo: what about words that construct problems such as "issue" or "problem"?
+  # todo: what about verbs/expressions as "address", "take care of", "tackle" or "fix"?
 }
 
 #' Extract most frequent subjects from political discourses
@@ -90,8 +92,7 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
   class(out) <- c("subjects", class(out))
   out
   # todo: exclude small words but sill count them
-  # todo: change similarity method to get expressions together
-  #(e.g. united states and unites states america)
+  # todo: what about nouns following verbs?
 }
 
 #' Extract terms related to subjects

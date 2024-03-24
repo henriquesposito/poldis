@@ -19,6 +19,7 @@ Urgency Analysis
 }
 \examples{
 \donttest{
-get_urgency(US_News_Conferences_1960_1980[1:10,3])
+get_urgency(US_News_Conferences_1960_1980[1:10,3],
+            subjects = c("kennedy", "military"))
 }
 }
