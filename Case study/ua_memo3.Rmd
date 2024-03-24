@@ -1,0 +1,94 @@
+---
+title: "Urgency Memo 3"
+author: "Henrique Sposito"
+date: "2024-03-22"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(poldis)
+```
+
+# Types/categories/dimensions of urgency (and components)
+
+*Frequency:*
+
+Currently we code definite and indefinite adverbs, though their current scores sometimes do not match their "frequency" For instance, is "hourly" the same as "always" and "yearly" the same as "hardly ever". Perhaps we should consider this in relation to either other words in sentence or as bigrams (e.g. "every hour" and "later than"). This could also be done taking advantage of the NLP tags and their ordering. Additionally, the number of words coded needs to be expanded and we might want to make clear what rules we use to score them (e.g. all/most/some frequency adverbs finishing in "ly" get a score of 0.5). 
+
+```{r}
+annotate_text("Every hour that goes by it is getting worse. Our first goal is to adress unemployment. We should tackle this issue no later than next year.")
+```
+
+*Timing:*
+
+We code relational and relative time words but fail to code them in relation, or relative, to others... We also miss some ordinal terms (e.g. "second", "third", "fourth") when ranking these. Timing is an important dimension of political urgency that we need to get a better hold on. If our definition of urgency implies that more urgent preferences will be addressed sooner, we should think about weighting "timing" differently. 
+
+*Degree:*
+
+There are 4 grades of degree adverbs according to ([Yoo, Kim, and Kwon 2011](https://www.sciencedirect.com/science/article/pii/S0957417410006627)), they are: maximizer, boosters, compromizers, and dividers. Each is multiplied by a different value (i.e. 2, 1.6, 1.2., and 0.5 respectively). I wonder if we should adopt this convention instead of the "important" and "unimportant" words?
+
+*Commitment:*
+
+In theory this component relates to the "intensity of the promise". That is, it "we should" is less of a commitment than "we must". This has just been added. Is this appropriate?
+
+*What about promises?*
+
+This is developing well but we still have issues when it comes to words, subjects, and promises. 
+
+```{r}
+"Every hour (frequency) that goes by it is getting worse (degree)."
+# neither hour nor worse are scored
+"Our first (timing) goal is to adress unemployment (topic)."
+# the topic is not identified automatically
+"We should (promise/commit level) tackle this issue no later than next year (timing)."
+# this is the only "promise" retained when we extract promises but ...
+# extract_promises("Every hour (frequency) that goes by it is getting worse (degree). Our first (timing) goal is to adress unemployment (topic). We should (promise/commit level) tackle this issue no later than next year (timing).")
+```
+
+Some possible solutions:
+
+- merge all neighboring promises and/or nearby promises with the same topic
+- code lemmas instead of words (for urgency)
+- code subjects based on common nouns and entities (for topic)
+- take into consideration NLP tags when scoring and coding words/lemmas related to urgency (e.g. only score frequency when word is an adverb) - that is, how to better use the NLP tags?
+- how to normalize scores? We currently try and score each word coded on a 0 to 1 scale, then, we add everything across and divide by the median. Is there a better approach?
+
+*What else?*
+
+The obvious question would be wether to include emotional words (i.e. emotion as a dimension/component of urgency see [Yoo, Kim, and Kwon 2011](https://www.sciencedirect.com/science/article/pii/S0957417410006627)). What do you think?
+
+Besides that, many works classify adverbs (see [Toboada et al. 2011](https://watermark.silverchair.com/coli_a_00049.pdf?token=AQECAHi208BE49Ooan9kkhW_Ercy7Dm3ZL_9Cf3qfKAc485ysgAAAzcwggMzBgkqhkiG9w0BBwagggMkMIIDIAIBADCCAxkGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMhEkCRBlZxTHGBKJnAgEQgIIC6mtBuA0BzNdRmuG1RyGQi9krBrNZ7ae_oQ8__uHQVeG8ux9eiyT0gVR_URENzkzAiBHiZG6nITGepBYQTYCEgyYAx-Xy8nfg9G23fuBfBemDNsYO8FuEAOkAH5gSUulDVM6cPWdIH41v7VdSSBeoTzv_odLEX0P0pM_q5VJE5n8CwjwULopYDt0odWllW-8zyHVg8k83IlgsucYkt8CVhx-OqS7fz1YErn5eqEZ_uKTn-63wH3sXpLqeXf88t02oBxsKuvSumNVLirPueJpZ5OHwRwDYlDsfpF0fK3nOB3HXi2alQGXs7sd-I0bs2RJj5S7BsD6aNsTHoikRHjPaVDWWkFv2Y4VfYJ8xjWCciX2DXBxfegOuIjyZVDFxby1sv7xZuzdrVUzz7a2b28vwhLfOmACM0p8ZbM0JbatFP9pHPXsgEK0JAD5Q5Fo54Q378B5jT5rlw3x7LGbM8ax3T92EWPyfDMqLuPsFLmKmeFIJzQULXWo2O9rrnpIyZDIjoNi3pgBr4mSl46rfhHMXre6Effd_jswSCAL0SjUPY_wGyr1BQ07HcTHc4dcF8ekMz3yOLn920lCBEHBq1vRzxQVPg1LkrSkuUYMbl9l_deuvPJVNm35FSXVMpSMkKqZhxR2FFMSerUzh2zMXo16Em4bWTqbgArIXVkyhL2x0OCgd2a2aDEYfBG2oPBHtX42INjH5LPiksDbeoN9zIaz_oywficbMXQk3Sc8a_jmkYC9zcStMerqmRp_cSz6rr-RFXp_qRQaMn9hB-laYiruekSxTykPjFTsrRRG6hHO6yF-WlY4qSJ7OEnGDD4DLZ6i2STnYQLlzfr2Z7-UjyxRKvugINwqw3cL7_Ti6cFoNyo_rcq0hOhZhsGQLmyKFzCtXdZANuaBSauJdDamERB6qDfH_Ac5Es2y9vaNF9DkTrlXNltBsbXRJoIIoRnN8eA8xcF6yZZLgXWDE9H_lQWI_YI-U52x4Z4N4se8J)), adjectives (see [Josef Ruppenhofer, Wiegand, and Brandes 2014](https://api.deutsche-digitale-bibliothek.de/binary/a33c7963-986b-4429-8320-917d89ae8b43.pdf); [Melo and bansal 2013](https://aclanthology.org/Q13-1023.pdf); [Paradis 1997](https://lucris.lub.lu.se/ws/portalfiles/portal/4923802/1590143.pdf)), and nouns (see [Ruppenhofer, Brandes, and Steiner](https://ids-pub.bsz-bw.de/frontdoor/deliver/index/docId/5206/file/Ruppenhofer_Brandes_Steiner_Scales_and_Scores_An_evaluation_of_methods_to_determine_the_intensity_of_subjective_expressions_2015.pdf)). I wonder if we should take this convention instead so that we can use and refer to a broader literature in linguistics (and their dictionaries)...
+
+# Further resources:
+
+## Additional Dictionares
+
+- [SO-CAL dictionary](https://github.com/sfu-discourse-lab/SO-CAL/tree/master/Resources/dictionaries/English)
+
+## NLP
+
+- [Extracting subjects](https://suttipong-kull.medium.com/how-to-extract-subject-verb-and-object-by-nlp-4149323a7d7d)
+- [On modal verbs](https://stackoverflow.com/questions/46303537/how-to-find-the-future-tense-of-a-word-using-stanford-nlp)
+- [An NLP-based novel approach for assessing national influence in clause dissemination across bilateral investment treaties](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0298380)
+
+## References for articles/books on word identification/categories/scales/weights (to be adapted)
+
+- [Ordering adverbs by their scaling effect on adjective intensity](https://aclanthology.org/R15-1071.pdf)
+- [The Effect of Negators, Modals, and Degree Adverbs on Sentiment Composition](https://arxiv.org/pdf/1712.01794.pdf)
+- [Emotional index measurement method for context-aware service](https://www.sciencedirect.com/science/article/pii/S0957417410006627)
+- [Scales and Scores An evaluation of methods to determine the intensity of subjective expressions](https://ids-pub.bsz-bw.de/frontdoor/deliver/index/docId/5206/file/Ruppenhofer_Brandes_Steiner_Scales_and_Scores_An_evaluation_of_methods_to_determine_the_intensity_of_subjective_expressions_2015.pdf)
+- [Comparing methods for deriving intensity scores for adjectives](https://api.deutsche-digitale-bibliothek.de/binary/a33c7963-986b-4429-8320-917d89ae8b43.pdf)
+- [Learning Scalar Adjective Intensity from Paraphrases](https://www.cis.upenn.edu/~ccb/publications/learning-scalar-adjective-intensity-from-paraphrases.pdf)
+- [Lexicon-Based Methods for Sentiment Analysis](https://watermark.silverchair.com/coli_a_00049.pdf?token=AQECAHi208BE49Ooan9kkhW_Ercy7Dm3ZL_9Cf3qfKAc485ysgAAAzcwggMzBgkqhkiG9w0BBwagggMkMIIDIAIBADCCAxkGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMhEkCRBlZxTHGBKJnAgEQgIIC6mtBuA0BzNdRmuG1RyGQi9krBrNZ7ae_oQ8__uHQVeG8ux9eiyT0gVR_URENzkzAiBHiZG6nITGepBYQTYCEgyYAx-Xy8nfg9G23fuBfBemDNsYO8FuEAOkAH5gSUulDVM6cPWdIH41v7VdSSBeoTzv_odLEX0P0pM_q5VJE5n8CwjwULopYDt0odWllW-8zyHVg8k83IlgsucYkt8CVhx-OqS7fz1YErn5eqEZ_uKTn-63wH3sXpLqeXf88t02oBxsKuvSumNVLirPueJpZ5OHwRwDYlDsfpF0fK3nOB3HXi2alQGXs7sd-I0bs2RJj5S7BsD6aNsTHoikRHjPaVDWWkFv2Y4VfYJ8xjWCciX2DXBxfegOuIjyZVDFxby1sv7xZuzdrVUzz7a2b28vwhLfOmACM0p8ZbM0JbatFP9pHPXsgEK0JAD5Q5Fo54Q378B5jT5rlw3x7LGbM8ax3T92EWPyfDMqLuPsFLmKmeFIJzQULXWo2O9rrnpIyZDIjoNi3pgBr4mSl46rfhHMXre6Effd_jswSCAL0SjUPY_wGyr1BQ07HcTHc4dcF8ekMz3yOLn920lCBEHBq1vRzxQVPg1LkrSkuUYMbl9l_deuvPJVNm35FSXVMpSMkKqZhxR2FFMSerUzh2zMXo16Em4bWTqbgArIXVkyhL2x0OCgd2a2aDEYfBG2oPBHtX42INjH5LPiksDbeoN9zIaz_oywficbMXQk3Sc8a_jmkYC9zcStMerqmRp_cSz6rr-RFXp_qRQaMn9hB-laYiruekSxTykPjFTsrRRG6hHO6yF-WlY4qSJ7OEnGDD4DLZ6i2STnYQLlzfr2Z7-UjyxRKvugINwqw3cL7_Ti6cFoNyo_rcq0hOhZhsGQLmyKFzCtXdZANuaBSauJdDamERB6qDfH_Ac5Es2y9vaNF9DkTrlXNltBsbXRJoIIoRnN8eA8xcF6yZZLgXWDE9H_lQWI_YI-U52x4Z4N4se8J)
+- [Good, Great, Excellent: Global Inference of Semantic Intensities](https://aclanthology.org/Q13-1023.pdf)
+- [Degree modifiers of adjectives in spoken British English](https://lucris.lub.lu.se/ws/portalfiles/portal/4923802/1590143.pdf)
+- [Not All Words are Created Equal: Extracting Semantic Orientation as a Function of Adjective Relevance](https://www.sfu.ca/~mtaboada/docs/publications/Voll_Taboada_AusAI.pdf)
+- [Analyzing Appraisal Automatically](https://www.sfu.ca/~mtaboada/docs/publications/TaboadaGrieveAppraisal.pdf)
+
+# The week's work...
+
+- Updated documentation
+- Improved function's weighting and terms coded
+- 
+
