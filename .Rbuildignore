@@ -5,3 +5,4 @@
 ^.github$
 ^.gitignore$
 ^inst$
+.DS_Store
