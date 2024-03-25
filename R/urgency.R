@@ -36,11 +36,16 @@ get_urgency <- function(v, subjects) {
                   timing = .assign_time(promises),
                   degree = .assign_degree(promises),
                   commit = .assign_commitment(promises),
-                  urgency = (frequency + timing + degree + commit)/stats::median(ntoken)) |>
+                  adjectives = .assign_adj(promises),
+                  adverbs = .assign_adv(promises),
+                  urgency = (frequency + timing + degree + commit + adjectives + adverbs)/
+                    stats::median(ntoken)) |>
     dplyr::arrange(-urgency)
   # todo: adjust frequency, timing, and degree
   # todo: add time (i.e. what the function is doing) messages for users
   # todo: fix how the function works for small numbers of text
+  # todo: what about nouns, should we code them using SO-CALL dictionaries?
+  # todo: fix normalization scores
 }
 
 .assign_subjects <- function(promises, subjects) {
@@ -51,11 +56,12 @@ get_urgency <- function(v, subjects) {
   }
   out <- apply(data.frame(out), 1, function(i) which(i > 0))
   out <- lapply(out, function(x) paste0(names(x), collapse = ", "))
+  # todo: get nouns if empty?
   out
 }
 
 .assign_frequencies <- function(promises) {
-  freq_adverbs <- list(definite = list("hourly" = 1,
+  freq_adverbs <- list(definite = list("by the minute|by the hour|hourly" = 1,
                                        "daily|nightly" = 365/8765,
                                        "weekly" = 52/8765,
                                        "fortnightly" = 26/8765,
@@ -109,16 +115,14 @@ get_urgency <- function(v, subjects) {
 }
 
 .assign_degree <- function(promises) {
-  degr_adverbs <-  list(very_important = c("extremely|especially|exceptionally|absolutely|awfully|
-                                           |badly|completely|decidedly|deeply|greatly|highly|
-                                           |incredibly|enormously|entirely|intensely|perfectly|
-                                           |positively|practically|purely|really|
-                                           |simply|strongly|terribly|thoroughly|totally|utterly|
-                                           |scarcely|virtually|urgently|quickly|obvious|serious|
+  # only for adverbs not in SO-CAL list
+  degr_adverbs <-  list(very_important = c("especially|completely|decidedly|
+                                           |deeply|highly|entirely|practically|
+                                           |really|simply|strongly|totally|utterly||
+                                           |virtually|urgently|obvious|serious|
                                            |significant|major" = 1),
-                        important = c("lots|very|much|most|fully|far|enough|stand for|clearly" = 0.5),
-                        unimportant = c("somewhat|barely|slightly|almost|least|less|
-                                        |little|indeed|pretty|quite|rather|too|hardly|scarcely" = 0.1))
+                        important = c("lots|very|much|most|fully|far|clearly" = 0.5),
+                        unimportant = c("somewhat|almost|least|less|indeed|quite|rather" = 0.2))
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in names(unlist(unname(degr_adverbs)))) {
     out[[i]] <- stringr::str_count(promises[["sentence"]], i)*
@@ -129,12 +133,32 @@ get_urgency <- function(v, subjects) {
 
 .assign_commitment <- function(promises) {
   commit_level <- list(commited = c("will|must|going to|need to|ready to|is time to|
-                                    |commit to|promise to|intend to|urge" = 0.2),
-                       not_as_commited = c("should|let's|want to|can|could|may|might" = 0.1))
+                                    |commit to|promise to|intend to|urge|stand for|
+                                    |address|take care of|tackle|fix" = 0.2),
+                       not_as_commited = c("should|let's|want to|can|could|may|
+                                           |might|shall|would" = 0.1))
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in names(unlist(unname(commit_level)))) {
     out[[i]] <- stringr::str_count(promises[["sentence"]], i)*
       unlist(unname(commit_level))[[i]]
+  }
+  rowSums(out[-1])
+}
+
+.assign_adv <- function(promises) {
+  out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
+  for (i in 1:length(adverbs[,1])) {
+    out[[adverbs[,1][i]]] <- stringr::str_count(promises[["sentence"]], adverbs[,1][i])*
+      abs(adverbs[,2][i]/5) # absolute value since we do not care about polarity
+  }
+  rowSums(out[-1])
+}
+
+.assign_adj <- function(promises) {
+  out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
+  for (i in 1:length(adjectives[,1])) {
+    out[[adjectives[,1][i]]] <- stringr::str_count(promises[["sentence"]], adjectives[,1][i])*
+      abs(adjectives[,2][i]/5) # absolute value since we do not care about polarity
   }
   rowSums(out[-1])
 }
