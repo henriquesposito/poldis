@@ -33,7 +33,8 @@ Imports:
     spacyr, 
     LSX,
     tm,
-    rlang
+    rlang,
+    textstem
 Suggests:
     rmarkdown,
     testthat,

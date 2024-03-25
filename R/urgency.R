@@ -81,7 +81,7 @@ get_urgency <- function(v, subjects) {
                                          "never" = 0))
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in names(unlist(unname(freq_adverbs)))) {
-    out[[i]] <- stringr::str_count(promises[["sentence"]], i)*
+    out[[i]] <- stringr::str_count(promises[["lemmas"]], textstem::lemmatize_strings(i))*
       unlist(unname(freq_adverbs))[[i]]
   }
   rowSums(out[-1])
@@ -108,7 +108,7 @@ get_urgency <- function(v, subjects) {
                                                     "at some stage" = 0.5/8))
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in names(unlist(unname(time_adverbs)))) {
-    out[[i]] <- stringr::str_count(promises[["sentence"]], i)*
+    out[[i]] <- stringr::str_count(promises[["lemmas"]], textstem::lemmatize_strings(i))*
       unlist(unname(time_adverbs))[[i]]
   }
   rowSums(out[-1])
@@ -125,7 +125,7 @@ get_urgency <- function(v, subjects) {
                         unimportant = c("somewhat|almost|least|less|indeed|quite|rather" = 0.2))
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in names(unlist(unname(degr_adverbs)))) {
-    out[[i]] <- stringr::str_count(promises[["sentence"]], i)*
+    out[[i]] <- stringr::str_count(promises[["lemmas"]], textstem::lemmatize_strings(i))*
       unlist(unname(degr_adverbs))[[i]]
   }
   rowSums(out[-1])
@@ -139,7 +139,7 @@ get_urgency <- function(v, subjects) {
                                            |might|shall|would" = 0.1))
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in names(unlist(unname(commit_level)))) {
-    out[[i]] <- stringr::str_count(promises[["sentence"]], i)*
+    out[[i]] <- stringr::str_count(promises[["lemmas"]], textstem::lemmatize_strings(i))*
       unlist(unname(commit_level))[[i]]
   }
   rowSums(out[-1])
@@ -148,17 +148,21 @@ get_urgency <- function(v, subjects) {
 .assign_adv <- function(promises) {
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in 1:length(adverbs[,1])) {
-    out[[adverbs[,1][i]]] <- stringr::str_count(promises[["sentence"]], adverbs[,1][i])*
+    out[[adverbs[,1][i]]] <- stringr::str_count(promises[["lemmas"]],
+                                                textstem::lemmatize_strings(adverbs[,1][i]))*
       abs(adverbs[,2][i]/5) # absolute value since we do not care about polarity
   }
+  # todo: fix lists for double vectors
   rowSums(out[-1])
 }
 
 .assign_adj <- function(promises) {
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in 1:length(adjectives[,1])) {
-    out[[adjectives[,1][i]]] <- stringr::str_count(promises[["sentence"]], adjectives[,1][i])*
+    out[[adjectives[,1][i]]] <- stringr::str_count(promises[["lemmas"]],
+                                                   textstem::lemmatize_strings(adjectives[,1][i]))*
       abs(adjectives[,2][i]/5) # absolute value since we do not care about polarity
   }
+  # todo: fix lists for double vectors
   rowSums(out[-1])
 }
