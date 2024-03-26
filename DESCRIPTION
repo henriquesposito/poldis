@@ -34,7 +34,8 @@ Imports:
     LSX,
     tm,
     rlang,
-    textstem
+    textstem,
+    usethis
 Suggests:
     rmarkdown,
     testthat,
