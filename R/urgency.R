@@ -4,10 +4,11 @@
 #' @param subjects List of subjects.
 #' @return A scored data frame.
 #' @import dplyr
+#' @importFrom usethis ui_done ui_info
 #' @examples
 #' \donttest{
 #' get_urgency(US_News_Conferences_1960_1980[1:10,3],
-#'             subjects = c("kennedy", "military"))
+#'             subjects = extract_subjects(US_News_Conferences_1960_1980[1:2, 3]))
 #' }
 #' @export
 get_urgency <- function(v, subjects) {
@@ -19,17 +20,23 @@ get_urgency <- function(v, subjects) {
   }
   if (any(class(v) == "promises")) {
     promises <- v
-  } else promises <- extract_promises(v)
+  } else {
+    promises <- extract_promises(v)
+    usethis::ui_done("Extracted promises.")
+  }
   if (missing(subjects)) {
     similar_words <- extract_related_terms(promises,
                                            extract_subjects(promises, n = 20))
+    usethis::ui_done("Extracted subjects.")
   } else {
     if ("related_subjects" %in% class(subjects)) {
       similar_words <- subjects
     } else {
       similar_words <- extract_related_terms(promises, subjects)
+      usethis::ui_done("Extracted similar topics for subjects.")
     }
   }
+  usethis::ui_info("Coding urgency components...")
   promises |>
     dplyr::mutate(topic = .assign_subjects(promises, similar_words),
                   frequency = .assign_frequencies(promises),
@@ -41,8 +48,6 @@ get_urgency <- function(v, subjects) {
                   urgency = (frequency + timing + degree + commit + adjectives + adverbs)/
                     stats::median(ntoken)) |>
     dplyr::arrange(-urgency)
-  # todo: adjust frequency, timing, and degree
-  # todo: add time (i.e. what the function is doing) messages for users
   # todo: fix how the function works for small numbers of text
   # todo: what about nouns, should we code them using SO-CALL dictionaries?
   # todo: fix normalization scores
@@ -150,7 +155,7 @@ get_urgency <- function(v, subjects) {
   for (i in 1:length(adverbs[,1])) {
     out[[adverbs[,1][i]]] <- stringr::str_count(promises[["lemmas"]],
                                                 textstem::lemmatize_strings(adverbs[,1][i]))*
-      abs(adverbs[,2][i]/5) # absolute value since we do not care about polarity
+      abs(adverbs[,2][i]/5) # absolute value since we do not care about direction
   }
   # todo: fix lists for double vectors
   rowSums(out[-1])
@@ -161,7 +166,7 @@ get_urgency <- function(v, subjects) {
   for (i in 1:length(adjectives[,1])) {
     out[[adjectives[,1][i]]] <- stringr::str_count(promises[["lemmas"]],
                                                    textstem::lemmatize_strings(adjectives[,1][i]))*
-      abs(adjectives[,2][i]/5) # absolute value since we do not care about polarity
+      abs(adjectives[,2][i]/5) # absolute value since we do not care about direction
   }
   # todo: fix lists for double vectors
   rowSums(out[-1])
