@@ -26,12 +26,13 @@ extract_promises <- function(v) {
   #                  lemmas = stringr::str_c(lemmas),
   #                  entities = stringr::str_c(entities))
   v <- v |> dplyr::filter(stringr::str_detect(tags, " MD ") |
-                          stringr::str_detect(sentence, "going to|need to|ready to|is time to|commit to|promise to|intend to|let's"))
+                          stringr::str_detect(sentence,
+                                              "going to|need to|ready to|is time to|
+                                              |commit to|promise to|intend to|let's|
+                                              |tackle the|fix the|address the"))
   class(v) <- c("promises", class(v))
   v
   # todo: extract related sentences around promises and re-paste together
-  # todo: what about words that construct problems such as "issue" or "problem"?
-  # todo: what about verbs/expressions as "address", "take care of", "tackle" or "fix"?
 }
 
 #' Extract most frequent subjects from political discourses
@@ -45,18 +46,13 @@ extract_promises <- function(v) {
 #' Defaults to 0.1.
 #' Possible values range from 0 to 1.
 #' @import dplyr
-#' @importFrom purrr map_dfr
-#' @importFrom stringr str_squish str_replace_all
-#' @importFrom tm removePunctuation
-#' @importFrom quanteda stopwords
-#' @importFrom stringdist stringdist
 #' @examples
 #' \donttest{
 #' extract_subjects(US_News_Conferences_1960_1980[1:2, 3])
 #' }
 #' @export
 extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
-  sentence_id <- doc_id <- entity <- group <- subjects <- subject <- NULL
+  sentence_id <- doc_id <- entity <- pos <- token <- subject <- NULL
   if (any(class(v) == "data.frame")) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated data frame.")
@@ -65,34 +61,48 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
       v <- suppressMessages(annotate_text(v[["sentence"]]))
     }
   } else v <- suppressMessages(annotate_text(v))
-  out <- spacyr::entity_extract(v) |>
+  nouns <- dplyr::filter(v, pos == "NOUN", nchar(token) > 3, entity == "") |>
+    dplyr::mutate(token = .clean_token(token)) |> # should we use the "lemma"?
+    dplyr::group_by(token) |>
+    dplyr::count() |>
+    dplyr::rename(strings = token)
+  entity <- spacyr::entity_extract(v) |>
     dplyr::group_by(doc_id, sentence_id) |>
-    dplyr::mutate(duplicated = n() > 1,
-                  entity = stringr::str_squish(
-                    tm::removePunctuation(tm::removeWords(
-                      stringr::str_replace_all(tolower(entity), "_", " "),
-                      quanteda::stopwords())))) |>
-    dplyr::filter(duplicated == FALSE) |>
-    dplyr::ungroup()
-  out <- purrr::map_dfr(out$entity, ~ {
-    i <- which(stringdist::stringdist(., out$entity, method) < level &
-                 nchar(out$entity) > 3)
-    dplyr::tibble(index = i, subjects = out$entity[i])
-  }, .id = "group") |>
-    dplyr::distinct(index, .keep_all = TRUE) |>
-    dplyr::group_by(group) |>
-    dplyr::summarize(subject = paste(unique(subjects), collapse = "|"),
-                     count = n()) |>
-    dplyr::arrange(-count) |>
+    dplyr::mutate(duplicated = n() > 1, entity = .clean_token(entity)) |>
+    dplyr::filter(duplicated == FALSE, nchar(entity) > 3) |>
+    dplyr::group_by(entity) |>
+    dplyr::count() |>
+    dplyr::rename(strings = entity)
+  out <- .find_similar_words(count = rbind(nouns, entity), method = method, level = level) |>
+    dplyr::arrange(-n) |>
     dplyr::ungroup() |>
-    dplyr::filter(subject != "") |>
     dplyr::select(subject) |>
     dplyr::slice_head(n = n) |>
     unlist()
   class(out) <- c("subjects", class(out))
   out
-  # todo: exclude small words but sill count them
-  # todo: what about nouns following verbs?
+  # todo: what to do with small words currently excluded?
+}
+
+.clean_token <- function(v) {
+  stringr::str_squish(tm::removePunctuation(tm::removeWords(
+    stringr::str_replace_all(tolower(v), "_", " "), quanteda::stopwords())))
+}
+
+.find_similar_words <- function(count, method, level) {
+  group <- subjects <- subject <- NULL
+  out <- purrr::map_dfr(count[,1][[1]], ~ {
+    i <- which(stringdist::stringdist(., count[,1][[1]], method) < level)
+    dplyr::tibble(index = i, subjects = count[,1][[1]][i])
+  }, .id = "group") |>
+    dplyr::distinct(index, .keep_all = TRUE) |>
+    dplyr::left_join(count, by = c("subjects" = names(count[,1]))) |>
+    dplyr::group_by(group) |>
+    dplyr::summarize(subject = paste(unique(subjects), collapse = "|"),
+                     n = sum(n)) |>
+    dplyr::mutate(n = n/(stringr::str_count(subject, "\\|")+1)) |>
+    dplyr::select(subject, n) |>
+    dplyr::distinct()
 }
 
 #' Extract terms related to subjects
@@ -109,15 +119,18 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
 #' }
 #' @export
 extract_related_terms <- function(v, subjects, n = 5) {
-  doc_id <- token <- text <- NULL
+  doc_id <- token <- text <- entity <- pos <- NULL
   if (any(class(v) == "data.frame")) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated data frame.")
     }
     if ("sentence" %in% names(v)) {
-      v <- v[["sentence"]]
-    } else if ("token_id" %in% names(v)) {
-      v <- group_by(doc_id) |>
+      v <- suppressMessages(annotate_text(v[["sentence"]]))
+      # todo: make it more efficient, too much back and forth
+    }
+    if ("token_id" %in% names(v)) {
+      v <- filter(v, entity != "" | pos == "NOUN") |>
+        group_by(doc_id) |>
         dplyr::summarise(text = paste(token, collapse = " ")) |>
         dplyr::select(text)
     }
@@ -149,8 +162,8 @@ extract_related_terms <- function(v, subjects, n = 5) {
   # remove duplicate words
   class(out) <- c("related_subjects", class(out))
   out
-  # todo: make it work with annotated data frames
   # todo: fix issue with multiple word subjects
+  # todo: use NLP to extract only entity or nouns as related terms
 }
 
 # helper function
