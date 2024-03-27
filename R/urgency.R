@@ -7,8 +7,7 @@
 #' @importFrom usethis ui_done ui_info
 #' @examples
 #' \donttest{
-#' get_urgency(US_News_Conferences_1960_1980[1:10,3],
-#'             subjects = extract_subjects(US_News_Conferences_1960_1980[1:2, 3]))
+#' get_urgency(US_News_Conferences_1960_1980[1:10,3])
 #' }
 #' @export
 get_urgency <- function(v, subjects) {
@@ -25,8 +24,7 @@ get_urgency <- function(v, subjects) {
     usethis::ui_done("Extracted promises.")
   }
   if (missing(subjects)) {
-    similar_words <- extract_related_terms(promises,
-                                           extract_subjects(promises, n = 20))
+    similar_words <- extract_related_terms(promises, extract_subjects(promises))
     usethis::ui_done("Extracted subjects.")
   } else {
     if ("related_subjects" %in% class(subjects)) {
@@ -153,21 +151,17 @@ get_urgency <- function(v, subjects) {
 .assign_adv <- function(promises) {
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in 1:length(adverbs[,1])) {
-    out[[adverbs[,1][i]]] <- stringr::str_count(promises[["lemmas"]],
-                                                textstem::lemmatize_strings(adverbs[,1][i]))*
+    out[[adverbs[,1][i]]] <- stringr::str_count(promises[["adverbs"]], adverbs[,3][i])*
       abs(adverbs[,2][i]/5) # absolute value since we do not care about direction
   }
-  # todo: fix lists for double vectors
   rowSums(out[-1])
 }
 
 .assign_adj <- function(promises) {
   out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
   for (i in 1:length(adjectives[,1])) {
-    out[[adjectives[,1][i]]] <- stringr::str_count(promises[["lemmas"]],
-                                                   textstem::lemmatize_strings(adjectives[,1][i]))*
+    out[[adjectives[,1][i]]] <- stringr::str_count(promises[["adjectives"]], adjectives[,3][i])*
       abs(adjectives[,2][i]/5) # absolute value since we do not care about direction
   }
-  # todo: fix lists for double vectors
   rowSums(out[-1])
 }
