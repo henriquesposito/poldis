@@ -19,6 +19,6 @@ Extract terms related to subjects
 \examples{
 \donttest{
 extract_related_terms(US_News_Conferences_1960_1980[1:2, 3],
-                      subjects = c("kennedy", "military"))
+                      subjects = extract_subjects(US_News_Conferences_1960_1980[1:2, 3]))
 }
 }
