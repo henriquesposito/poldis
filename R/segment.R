@@ -9,26 +9,43 @@
 #' }
 #' @export
 extract_promises <- function(v) {
-  tags <- tokens <- sentence <- segment_id <- poss <-
-    lemmas <- text <- doc_id <- entities <- sentence_id <- NULL
+  tags <- tokens <- sentence <- seg_id <- poss <-
+    lemmas <- text <- doc_id <- entities <- NULL
   if (any(class(v) == "data.frame")) {
     if ("token_id" %in% names(v))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
   } else v <- suppressMessages(annotate_text(v, level = "sentences"))
   # todo: extract related sentences around promises and re-paste together
   # segment text first
+  # assign IDs for segments
   # v <- v |>
   #   dplyr::group_by(doc_id) |>
   #   dplyr::mutate(lemmas = tolower(lemmas)) |>
   #   dplyr::mutate(seg_id = ifelse(stringr::str_detect(lemmas,
   #                                                     "first|second|third|fourth|
-  #                                                     |fifth|\\?|begin by|start by|
-  #                                                     |begin with|otherwise|apart from|
-  #                                                     |besides|other than"),
+  #                                                     |fifth|begin by|start by|
+  #                                                     |begin with|otherwise|
+  #                                                     |apart from|besides|other than"),
   #                                 1:dplyr::n(), NA)) |> # first attempt to identify breaks in the text
   #   tidyr::fill(seg_id) |>
   #   dplyr::mutate(seg_id = ifelse(is.na(seg_id), 0, seg_id),
   #                 seg_id = paste0(doc_id, "-", seg_id))
+  #
+  # # remove problems (?)
+  # v <- v |>
+  #   dplyr::filter(!stringr::str_detect(lemmas, "problem|issue|challenge|matter|
+  #                                   |can of worms|deep water|pain|hydra|matter|
+  #                                   |difficulty|trouble|killer|kink|
+  #                                   |pitfall|trap|hindrance|impediment|
+  #                                   |deterrent|wrinkle|puzzle|case|conundrum|
+  #                                   |dilemma|question|hazard|predicament|plight|
+  #                                   |quandary|hard time|stress|strain|crisis|
+  #                                   |mire|complex|address|solve|resolve|tackle|
+  #                                   |fix|confront|face|take care of|consider|
+  #                                   |recognise|reject|ignore|act on|give attention|
+  #                                   |direct attention|handle|treat|deal with"))
+  # # paste together potential promises connected to one another
+  # # and count instances of promises within each segment
   # v <- within(v,
   #             {
   #               text <- ave(sentence, seg_id, FUN = toString)
@@ -42,11 +59,15 @@ extract_promises <- function(v) {
   #   dplyr::distinct() |>
   #   dplyr::mutate(text = stringr::str_replace_all(text, "\n, ", ""),
   #                 text = stringr::str_remove_all(text, "\n"),
-  #                 text = stringr::str_squish(text))
+  #                 text = stringr::str_squish(text)) |>
+  #   dplyr::mutate(promise_count = stringr::str_count(lemmas, "going to|need to|
+  #                                                    |ready to|is time to|
+  #                                                    |commit to|promise to|
+  #                                                    |intend to|let 's"))
   # extract promises
   v <- v |> dplyr::filter(stringr::str_detect(tags, " MD ") |
-                          stringr::str_detect(sentence,
-                                              "going to|need to|ready to|is time to|
+                            stringr::str_detect(sentence,
+                                                "going to|need to|ready to|is time to|
                                               |commit to|promise to|intend to|let's|
                                               |tackle the|fix the|address the"))
   class(v) <- c("promises", class(v))
