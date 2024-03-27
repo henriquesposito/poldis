@@ -25,6 +25,8 @@ load_pdf <- function(path) {
 #' @param level Do you want to parse words or sentences? Words by default.
 #' @import spacyr
 #' @importFrom dplyr group_by summarise ungroup
+#' @importFrom stringr str_squish
+#' @importFrom usethis ui_info
 #' @examples
 #' \donttest{
 #' annotate_text(US_News_Conferences_1960_1980[1:2, 3])
@@ -39,18 +41,28 @@ annotate_text <- function(v, level = "words") {
   parse <- spacyr::spacy_parse(v, tag = TRUE)
   suppressWarnings(spacyr::spacy_finalize())
   if (level == "sentences") {
-    parse <- group_by(parse, doc_id, sentence_id) |>
+    usethis::ui_info("Annotating sentences...")
+    entity <- spacyr::entity_extract(parse) |>
+      dplyr::group_by(sentence_id, doc_id) |>
+      dplyr::summarise(entities = unique(paste(entity, collapse = " ")))
+    parse <- dplyr::group_by(parse, doc_id, sentence_id) |>
       dplyr::summarise(ntoken = max(token_id),
                        sentence = paste(token, collapse = " "),
                        poss = paste(pos, collapse = " "),
                        tags = paste(tag, collapse = " "),
                        lemmas = paste(lemma, collapse = " "),
-                       entities = paste(ifelse(entity == "", NA, entity),
-                                        collapse = " ")) |>
+                       adverbs = stringr::str_squish(paste(ifelse(
+                         pos == "ADP", lemma, ""), collapse = " ")),
+                       adjectives = stringr::str_squish(paste(ifelse(
+                         pos == "ADJ", lemma, ""), collapse = " ")),
+                       nouns = stringr::str_squish(paste(ifelse(
+                         pos == "NOUN" & entity == "", lemma, ""), collapse = " "))) |>
+      dplyr::left_join(entity) |>
       dplyr::ungroup()
   }
   parse
   # todo: add more informative messages/warnings for users
+  # todo: add nouns, adverbs, adjectives and entities together
 }
 
 # Helper function for checking and downloading packages
