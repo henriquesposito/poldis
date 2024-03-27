@@ -48,7 +48,7 @@ get_urgency <- function(v, subjects) {
     dplyr::arrange(-urgency)
   # todo: fix how the function works for small numbers of text
   # todo: what about nouns, should we code them using SO-CALL dictionaries?
-  # todo: fix normalization scores
+  # todo: fix normalization scores, how to best do it?
 }
 
 .assign_subjects <- function(promises, subjects) {
