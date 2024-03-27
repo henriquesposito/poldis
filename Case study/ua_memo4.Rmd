@@ -1,0 +1,44 @@
+---
+title: "Urgency Memo 4"
+author: "Henrique Sposito"
+date: "2024-03-27"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(poldis)
+library(readr)
+library(readxl)
+```
+
+# What are promises?
+
+Promises in political discourse relate to future oriented  “calls to action” in relation to objects of policy. 
+
+- only future (not past or present) - no taking stock but this activity can be a continuation of a previous action (e.g. "we will keep on working towards")
+- "calls to action" are internally (e.g. "I will do") and externally (e.g. "we need to take this seriously") directed discourse aimed at describing, move, or inspiring future activity
+- objects of policy refer to political problems constructed in discourse that demand dedicated policy attention - is this our subjects/topics?
+
+Looking into promises allows us to rank political preferences related to future action.
+
+```{r}
+sample_text <- read_csv("sample_text.csv")
+sentences <- annotate_text(sample_text$text, level = "sentences")
+promises <- extract_promises(sentences)
+subjects <- extract_subjects(promises)
+related_terms <- extract_related_terms(promises$sentence, subjects)
+urgency <- get_urgency(promises, related_terms)
+head(urgency$sentence, n = 10)
+```
+
+# Outstanding issues:
+
+- promise merging - maybe we can focus on sentence connectors for this (i.e. senetnecs that begin with these could be merged with previous sentences)?
+
+```{r}
+sentence_connectors <- read_excel("sentence_connectors.xlsx")
+head(sentence_connectors, n = 20)
+```
+
+- normalization - bias towards longer sentences still an issue...

@@ -71,8 +71,9 @@ extract_promises <- function(v) {
   v <- v |> dplyr::filter(stringr::str_detect(tags, " MD ") |
                             stringr::str_detect(sentence,
                                                 "going to|need to|ready to|is time to|
-                                              |commit to|promise to|intend to|let's|
-                                              |tackle the|fix the|address the"))
+                                                |commit to|promise to|intend to|let's|
+                                                |tackle the|fix the|address the|
+                                                |"))
   class(v) <- c("promises", class(v))
   v
 }
