@@ -23,30 +23,30 @@ extract_promises <- function(v) {
   #   dplyr::mutate(lemmas = tolower(lemmas)) |>
   #   dplyr::mutate(seg_id = ifelse(stringr::str_detect(lemmas,
   #                                                     "first|second|third|fourth|
-  #                                                     |fifth|begin by|start by|
-  #                                                     |begin with|otherwise|apart from|
-  #                                                     |besides|other than|contrary|
-  #                                                     |conversely|moreover|furthermore|
-  #                                                     |further|however|addition|
-  #                                                     |anyway|while|ladies|gentlemen|
-  #                                                     |distinguished|sir"),
-  #                                 1:dplyr::n(), NA)) |> # first attempt to identify breaks in the text
+  ##                                                     |fifth|begin by|start by|
+  ##                                                     |begin with|otherwise|apart from|
+  ##                                                     |besides|other than|contrary|
+  ##                                                     |conversely|moreover|furthermore|
+  ##                                                     |further|however|addition|
+  ##                                                     |anyway|while|ladies|gentlemen|
+  ##                                                     |distinguished|sir"),
+  ##                                 1:dplyr::n(), NA)) |> # first attempt to identify breaks in the text
   #   tidyr::fill(seg_id) |>
   #   dplyr::mutate(seg_id = ifelse(is.na(seg_id), 0, seg_id),
   #                 seg_id = paste0(doc_id, "-", seg_id))
   # # remove problems (?)
   # v <- v |>
   #   dplyr::filter(!stringr::str_detect(lemmas, "problem|issue|challenge|matter|
-  #                                   |can of worms|deep water|pain|hydra|matter|
-  #                                   |difficulty|trouble|killer|kink|
-  #                                   |pitfall|trap|hindrance|impediment|
-  #                                   |deterrent|wrinkle|puzzle|case|conundrum|
-  #                                   |dilemma|question|hazard|predicament|plight|
-  #                                   |quandary|hard time|stress|strain|crisis|
-  #                                   |mire|complex|address|solve|resolve|tackle|
-  #                                   |fix|confront|face|take care of|consider|
-  #                                   |recognise|reject|ignore|act on|give attention|
-  #                                   |direct attention|handle|treat|deal with"))
+  ##                                   |can of worms|deep water|pain|hydra|matter|
+  ##                                   |difficulty|trouble|killer|kink|
+  ##                                   |pitfall|trap|hindrance|impediment|
+  ##                                   |deterrent|wrinkle|puzzle|case|conundrum|
+  ##                                   |dilemma|question|hazard|predicament|plight|
+  ##                                   |quandary|hard time|stress|strain|crisis|
+  ##                                   |mire|complex|address|solve|resolve|tackle|
+  ##                                   |fix|confront|face|take care of|consider|
+  ##                                   |recognise|reject|ignore|act on|give attention|
+  ##                                   |direct attention|handle|treat|deal with"))
   # # paste together potential promises connected to one another
   # # and count instances of promises within each segment
   # v <- within(v,
@@ -64,9 +64,9 @@ extract_promises <- function(v) {
   #                 text = stringr::str_remove_all(text, "\n"),
   #                 text = stringr::str_squish(text)) |>
   #   dplyr::mutate(promise_count = stringr::str_count(lemmas, "going to|need to|
-  #                                                    |ready to|is time to|
-  #                                                    |commit to|promise to|
-  #                                                    |intend to|let 's"))
+  ##                                                    |ready to|is time to|
+  ##                                                    |commit to|promise to|
+  ##                                                    |intend to|let 's"))
   # extract promises
   v <- v |> dplyr::filter(stringr::str_detect(tags, " MD ") |
                             stringr::str_detect(sentence,
@@ -94,27 +94,37 @@ extract_promises <- function(v) {
 #' }
 #' @export
 extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
-  sentence_id <- doc_id <- entity <- pos <- token <- subject <- NULL
+  sentence_id <- doc_id <- entity <- pos <- token <- subject <- strings <- NULL
   if (any(class(v) == "data.frame")) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated data frame.")
     }
-    if ("sentence" %in% names(v)) {
-      v <- suppressMessages(annotate_text(v[["sentence"]]))
-    }
   } else v <- suppressMessages(annotate_text(v))
-  nouns <- dplyr::filter(v, pos == "NOUN", nchar(token) > 3, entity == "") |>
-    dplyr::mutate(token = .clean_token(token)) |> # should we use the "lemma"?
-    dplyr::group_by(token) |>
-    dplyr::count() |>
-    dplyr::rename(strings = token)
-  entity <- spacyr::entity_extract(v) |>
-    dplyr::group_by(doc_id, sentence_id) |>
-    dplyr::mutate(duplicated = n() > 1, entity = .clean_token(entity)) |>
-    dplyr::filter(duplicated == FALSE, nchar(entity) > 3) |>
-    dplyr::group_by(entity) |>
-    dplyr::count() |>
-    dplyr::rename(strings = entity)
+  if ("sentence" %in% names(v)) {
+    nouns <- data.frame(strings = .clean_token(unlist(strsplit(v[["nouns"]], " ")))) |>
+      dplyr::filter(nchar(strings) > 3) |>
+      dplyr::group_by(strings) |>
+      dplyr::count() |>
+      dplyr::ungroup()
+    entity <- data.frame(strings = .clean_token(unlist(strsplit(v[["entities"]], " ")))) |>
+      dplyr::filter(nchar(strings) > 3) |>
+      dplyr::group_by(strings) |>
+      dplyr::count() |>
+      dplyr::ungroup()
+  } else {
+    nouns <- dplyr::filter(v, pos == "NOUN", nchar(token) > 3, entity == "") |>
+      dplyr::mutate(strings = .clean_token(token)) |> # should we use the "lemma"?
+      dplyr::group_by(strings) |>
+      dplyr::count() |>
+      dplyr::ungroup()
+    entity <- spacyr::entity_extract(v) |>
+      dplyr::group_by(doc_id, sentence_id) |>
+      dplyr::mutate(duplicated = n() > 1, strings = .clean_token(entity)) |>
+      dplyr::filter(duplicated == FALSE, nchar(strings) > 3) |>
+      dplyr::group_by(strings) |>
+      dplyr::count() |>
+      dplyr::ungroup()
+  }
   out <- .find_similar_words(count = rbind(nouns, entity), method = method, level = level) |>
     dplyr::arrange(-n) |>
     dplyr::ungroup() |>
@@ -157,24 +167,25 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
 #' @examples
 #' \donttest{
 #' extract_related_terms(US_News_Conferences_1960_1980[1:2, 3],
-#'                       subjects = c("kennedy", "military"))
+#'                       subjects = extract_subjects(US_News_Conferences_1960_1980[1:2, 3]))
 #' }
 #' @export
 extract_related_terms <- function(v, subjects, n = 5) {
-  doc_id <- token <- text <- entity <- pos <- NULL
+  doc_id <- token <- text <- entity <- entities <- nouns <- pos <- NULL
   if (any(class(v) == "data.frame")) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated data frame.")
     }
     if ("sentence" %in% names(v)) {
-      v <- suppressMessages(annotate_text(v[["sentence"]]))
-      # todo: make it more efficient, too much back and forth
-    }
-    if ("token_id" %in% names(v)) {
-      v <- filter(v, entity != "" | pos == "NOUN") |>
-        group_by(doc_id) |>
-        dplyr::summarise(text = paste(token, collapse = " ")) |>
+      v <- dplyr::mutate(v, text = ifelse(is.na(entities), nouns,
+                                          paste0(nouns, " ", entities))) |>
         dplyr::select(text)
+    } else if ("token_id" %in% names(v)) {
+      v <- dplyr::filter(v, entity != "" | pos == "NOUN") |>
+        dplyr::group_by(doc_id) |>
+        dplyr::summarise(text = paste(token, collapse = " ")) |>
+        dplyr::select(text) |>
+        dplyr::ungroup()
     }
   }
   corp <- quanteda::corpus(v) |>
@@ -205,7 +216,6 @@ extract_related_terms <- function(v, subjects, n = 5) {
   class(out) <- c("related_subjects", class(out))
   out
   # todo: fix issue with multiple word subjects
-  # todo: use NLP to extract only entity or nouns as related terms
 }
 
 # helper function
@@ -388,6 +398,19 @@ extract_match <- function(v, match, invert = FALSE,
 #' }
 #' @export
 extract_similarities <- function(v, comparison = "similarities", method) {
+  doc_id <- token <- text <- NULL
+  if (any(class(v) == "data.frame")) {
+    if (!"doc_id" %in% names(v)) {
+      stop("Please declare a text vector or an annotated data frame.")
+    }
+    if ("sentence" %in% names(v)) {
+      v <- v[["sentence"]]
+    } else if ("token_id" %in% names(v)) {
+      v <- dplyr::group_by(doc_id) |>
+        dplyr::summarise(text = paste(token, collapse = " ")) |>
+        dplyr::select(text)
+    }
+  }
   v <- quanteda::corpus(v)
   if (comparison == "similarities") {
     if(missing(method)) method = "correlation"
@@ -395,5 +418,6 @@ extract_similarities <- function(v, comparison = "similarities", method) {
   } else {
     if(missing(method)) method = "euclidean"
     quanteda.textstats::textstat_dist(quanteda::dfm(v), method = method)
-  } #todo: add plotting method that plots texts similarities as a dendogram
+  }
+  # todo: add plotting method that plots texts similarities as a dendogram
 }
