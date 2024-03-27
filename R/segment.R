@@ -15,16 +15,35 @@ extract_promises <- function(v) {
     if ("token_id" %in% names(v))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
   } else v <- suppressMessages(annotate_text(v, level = "sentences"))
+  # todo: extract related sentences around promises and re-paste together
+  # segment text first
   # v <- v |>
-  #   dplyr::mutate(segment_id = cumsum(grepl("First|Second|Third|Fourth|Fifth|\\?|begin by|start by|begin with|Let",
-  #                                           v$sentence))) |> # assign segment IDs for merging text that belong together
-  #   dplyr::select(-c(sentence_id, ntoken)) |>
-  #   dplyr::group_by(doc_id, segment_id) |>
-  #   dplyr::reframe(sentence = stringr::str_c(sentence),
-  #                  poss = stringr::str_c(poss),
-  #                  tags = stringr::str_c(tags),
-  #                  lemmas = stringr::str_c(lemmas),
-  #                  entities = stringr::str_c(entities))
+  #   dplyr::group_by(doc_id) |>
+  #   dplyr::mutate(lemmas = tolower(lemmas)) |>
+  #   dplyr::mutate(seg_id = ifelse(stringr::str_detect(lemmas,
+  #                                                     "first|second|third|fourth|
+  #                                                     |fifth|\\?|begin by|start by|
+  #                                                     |begin with|otherwise|apart from|
+  #                                                     |besides|other than"),
+  #                                 1:dplyr::n(), NA)) |> # first attempt to identify breaks in the text
+  #   tidyr::fill(seg_id) |>
+  #   dplyr::mutate(seg_id = ifelse(is.na(seg_id), 0, seg_id),
+  #                 seg_id = paste0(doc_id, "-", seg_id))
+  # v <- within(v,
+  #             {
+  #               text <- ave(sentence, seg_id, FUN = toString)
+  #               poss <- ave(poss, seg_id, FUN = toString)
+  #               tags <- ave(tags, seg_id, FUN = toString)
+  #               lemmas <- ave(lemmas, seg_id, FUN = toString)
+  #               entities <- ave(entities, seg_id, FUN = toString)
+  #               ntoken <- ave(ntoken, seg_id, FUN = sum)
+  #             }) |>
+  #   dplyr::select(doc_id, seg_id, text, poss, tags, lemmas, entities) |>
+  #   dplyr::distinct() |>
+  #   dplyr::mutate(text = stringr::str_replace_all(text, "\n, ", ""),
+  #                 text = stringr::str_remove_all(text, "\n"),
+  #                 text = stringr::str_squish(text))
+  # extract promises
   v <- v |> dplyr::filter(stringr::str_detect(tags, " MD ") |
                           stringr::str_detect(sentence,
                                               "going to|need to|ready to|is time to|
@@ -32,7 +51,6 @@ extract_promises <- function(v) {
                                               |tackle the|fix the|address the"))
   class(v) <- c("promises", class(v))
   v
-  # todo: extract related sentences around promises and re-paste together
 }
 
 #' Extract most frequent subjects from political discourses
