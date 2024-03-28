@@ -35,7 +35,8 @@ Imports:
     tm,
     rlang,
     textstem,
-    usethis
+    usethis,
+    tidyr
 Suggests:
     rmarkdown,
     testthat,

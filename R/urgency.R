@@ -35,7 +35,7 @@ get_urgency <- function(v, subjects) {
     }
   }
   usethis::ui_info("Coding urgency components...")
-  promises |>
+  out <- promises |>
     dplyr::mutate(topic = .assign_subjects(promises, similar_words),
                   frequency = .assign_frequencies(promises),
                   timing = .assign_time(promises),
@@ -43,9 +43,11 @@ get_urgency <- function(v, subjects) {
                   commit = .assign_commitment(promises),
                   adjectives = .assign_adj(promises),
                   adverbs = .assign_adv(promises),
-                  urgency = (frequency + timing + degree + commit + adjectives + adverbs)/
-                    stats::median(ntoken)) |>
+                  urgency = (frequency + timing + degree + commit +
+                               adjectives + adverbs)/ntoken) |>
     dplyr::arrange(-urgency)
+  class(out) <- c("urgency", class(out))
+  out
   # todo: fix how the function works for small numbers of text
   # todo: what about nouns, should we code them using SO-CALL dictionaries?
   # todo: fix normalization scores, how to best do it?
@@ -164,4 +166,29 @@ get_urgency <- function(v, subjects) {
       abs(adjectives[,2][i]/5) # absolute value since we do not care about direction
   }
   rowSums(out[-1])
+}
+
+#' Rank urgent topics
+#'
+#' @param v Text vector or annotated data frame.
+#' @param subjects List of subjects.
+#' @import dplyr
+#' @importFrom tidyr separate_rows
+#' @examples
+#' \donttest{
+#' rank_urgent_topics(US_News_Conferences_1960_1980[1:10,3])
+#' }
+#' @export
+rank_urgent_topics <- function(v, subjects) {
+  topic <- urgency <- urgency_sum <- NULL
+  if (any(class(v) != "urgency")) {
+    v <- get_urgency(v, subjects)
+  }
+  v |> dplyr::mutate(topic = ifelse(topic == "", "No topic", topic)) |>
+    tidyr::separate_rows(topic, sep = ", ") |>
+    dplyr::group_by(topic) |>
+    dplyr::summarise(urgency_sum = sum(urgency),
+                     urgency_mean = mean(urgency),
+                     urgency_median = stats::median(urgency)) |>
+    dplyr::arrange(-urgency_sum)
 }
