@@ -23,13 +23,13 @@ extract_promises <- function(v) {
   #   dplyr::mutate(lemmas = tolower(lemmas)) |>
   #   dplyr::mutate(seg_id = ifelse(stringr::str_detect(lemmas,
   #                                                     "first|second|third|fourth|
-  ##                                                     |fifth|begin by|start by|
+  ##                                                     |fifth|finally|end|lastly|begin by|start by|
   ##                                                     |begin with|otherwise|apart from|
   ##                                                     |besides|other than|contrary|
   ##                                                     |conversely|moreover|furthermore|
   ##                                                     |further|however|addition|
   ##                                                     |anyway|while|ladies|gentlemen|
-  ##                                                     |distinguished|sir"),
+  ##                                                     |distinguished|sir|now|every|another|on the other hand"),
   ##                                 1:dplyr::n(), NA)) |> # first attempt to identify breaks in the text
   #   tidyr::fill(seg_id) |>
   #   dplyr::mutate(seg_id = ifelse(is.na(seg_id), 0, seg_id),
@@ -63,6 +63,10 @@ extract_promises <- function(v) {
   #   dplyr::mutate(text = stringr::str_replace_all(text, "\n, ", ""),
   #                 text = stringr::str_remove_all(text, "\n"),
   #                 text = stringr::str_squish(text)) |>
+  # dplyr::filter(stringr::str_detect(tags, "PRP MD ") |
+  #                 stringr::str_detect(lemmas,
+  #                                     "going to|need to|ready to|is time to|
+  ##                                    |commit to|promise to|intend to|let 's"))
   #   dplyr::mutate(promise_count = stringr::str_count(lemmas, "going to|need to|
   ##                                                    |ready to|is time to|
   ##                                                    |commit to|promise to|
