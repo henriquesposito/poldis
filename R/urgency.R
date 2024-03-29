@@ -176,10 +176,10 @@ get_urgency <- function(v, subjects) {
 #' @importFrom tidyr separate_rows
 #' @examples
 #' \donttest{
-#' rank_urgent_topics(US_News_Conferences_1960_1980[1:10,3])
+#' get_urgency_rank(US_News_Conferences_1960_1980[1:10,3])
 #' }
 #' @export
-rank_urgent_topics <- function(v, subjects) {
+get_urgency_rank <- function(v, subjects) {
   topic <- urgency <- urgency_sum <- NULL
   if (any(class(v) != "urgency")) {
     v <- get_urgency(v, subjects)
