@@ -11,7 +11,7 @@
 #' @export
 extract_promises <- function(v) {
   tags <- tokens <- sentence <- seg_id <- poss <-
-    lemmas <- text <- doc_id <- entities <- problems <- promises <-
+    lemmas <- segment <- doc_id <- entities <- problems <- promises <-
     lemmas_p <- adv_p <- adj_p <- promise <- problem <- NULL
   if (any(class(v) == "data.frame")) {
     if ("token_id" %in% names(v))
@@ -83,7 +83,7 @@ extract_promises <- function(v) {
   # and exclude instances of promises that are problems within each segment
   v <- within(v,
               {
-                text <- ave(sentence, seg_id, FUN = toString)
+                segment <- ave(sentence, seg_id, FUN = toString)
                 poss <- ave(poss, seg_id, FUN = toString)
                 tags <- ave(tags, seg_id, FUN = toString)
                 lemmas <- ave(lemmas_p, seg_id, FUN = toString)
@@ -95,12 +95,12 @@ extract_promises <- function(v) {
                 problems <- ave(problem, seg_id, FUN = toString)
                 promises <- ave(promise, seg_id, FUN = toString)
               }) |>
-    dplyr::select(doc_id, seg_id, text, poss, tags, lemmas, entities, adverbs,
-                  adjectives, nouns, ntoken, problems, promises) |>
+    dplyr::select(doc_id, seg_id, segment, poss, tags, lemmas, entities,
+                  adverbs, adjectives, nouns, ntoken, problems, promises) |>
     dplyr::distinct() |>
-    dplyr::mutate(text = stringr::str_replace_all(text, "[.],", "."),
-                  text = stringr::str_remove_all(text, "\n"),
-                  text = stringr::str_squish(text),
+    dplyr::mutate(segment = stringr::str_replace_all(segment, "[.],", "."),
+                  segment = stringr::str_remove_all(segment, "\n"),
+                  segment = stringr::str_squish(segment),
                   lemmas = stringr::str_remove_all(lemmas, "NA, "),
                   lemmas = stringr::str_replace_all(lemmas, "., NA", "."),
                   adverbs = stringr::str_remove_all(adverbs, "NA, |, NA"),
@@ -140,7 +140,7 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
       stop("Please declare a text vector or an annotated data frame.")
     }
   } else v <- suppressMessages(annotate_text(v))
-  if ("sentence" %in% names(v) | "text" %in% names(v)) {
+  if ("sentence" %in% names(v) | "segment" %in% names(v)) {
     nouns <- data.frame(strings = .clean_token(unlist(strsplit(v[["nouns"]], " ")))) |>
       dplyr::filter(nchar(strings) > 3) |>
       dplyr::group_by(strings) |>
@@ -216,7 +216,7 @@ extract_related_terms <- function(v, subjects, n = 5) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated data frame.")
     }
-    if ("sentence" %in% names(v) | "text" %in% names(v)) {
+    if ("sentence" %in% names(v) | "segment" %in% names(v)) {
       v <- dplyr::mutate(v, text = ifelse(is.na(entities), nouns,
                                           paste0(nouns, " ", entities))) |>
         dplyr::select(text)
