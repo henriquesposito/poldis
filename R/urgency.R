@@ -23,7 +23,8 @@
 #' }
 #' @export
 get_urgency <- function(v, subjects) {
-  frequency <- timing <- topic <- degree <- urgency <- commit <- NULL
+  frequency <- timing <- topic <- degree <- urgency <- commit <-
+    promises <- subjects <- similar_words <- adjectives <- adverbs <- NULL
   if (any(class(v) == "data.frame") & !"doc_id" %in% names(v)) {
     stop("Please declare a text vector or an annotated object.")
   }
@@ -32,14 +33,14 @@ get_urgency <- function(v, subjects) {
     usethis::ui_done("Extracted promises.")
   }
   if (missing(subjects)) {
-    subjects <- extract_subjects(promises)
+    subjects <- extract_subjects(v)
     usethis::ui_done("Extracted subjects.")
   }
   if (is.list(subjects) | "related_subjects" %in% class(subjects)) {
     similar_words <- subjects
   } else {
     similar_words <- tryCatch({
-      extract_related_terms(promises, subjects)
+      extract_related_terms(v, subjects)
       usethis::ui_done("Extracted similar topics for subjects.")
     }, error = function(e) {
       usethis::ui_info("Failed to identify related terms, subjects will be used to code topics.")
@@ -47,21 +48,22 @@ get_urgency <- function(v, subjects) {
     })
   }
   usethis::ui_info("Coding urgency components...")
-  out <- promises |>
-    dplyr::mutate(topic = .assign_subjects(promises, similar_words),
-                  frequency = .assign_frequencies(promises),
-                  timing = .assign_time(promises),
-                  degree = .assign_degree(promises),
-                  commit = .assign_commitment(promises),
-                  adjectives = .assign_adj(promises),
-                  adverbs = .assign_adv(promises),
-                  urgency = (frequency + timing + degree + commit +
+  out <- promises
+  out$topic <- .assign_subjects(promises, similar_words)
+  out$frequency <- .assign_frequencies(promises)
+  out$timing <- .assign_time(promises)
+  out$degree <- .assign_degree(promises)
+  out$commit <- .assign_commitment(promises)
+  out$adjectives <- .assign_adj(promises)
+  out$adverbs <- .assign_adv(promises)
+  out <- out |>
+    dplyr::mutate(urgency = (frequency + timing + degree + commit +
                                adjectives + adverbs)/ntoken) |>
     dplyr::arrange(-urgency)
   class(out) <- c("urgency", class(out))
   out
   # todo: fix how the function works for small numbers of text
-  # todo: what about nouns, should we code them using SO-CALL dictionaries?
+  # todo: what about nouns, should we code them using SO-CAL dictionaries?
   # todo: fix normalization scores, how to best do it?
 }
 
@@ -71,7 +73,7 @@ get_urgency <- function(v, subjects) {
   } else names(subjects) <- subjects
   out = list()
   for (i in names(subjects)) {
-    out[[i]] <- stringr::str_count(promises$sentence, subjects[[i]])
+    out[[i]] <- stringr::str_count(promises[["promises"]], subjects[[i]])
   }
   out <- apply(data.frame(out), 1, function(i) which(i > 0))
   out <- lapply(out, function(x) paste0(names(x), collapse = ", "))
@@ -98,7 +100,7 @@ get_urgency <- function(v, subjects) {
                                          "rarely" = 0.05,
                                          "hardly ever" = 0.02,
                                          "never" = 0))
-  out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
+  out <- data.frame(sentence = 1:(length(promises[["promises"]])))
   for (i in names(unlist(unname(freq_adverbs)))) {
     out[[i]] <- stringr::str_count(promises[["lemmas"]], textstem::lemmatize_strings(i))*
       unlist(unname(freq_adverbs))[[i]]
@@ -125,7 +127,7 @@ get_urgency <- function(v, subjects) {
                                                     "finally" = 2/8, # degree?
                                                     "eventually" = 1/8,
                                                     "at some stage" = 0.5/8))
-  out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
+  out <- data.frame(sentence = 1:(length(promises[["promises"]])))
   for (i in names(unlist(unname(time_adverbs)))) {
     out[[i]] <- stringr::str_count(promises[["lemmas"]], textstem::lemmatize_strings(i))*
       unlist(unname(time_adverbs))[[i]]
@@ -142,7 +144,7 @@ get_urgency <- function(v, subjects) {
                                            |significant|major" = 1),
                         important = c("lots|very|much|most|fully|far|clearly" = 0.5),
                         unimportant = c("somewhat|almost|least|less|indeed|quite|rather" = 0.2))
-  out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
+  out <- data.frame(sentence = 1:(length(promises[["promises"]])))
   for (i in names(unlist(unname(degr_adverbs)))) {
     out[[i]] <- stringr::str_count(promises[["lemmas"]], textstem::lemmatize_strings(i))*
       unlist(unname(degr_adverbs))[[i]]
@@ -156,7 +158,7 @@ get_urgency <- function(v, subjects) {
                                     |address|take care of|tackle|fix" = 0.2),
                        not_as_commited = c("should|let's|want to|can|could|may|
                                            |might|shall|would" = 0.1))
-  out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
+  out <- data.frame(sentence = 1:(length(promises[["promises"]])))
   for (i in names(unlist(unname(commit_level)))) {
     out[[i]] <- stringr::str_count(promises[["lemmas"]], textstem::lemmatize_strings(i))*
       unlist(unname(commit_level))[[i]]
@@ -165,7 +167,7 @@ get_urgency <- function(v, subjects) {
 }
 
 .assign_adv <- function(promises) {
-  out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
+  out <- data.frame(sentence = 1:(length(promises[["promises"]])))
   for (i in 1:length(adverbs[,1])) {
     out[[adverbs[,1][i]]] <- stringr::str_count(promises[["adverbs"]], adverbs[,3][i])*
       abs(adverbs[,2][i]/5) # absolute value since we do not care about direction
@@ -174,7 +176,7 @@ get_urgency <- function(v, subjects) {
 }
 
 .assign_adj <- function(promises) {
-  out <- data.frame(sentence = 1:(length(promises[["sentence"]])))
+  out <- data.frame(sentence = 1:(length(promises[["promises"]])))
   for (i in 1:length(adjectives[,1])) {
     out[[adjectives[,1][i]]] <- stringr::str_count(promises[["adjectives"]], adjectives[,3][i])*
       abs(adjectives[,2][i]/5) # absolute value since we do not care about direction
