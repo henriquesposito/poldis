@@ -1,4 +1,4 @@
-# Intercoder reliability
+# Inter-coder reliability
 library(dplyr)
 library(readxl)
 # Data from dropbox was converted/altered and loaded in
@@ -26,7 +26,7 @@ intercoder <- left_join(intercoder, poldis, by = c("text" = "sentence"))
 table(intercoder$promise_hs == intercoder$promise_jh) # 81%
 table(intercoder$promise_hs == intercoder$promise_jt) # 77%
 table(intercoder$promise_jt == intercoder$promise_jh) # 86%
-# coders and package (for 79 obs only)
+# coders and package (for 79 obs only unfortunately)
 table(intercoder$promise_poldis == intercoder$promise_jh) # 81%
 table(intercoder$promise_poldis == intercoder$promise_jt) # 86%
 table(intercoder$promise_poldis == intercoder$promise_hs) # 82%
