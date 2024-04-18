@@ -16,6 +16,8 @@ extract_promises <- function(v) {
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
   } else v <- suppressMessages(annotate_text(v, level = "sentences"))
   # todo: extract related sentences around promises and re-paste together
+  # todo: exclude past sentences that contain a modal verb/adverb
+  # todo: how to handle negative promises?
   # segment text first
   # assign IDs for segments
   # v <- v |>
@@ -100,11 +102,12 @@ extract_promises <- function(v) {
   #                 problems = stringr::str_replace_all(problems, "., NA", "."),
   #                 promises = stringr::str_remove_all(promises, "NA, "),
   #                 promises = stringr::str_replace_all(promises, "[.], NA", "."))
-  # extract promises
+  # extract promises (use modal verbs/adverbs and "plan" sentences)
   v <- v |> dplyr::filter(stringr::str_detect(tags, " MD ") |
                             stringr::str_detect(sentence,
                                                 "going to|need to|ready to|is time to|
                                                 |commit to|promise to|intend to|let's|
+                                                |plan to|
                                                 |tackle the|fix the|address the"))
   class(v) <- c("promises", class(v))
   v
@@ -231,7 +234,7 @@ extract_related_terms <- function(v, subjects, n = 5) {
   out <- list()
   for (i in 1:length(dict)) out[[i]] <- quanteda::dfm_select(dfmt, dict[[i]])
   dfmts <- quanteda::dfm_remove(dfmt, dict) |> cbind(do.call(cbind, out))
-  lss <- LSX::textmodel_lss(dfmts, seeds = dict) # model
+  lss <- LSX::textmodel_lss(dfmts, seeds = dict, k = sum(lengths(dict))) # model
   terms <- LSX::bootstrap_lss(lss, mode = "terms")[1:n,]
   out <- list()
   if (is.null(colnames(terms))) {
@@ -261,7 +264,8 @@ extract_related_terms <- function(v, subjects, n = 5) {
                      stringr::str_split_i(a, "\\|", i = 1), a)
   for (i in names(a)) {
     out[[i]] <- ifelse(stringr::str_detect(a[[i]], "\\|"),
-                       stringr::str_split(a[[i]], "\\|"), a[[i]])
+                       lapply(stringr::str_split(a[[i]], "\\|"), function(x) paste0(x, "*")),
+                       paste0(a[[i]], "*"))
   }
   quanteda::dictionary(out)
 }
