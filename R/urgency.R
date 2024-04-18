@@ -49,7 +49,7 @@ get_urgency <- function(v, subjects) {
   }
   usethis::ui_info("Coding urgency components...")
   out <- promises
-  out$topic <- .assign_subjects(promises, similar_words)
+  out$topic <- .assign_subjects(promises, subjects = similar_words)
   out$frequency <- .assign_frequencies(promises)
   out$timing <- .assign_time(promises)
   out$degree <- .assign_degree(promises)
@@ -139,13 +139,14 @@ get_urgency <- function(v, subjects) {
   # only for adverbs not in SO-CAL list
   degr_adverbs <-  list(very_important = c("especially|completely|decidedly|
                                            |deeply|highly|entirely|practically|
-                                           |really|simply|strongly|totally|utterly||
+                                           |really|simply|strongly|totally|utterly|
                                            |virtually|urgently|obvious|serious|
                                            |significant|major" = 1),
                         important = c("lots|very|much|most|fully|far|clearly" = 0.5),
                         unimportant = c("somewhat|almost|least|less|indeed|quite|rather" = 0.2))
   out <- data.frame(sentence = 1:(length(promises[["promises"]])))
   for (i in names(unlist(unname(degr_adverbs)))) {
+    i <- stringr::str_remove_all(i, "|\n")
     out[[i]] <- stringr::str_count(promises[["lemmas"]], textstem::lemmatize_strings(i))*
       unlist(unname(degr_adverbs))[[i]]
   }
