@@ -3,6 +3,7 @@
 #' @param v Text vector or annotated data frame.
 #' @importFrom dplyr filter
 #' @importFrom stringr str_detect
+#' @importFrom stats ave
 #' @examples
 #' \donttest{
 #' extract_promises(US_News_Conferences_1960_1980[1:2,3])
@@ -10,7 +11,8 @@
 #' @export
 extract_promises <- function(v) {
   tags <- tokens <- sentence <- seg_id <- poss <-
-    lemmas <- text <- doc_id <- entities <- NULL
+    lemmas <- text <- doc_id <- entities <- problems <- promises <-
+    lemmas_p <- adv_p <- adj_p <- promise <- problem <- NULL
   if (any(class(v) == "data.frame")) {
     if ("token_id" %in% names(v))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
@@ -73,6 +75,10 @@ extract_promises <- function(v) {
     # remove negative sentences for now
     dplyr::filter(is.na(promise) | !stringr::str_detect(promise, " not "))
     # todo: exclude past sentences that contain a modal verb/adverb
+  # identify lemmas, adjectives, and adverbs that are linked to promises for scoring
+  v <- v |> dplyr::mutate(lemmas_p = ifelse(!is.na(promise), lemmas, NA),
+                          adv_p = ifelse(!is.na(promise), adverbs, NA),
+                          adj_p = ifelse(!is.na(promise), adjectives, NA))
   # paste together potential promises connected to one another
   # and exclude instances of promises that are problems within each segment
   v <- within(v,
@@ -80,10 +86,10 @@ extract_promises <- function(v) {
                 text <- ave(sentence, seg_id, FUN = toString)
                 poss <- ave(poss, seg_id, FUN = toString)
                 tags <- ave(tags, seg_id, FUN = toString)
-                lemmas <- ave(lemmas, seg_id, FUN = toString)
+                lemmas <- ave(lemmas_p, seg_id, FUN = toString)
                 entities <- ave(entities, seg_id, FUN = toString)
-                adverbs <- ave(adverbs, seg_id, FUN = toString)
-                adjectives <- ave(adjectives, seg_id, FUN = toString)
+                adverbs <- ave(adv_p, seg_id, FUN = toString)
+                adjectives <- ave(adj_p, seg_id, FUN = toString)
                 nouns <- ave(nouns, seg_id, FUN = toString)
                 ntoken <- ave(ntoken, seg_id, FUN = sum)
                 problems <- ave(problem, seg_id, FUN = toString)
@@ -95,15 +101,18 @@ extract_promises <- function(v) {
     dplyr::mutate(text = stringr::str_replace_all(text, "[.],", "."),
                   text = stringr::str_remove_all(text, "\n"),
                   text = stringr::str_squish(text),
-                  adverbs = stringr::str_replace_all(adverbs, ", ,", ","),
-                  adjectives = stringr::str_replace_all(adjectives, ", ,", ","),
+                  lemmas = stringr::str_remove_all(lemmas, "NA, "),
+                  lemmas = stringr::str_replace_all(lemmas, "., NA", "."),
+                  adverbs = stringr::str_remove_all(adverbs, "NA, |, NA"),
+                  adjectives = stringr::str_remove_all(adjectives, "NA, |, NA"),
                   nouns = stringr::str_replace_all(nouns, ", ,", ","),
                   entities = stringr::str_remove_all(entities, "NA, "),
                   entities = stringr::str_remove_all(entities, ", NA"),
                   problems = stringr::str_remove_all(problems, "NA, "),
                   problems = stringr::str_replace_all(problems, "., NA", "."),
                   promises = stringr::str_remove_all(promises, "NA, "),
-                  promises = stringr::str_replace_all(promises, "[.], NA", "."))
+                  promises = stringr::str_replace_all(promises, "., NA", ".")) |>
+    dplyr::ungroup()
   class(v) <- c("promises", class(v))
   v
 }
@@ -131,7 +140,7 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
       stop("Please declare a text vector or an annotated data frame.")
     }
   } else v <- suppressMessages(annotate_text(v))
-  if ("sentence" %in% names(v)) {
+  if ("sentence" %in% names(v) | "text" %in% names(v)) {
     nouns <- data.frame(strings = .clean_token(unlist(strsplit(v[["nouns"]], " ")))) |>
       dplyr::filter(nchar(strings) > 3) |>
       dplyr::group_by(strings) |>
@@ -207,7 +216,7 @@ extract_related_terms <- function(v, subjects, n = 5) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated data frame.")
     }
-    if ("sentence" %in% names(v)) {
+    if ("sentence" %in% names(v) | "text" %in% names(v)) {
       v <- dplyr::mutate(v, text = ifelse(is.na(entities), nouns,
                                           paste0(nouns, " ", entities))) |>
         dplyr::select(text)
