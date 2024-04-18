@@ -9,7 +9,7 @@ extract_related_terms(v, subjects, n = 5)
 \arguments{
 \item{v}{Text vector or annotated data frame.}
 
-\item{subjects}{List of subjects.}
+\item{subjects}{Vector containing subjects.}
 
 \item{n}{Number of terms.}
 }

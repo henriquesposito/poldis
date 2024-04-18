@@ -196,7 +196,7 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
 #' Extract terms related to subjects
 #'
 #' @param v Text vector or annotated data frame.
-#' @param subjects List of subjects.
+#' @param subjects Vector containing subjects.
 #' @param n Number of terms.
 #' @import LSX
 #' @import quanteda

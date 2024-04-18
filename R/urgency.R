@@ -1,38 +1,50 @@
 #' Urgency Analysis
 #'
 #' @param v Text vector or annotated data frame.
-#' @param subjects List of subjects.
+#' @param subjects A vector or a list of subjects and related terms.
+#' If not declared, package will try to automatically detect subjects
+#' and related terms to these subjects.
+#' If users declare a vector, each element is treated as a independent topic
+#' and related terms to each of the elements will be automatically
+#' identified if possible.
+#' If users declare a list of subjects and related terms, function understands
+#' these as the topics and the related terms.
 #' @return A scored data frame.
 #' @import dplyr
 #' @importFrom usethis ui_done ui_info
 #' @examples
 #' \donttest{
 #' get_urgency(US_News_Conferences_1960_1980[1:10,3])
+#' get_urgency(US_News_Conferences_1960_1980[1:10,3],
+#'             subjects = c("war", "inflation"))
+#' get_urgency(US_News_Conferences_1960_1980[1:10,3],
+#'             subjects = list("war" = c("war", "military", "guns"),
+#'                             "inflation" = c("inflation", "interest rates", "prices")))
 #' }
 #' @export
 get_urgency <- function(v, subjects) {
   frequency <- timing <- topic <- degree <- urgency <- commit <- NULL
-  if (any(class(v) == "data.frame")) {
-    if (!"doc_id" %in% names(v)) {
-      stop("Please declare a text vector or an annotated object.")
-    }
+  if (any(class(v) == "data.frame") & !"doc_id" %in% names(v)) {
+    stop("Please declare a text vector or an annotated object.")
   }
-  if (any(class(v) == "promises")) {
-    promises <- v
-  } else {
+  if (any(class(v) == "promises")) promises <- v else {
     promises <- extract_promises(v)
     usethis::ui_done("Extracted promises.")
   }
   if (missing(subjects)) {
-    similar_words <- extract_related_terms(promises, extract_subjects(promises))
+    subjects <- extract_subjects(promises)
     usethis::ui_done("Extracted subjects.")
+  }
+  if (is.list(subjects) | "related_subjects" %in% class(subjects)) {
+    similar_words <- subjects
   } else {
-    if ("related_subjects" %in% class(subjects)) {
-      similar_words <- subjects
-    } else {
-      similar_words <- extract_related_terms(promises, subjects)
+    similar_words <- tryCatch({
+      extract_related_terms(promises, subjects)
       usethis::ui_done("Extracted similar topics for subjects.")
-    }
+    }, error = function(e) {
+      usethis::ui_info("Failed to identify related terms, subjects will be used to code topics.")
+      subjects
+    })
   }
   usethis::ui_info("Coding urgency components...")
   out <- promises |>
@@ -54,7 +66,9 @@ get_urgency <- function(v, subjects) {
 }
 
 .assign_subjects <- function(promises, subjects) {
-  subjects <- lapply(subjects, function(x) paste0(x, collapse = "|"))
+  if (is.list(subjects)) {
+    subjects <- lapply(subjects, function(x) paste0(x, collapse = "|"))
+  } else names(subjects) <- subjects
   out = list()
   for (i in names(subjects)) {
     out[[i]] <- stringr::str_count(promises$sentence, subjects[[i]])

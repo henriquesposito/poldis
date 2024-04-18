@@ -9,7 +9,14 @@ get_urgency(v, subjects)
 \arguments{
 \item{v}{Text vector or annotated data frame.}
 
-\item{subjects}{List of subjects.}
+\item{subjects}{A vector or a list of subjects and related terms.
+If not declared, package will try to automatically detect subjects
+and related terms to these subjects.
+If users declare a vector, each element is treated as a independent topic
+and related terms to each of the elements will be automatically
+identified if possible.
+If users declare a list of subjects and related terms, function understands
+these as the topics and the related terms.}
 }
 \value{
 A scored data frame.
@@ -20,5 +27,10 @@ Urgency Analysis
 \examples{
 \donttest{
 get_urgency(US_News_Conferences_1960_1980[1:10,3])
+get_urgency(US_News_Conferences_1960_1980[1:10,3],
+            subjects = c("war", "inflation"))
+get_urgency(US_News_Conferences_1960_1980[1:10,3],
+            subjects = list("war" = c("war", "military", "guns"),
+                            "inflation" = c("inflation", "interest rates", "prices")))
 }
 }
