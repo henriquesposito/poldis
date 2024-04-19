@@ -73,8 +73,10 @@ extract_promises <- function(v) {
                                            paste(sentence), NA),
                           promise = ifelse(!is.na(problem), NA, promise)) |>
     # remove negative sentences for now
-    dplyr::filter(is.na(promise) | !stringr::str_detect(promise, " not "))
-    # todo: exclude past sentences that contain a modal verb/adverb
+    dplyr::filter(is.na(promise) | !stringr::str_detect(promise, " not ")) |>
+    # exclude sentences in past tense that contain a modal verb/adverb
+    dplyr::filter(!stringr::str_detect(tags, # will this remove too many sentences?
+                                      "MD VB [RB]? VBN|VBD [RB]? VBN|VBZ [RB]? VBN|VBD [RB]? JJ|PRP [RB]? VBD"))
   # identify lemmas, adjectives, and adverbs that are linked to promises for scoring
   v <- v |> dplyr::mutate(lemmas_p = ifelse(!is.na(promise), lemmas, NA),
                           adv_p = ifelse(!is.na(promise), adverbs, NA),
