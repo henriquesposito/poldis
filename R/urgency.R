@@ -23,24 +23,24 @@
 #' }
 #' @export
 get_urgency <- function(v, subjects) {
-  frequency <- timing <- topic <- degree <- urgency <- commit <-
-    promises <- subjects <- similar_words <- adjectives <- adverbs <- NULL
+  frequency <- timing <- topic <- degree <- urgency <- commit <- NULL
   if (any(class(v) == "data.frame") & !"doc_id" %in% names(v)) {
     stop("Please declare a text vector or an annotated object.")
   }
-  if (any(class(v) == "promises")) promises <- v else {
+  if (any(class(v) == "promises")) promises <- v
+  else {
     promises <- extract_promises(v)
     usethis::ui_done("Extracted promises.")
   }
   if (missing(subjects)) {
-    subjects <- extract_subjects(v)
+    subjects <- extract_subjects(promises)
     usethis::ui_done("Extracted subjects.")
   }
   if (is.list(subjects) | "related_subjects" %in% class(subjects)) {
     similar_words <- subjects
   } else {
     similar_words <- tryCatch({
-      extract_related_terms(v, subjects)
+      extract_related_terms(promises, subjects)
       usethis::ui_done("Extracted similar topics for subjects.")
     }, error = function(e) {
       usethis::ui_info("Failed to identify related terms, subjects will be used to code topics.")
@@ -49,7 +49,7 @@ get_urgency <- function(v, subjects) {
   }
   usethis::ui_info("Coding urgency components...")
   out <- promises
-  out$topic <- .assign_subjects(promises, subjects = similar_words)
+  out$topic <- .assign_subjects(promises, similar_words)
   out$frequency <- .assign_frequencies(promises)
   out$timing <- .assign_time(promises)
   out$degree <- .assign_degree(promises)
