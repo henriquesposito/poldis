@@ -32,7 +32,7 @@ extract_promises <- function(v) {
                                                         |conversely|moreover|furthermore|
                                                         |further|however|addition|alternate|
                                                         |anyway|while|ladies|gentlemen|
-                                                        |distinguished|sir|now|every|another|
+                                                        |sir|madam|now|every|another|
                                                         |one hand|on the other hand|compared to
                                                         |let me|greet"),
                                   1:dplyr::n(), NA)) |> # first attempt to identify breaks in the text
