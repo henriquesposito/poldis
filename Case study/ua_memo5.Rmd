@@ -1,0 +1,77 @@
+---
+title: "Updates on functions"
+output: pdf_document
+date: "2024-04-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(poldis)
+library(readr)
+library(textclean)
+library(kableExtra)
+```
+
+## Extract 'Promises' (or plans, proposals, etc.)
+
+Key updates to the function `extract_promises()`:
+
+
+* Text is segmented using ordinal and conjunctive adverbs (eg. first/firstly, therefore, however),
+as well as specific words used in greetings (eg. greet, ladies, gentleman, sir).
+* Identifies separately statements that refer to issues/problems and promise/proposal/plan statements.
+* Problem statements are identified using synonyms of 'problem' and 
+verbs used when discussing problems (eg. address, tackle, face).
+* Promise statements are identified using modal verbs (will, shall, must) and a set of 'plan' phrases (eg. need to, plan to, commit to, going to).
+* Dealing with exceptions:
+  + Statements that are recognised as problems are removed from list of promise statements
+  + Negative statements (eg. cannot, would not) are removed from list of promises statements
+  + Statements made in the past tense (eg. I would have; needed to) are removed from list of promise statements
+  
+Currently, statements that are not detected to be promises are marked as NA in the 'promises' variable.
+These rows are not removed from the output.
+
+```{r promises, echo=TRUE, message=FALSE, warning=FALSE}
+WHO <- read_csv("WHO_reform_speeches.csv")
+WHO <- annotate_text(WHO$text, "sentences")
+promises_WHO <- extract_promises(WHO) |>
+  dplyr::mutate(segment = replace_non_ascii(segment, ""),
+                promises = replace_non_ascii(promises, ""))
+head(promises_WHO[,c(3,13)], n = 10) |>
+  kable("latex", colnames = "Promises") |>
+  column_spec(1:2, width = "7cm")
+
+UNGDC <- read_csv("UNGDC_2022.csv")
+UNGDC <- annotate_text(UNGDC$text, "sentences")
+promises_UNGDC <- extract_promises(UNGDC) |>
+  dplyr::mutate(segment = replace_non_ascii(segment, ""),
+                promises = replace_non_ascii(promises, ""))
+head(promises_UNGDC[,c(3,13)], n = 10) |>
+  kable("latex", colnames = "Promises") |>
+  column_spec(1:2, width = "7cm")
+```
+
+
+## Scoring urgency
+
+`get_urgency()` works with output from `extract_promises()` now.
+Urgency is calculated only on promise statements in the variable 'promises',
+but the full text segment from which the promise statement(s) are derived can be seen in the variable 'segment'.
+Let's take a look at the top 10 sentences from selected 6 speeches on WHO reform and
+7 speeches from the UN General Debate Corpus (2022).
+The statements are ranked in descending order.
+
+```{r urgency, echo=TRUE, message=FALSE, warning=FALSE}
+urgency_WHO <- get_urgency(WHO) |>
+  dplyr::mutate(promises = replace_non_ascii(promises, ""))
+head(urgency_WHO$promises, n = 10) |>
+  kable("latex", col.names = "Promises") |>
+  column_spec(1, width = "14cm")
+urgency_UNGDC <- get_urgency(UNGDC) |>
+  dplyr::mutate(promises = replace_non_ascii(promises, ""))
+head(urgency_UNGDC$promises, n = 10) |>
+  kable("latex", col.names = "Promises") |>
+  column_spec(1, width = "14cm")
+```
+
+
