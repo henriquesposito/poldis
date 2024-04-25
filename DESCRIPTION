@@ -31,7 +31,7 @@ Imports:
     quanteda,
     quanteda.textstats,
     spacyr, 
-    LSX,
+    keyATM,
     tm,
     rlang,
     textstem,

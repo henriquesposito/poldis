@@ -17,7 +17,6 @@ extract_promises <- function(v) {
     if ("token_id" %in% names(v))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
   } else v <- suppressMessages(annotate_text(v, level = "sentences"))
-  # segment text first
   # assign IDs for segments
   v <- v |>
     dplyr::group_by(doc_id) |>
@@ -176,6 +175,7 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
   class(out) <- c("subjects", class(out))
   out
   # todo: what to do with small words currently excluded?
+  # todo: what to do with plural words
 }
 
 .clean_token <- function(v) {
@@ -204,8 +204,10 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
 #' @param v Text vector or annotated data frame.
 #' @param subjects Vector containing subjects.
 #' @param n Number of terms.
-#' @import LSX
 #' @import quanteda
+#' @import dplyr
+#' @importFrom keyATM keyATM keyATM_read
+#' @importFrom stringr str_detect str_remove_all
 #' @examples
 #' \donttest{
 #' extract_related_terms(US_News_Conferences_1960_1980[1:2, 3],
@@ -213,7 +215,8 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
 #' }
 #' @export
 extract_related_terms <- function(v, subjects, n = 5) {
-  doc_id <- token <- text <- entity <- entities <- nouns <- pos <- NULL
+  doc_id <- sentence_id <- token <- text <- entity <- entities <-
+    nouns <- pos <- tok <- NULL
   if (any(class(v) == "data.frame")) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated data frame.")
@@ -224,56 +227,51 @@ extract_related_terms <- function(v, subjects, n = 5) {
         dplyr::select(text)
     } else if ("token_id" %in% names(v)) {
       v <- dplyr::filter(v, entity != "" | pos == "NOUN") |>
-        dplyr::group_by(doc_id) |>
+        dplyr::group_by(doc_id, sentence_id) |>
         dplyr::summarise(text = paste(token, collapse = " ")) |>
-        dplyr::select(text) |>
-        dplyr::ungroup()
+        dplyr::ungroup() |>
+        dplyr::select(text)
     }
   }
-  corp <- quanteda::corpus(v) |>
-    quanteda::corpus_reshape(to = "sentences") # sentences
-  toks <- quanteda::tokens(corp, remove_punct = TRUE, remove_symbols = TRUE,
-                           remove_numbers = TRUE, remove_url = TRUE) # tokens
-  dfmt <- quanteda::dfm(toks) |>
-    quanteda::dfm_remove(quanteda::stopwords("en")) # document feature matrix
-  dict <- .as_dictionary(subjects) # set subjects
-  out <- list()
-  for (i in 1:length(dict)) out[[i]] <- quanteda::dfm_select(dfmt, dict[[i]])
-  dfmts <- quanteda::dfm_remove(dfmt, dict) |> cbind(do.call(cbind, out))
-  lss <- LSX::textmodel_lss(dfmts, seeds = dict, k = sum(lengths(dict))) # model
-  terms <- LSX::bootstrap_lss(lss, mode = "terms")[1:n,]
-  out <- list()
-  if (is.null(colnames(terms))) {
-    out[[dict]] <- terms
-  } else {
-    for (i in 1:length(dict)) {
-      out[[names(dict)[i]]] <- c(terms[,c(colnames(terms) %in% dict[[i]])])
-    }
-  }
-  out <- ifelse(lapply(out, rlang::is_empty), names(out), out)
-  names(out) <- names(dict)
-  un <- unlist(out)
-  out <- Map(`[`, out, utils::relist(!duplicated(un), skeleton = out))
-  # remove duplicate words
+  # Get tokens and document feature matrix
+  tok <- quanteda::corpus_reshape(quanteda::corpus(v), "sentences") %>%
+    quanteda::tokens(remove_numbers = TRUE, remove_punct = TRUE,
+                     remove_symbols = TRUE, remove_separators = TRUE,
+                     remove_url = TRUE) %>%
+    quanteda::tokens_tolower() %>%
+    quanteda::tokens_select(min_nchar = 3) %>%
+    quanteda::dfm() %>%
+    quanteda::dfm_remove(quanteda::stopwords("en"))
+  tok <- quanteda::dfm_subset(tok, quanteda::ntoken(tok) > 0)
+  out <- keyATM::keyATM(docs = keyATM::keyATM_read(texts = tok),
+                        no_keyword_topics = 0,
+                        keywords = .as_dictionary(subjects), model = "base")
+  out <- as.list(keyATM::top_words(out))
+  out <- lapply(out, function(x)
+    stringr::str_remove_all(ifelse(stringr::str_detect(x, " \\[([:digit:])"),
+                                   "", x), "\\[\\✓\\]"))
+  out <- lapply(out, function(x) x[x!=""])
+  names(out) <- stringr::str_remove_all(names(out), "[0-9]|\\_")
   class(out) <- c("related_subjects", class(out))
   out
+  # todo: get only words above certain threshold for topics?
+  # todo: what to do with overlapping words/topics?
   # todo: fix issue with multiple word subjects
 }
 
 # helper function
 .as_dictionary <- function(a) {
   out <- list()
-  if (is.null(names(a))) {
-    names(a) <- a
-  }
-  names(a) <- ifelse(stringr::str_detect(a, "\\|"),
-                     stringr::str_split_i(a, "\\|", i = 1), a)
-  for (i in names(a)) {
+  names <- ifelse(stringr::str_detect(a, "\\|"),
+                  stringr::str_split_i(a, "\\|", i = 1), a)
+  for (i in seq_len(length(a))) {
     out[[i]] <- ifelse(stringr::str_detect(a[[i]], "\\|"),
-                       lapply(stringr::str_split(a[[i]], "\\|"), function(x) paste0(x, "*")),
-                       paste0(a[[i]], "*"))
+                       stringr::str_split(a[[i]], "\\|"),
+                       a[[i]])
   }
-  quanteda::dictionary(out)
+  out <- lapply(out, function(x) unname(unlist(x)))
+  names(out) <- names
+  out
 }
 
 #' Extract context for string matches
