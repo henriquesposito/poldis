@@ -27,9 +27,9 @@ sample_text <- read_csv("sample_text.csv")
 sentences <- annotate_text(sample_text$text, level = "sentences")
 promises <- extract_promises(sentences)
 subjects <- extract_subjects(promises)
-related_terms <- extract_related_terms(promises$sentence, subjects)
+related_terms <- extract_related_terms(promises, subjects)
 urgency <- get_urgency(promises, related_terms)
-head(urgency$sentence, n = 10)
+get_urgency_rank(urgency)
 ```
 
 # Outstanding issues:

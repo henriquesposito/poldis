@@ -40,7 +40,7 @@ annotate_text <- function(v, level = "words") {
   suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
   parse <- spacyr::spacy_parse(v, tag = TRUE)
   suppressWarnings(spacyr::spacy_finalize())
-  if (level == "sentences") {
+  if (level == "sentences" | level == "sentence") {
     usethis::ui_info("Annotating sentences...")
     entity <- spacyr::entity_extract(parse) |>
       dplyr::group_by(sentence_id, doc_id) |>
@@ -56,8 +56,9 @@ annotate_text <- function(v, level = "words") {
                        adjectives = stringr::str_squish(paste(ifelse(
                          pos == "ADJ", lemma, ""), collapse = " ")),
                        nouns = stringr::str_squish(paste(ifelse(
-                         pos == "NOUN" & entity == "", lemma, ""), collapse = " "))) |>
-      dplyr::left_join(entity) |>
+                         pos == "NOUN" & entity == "", lemma, ""),
+                         collapse = " "))) |>
+      dplyr::left_join(entity, by = c("doc_id", "sentence_id")) |>
       dplyr::ungroup()
   }
   parse
