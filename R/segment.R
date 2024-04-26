@@ -1,18 +1,16 @@
 #' Extract future promises from political discourses
 #'
 #' @param v Text vector or annotated data frame.
-#' @importFrom dplyr filter
-#' @importFrom stringr str_detect
-#' @importFrom stats ave
+#' @import dplyr
+#' @importFrom stringr str_detect str_remove_all
 #' @examples
 #' \donttest{
 #' extract_promises(US_News_Conferences_1960_1980[1:2,3])
 #' }
 #' @export
 extract_promises <- function(v) {
-  tags <- tokens <- sentence <- seg_id <- poss <-
-    lemmas <- segment <- doc_id <- entities <- problems <- promises <-
-    lemmas_p <- adv_p <- adj_p <- promise <- problem <- NULL
+  tags <- tokens <- sentence <- seg_id <- poss <- lemmas <- segment <-
+    doc_id <- entities <- problems <- promises <- problem <- NULL
   if (any(class(v) == "data.frame")) {
     if ("token_id" %in% names(v))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
@@ -20,8 +18,8 @@ extract_promises <- function(v) {
   # assign IDs for segments
   v <- v |>
     dplyr::group_by(doc_id) |>
-    dplyr::mutate(lemmas = tolower(lemmas)) |>
-    dplyr::mutate(seg_id = ifelse(stringr::str_detect(lemmas,
+    dplyr::mutate(lemmas = tolower(lemmas),
+                  seg_id = ifelse(stringr::str_detect(lemmas,
                                                       "first|second|third(?!s)|
                                                         |fourth(?!s)|fifth(?!s)|
                                                         |sixth(?!s)|finally|end|
@@ -34,13 +32,8 @@ extract_promises <- function(v) {
                                                         |sir|madam|now|every|another|
                                                         |one hand|on the other hand|compared to
                                                         |let me|greet"),
-                                  1:dplyr::n(), NA)) |> # first attempt to identify breaks in the text
-    tidyr::fill(seg_id) |>
-    dplyr::mutate(seg_id = ifelse(is.na(seg_id), 0, seg_id),
-                  seg_id = paste0(doc_id, "-", seg_id))
-  # mark out problems/context rather than removing them
-  v <- v |>
-    dplyr::mutate(problem = ifelse(stringr::str_detect(lemmas,
+                                  1:dplyr::n(), NA),
+                  problem = ifelse(stringr::str_detect(lemmas,
                                                        "problem|issue|challenge|
                                                         |matter|can of worms|
                                                         |deep water|pain|hydra|
@@ -62,57 +55,29 @@ extract_promises <- function(v) {
                                                         |act on|give attention|
                                                         |direct attention|handle|
                                                         |treat|deal with"),
-                                   paste(sentence), NA))
-  # identify promises
-  v <- v |> dplyr::mutate(promise = ifelse(stringr::str_detect(tags, "PRP MD ")|
-                                             stringr::str_detect(lemmas,
-                                             "going to|need to|ready to|
-                                             |is time to|commit to|promise to|
-                                             |plan to|intend to|let 's"),
-                                           paste(sentence), NA),
-                          promise = ifelse(!is.na(problem), NA, promise)) |>
-    # remove negative sentences and sentences in past tense for now
-    dplyr::mutate(promise = ifelse(stringr::str_detect(promise, " not "), NA, promise),
-                  promise = ifelse(stringr::str_detect(tags,
-                                                       "MD VB [RB]? VBN|VBD [RB]? VBN|VBZ [RB]? VBN|VBD [RB]? JJ|PRP [RB]? VBD"),
-                                   NA, promise))
-  # identify lemmas, adjectives, and adverbs that are linked to promises for scoring
-  v <- v |> dplyr::mutate(lemmas_p = ifelse(!is.na(promise), lemmas, NA),
-                          adv_p = ifelse(!is.na(promise), adverbs, NA),
-                          adj_p = ifelse(!is.na(promise), adjectives, NA))
-  # paste together potential promises connected to one another
-  # and exclude instances of promises that are problems within each segment
-  v <- within(v,
-              {
-                segment <- ave(sentence, seg_id, FUN = toString)
-                poss <- ave(poss, seg_id, FUN = toString)
-                tags <- ave(tags, seg_id, FUN = toString)
-                lemmas <- ave(lemmas_p, seg_id, FUN = toString)
-                entities <- ave(entities, seg_id, FUN = toString)
-                adverbs <- ave(adv_p, seg_id, FUN = toString)
-                adjectives <- ave(adj_p, seg_id, FUN = toString)
-                nouns <- ave(nouns, seg_id, FUN = toString)
-                ntoken <- ave(ntoken, seg_id, FUN = sum)
-                problems <- ave(problem, seg_id, FUN = toString)
-                promises <- ave(promise, seg_id, FUN = toString)
-              }) |>
-    dplyr::select(doc_id, seg_id, segment, poss, tags, lemmas, entities,
-                  adverbs, adjectives, nouns, ntoken, problems, promises) |>
-    dplyr::distinct() |>
-    dplyr::mutate(segment = stringr::str_replace_all(segment, "[.],", "."),
-                  segment = stringr::str_remove_all(segment, "\n"),
-                  segment = stringr::str_squish(segment),
-                  lemmas = stringr::str_remove_all(lemmas, "NA, "),
-                  lemmas = stringr::str_replace_all(lemmas, "., NA", "."),
-                  adverbs = stringr::str_remove_all(adverbs, "NA, |, NA"),
-                  adjectives = stringr::str_remove_all(adjectives, "NA, |, NA"),
-                  nouns = stringr::str_replace_all(nouns, ", ,", ","),
-                  entities = stringr::str_remove_all(entities, "NA, "),
-                  entities = stringr::str_remove_all(entities, ", NA"),
-                  problems = stringr::str_remove_all(problems, "NA, "),
-                  problems = stringr::str_replace_all(problems, "., NA", "."),
-                  promises = stringr::str_remove_all(promises, "NA, "),
-                  promises = stringr::str_replace_all(promises, "., NA", ".")) |>
+                                   paste(sentence), NA)) |> # first attempt to identify breaks in the text
+    tidyr::fill(seg_id) |>
+    dplyr::mutate(seg_id = ifelse(!is.na(seg_id), paste0(doc_id, "-", seg_id), NA)) |>
+    dplyr::group_by(seg_id) |>
+    dplyr::mutate(problem = stringr::str_remove_all(paste(problem, collapse = " "),
+                                                    "^NA$| NA |^NA |NA$|NANA|NA NA")) |>
+    dplyr::ungroup() |> # mark out problems/context rather than removing them
+    dplyr::mutate(promises = ifelse(stringr::str_detect(tags, "PRP MD ")|
+                                     stringr::str_detect(lemmas,
+                                     "going to|need to|ready to|
+                                     |is time to|commit to|promise to|
+                                     |plan to|intend to|let 's"),
+                                   paste(sentence), NA), # detect promises
+                  promises = ifelse(stringr::str_detect(promises, " not ") |
+                                     stringr::str_detect(tags, "MD VB [RB]? VBN|
+                                                         |VBD [RB]? VBN|VBZ [RB]? VBN|
+                                                         |VBD [RB]? JJ|PRP [RB]? VBD"),
+                                   NA, promises)) |>
+    dplyr::filter(!is.na(promises)) |>
+    dplyr::group_by(seg_id) |>
+    dplyr::mutate(dplyr::across(sentence:promises, # paste promises connected to one another
+                                ~ paste(.x, collapse = " ")),
+                  ntoken = sum(ntoken)) |>
     dplyr::ungroup()
   class(v) <- c("promises", class(v))
   v
@@ -203,7 +168,6 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
 #'
 #' @param v Text vector or annotated data frame.
 #' @param subjects Vector containing subjects.
-#' @param n Number of terms.
 #' @import quanteda
 #' @import dplyr
 #' @importFrom keyATM keyATM keyATM_read
@@ -214,7 +178,7 @@ extract_subjects <- function(v, n = 20, method = "cosine", level = 0.1) {
 #'                       subjects = extract_subjects(US_News_Conferences_1960_1980[1:2, 3]))
 #' }
 #' @export
-extract_related_terms <- function(v, subjects, n = 5) {
+extract_related_terms <- function(v, subjects) {
   doc_id <- sentence_id <- token <- text <- entity <- entities <-
     nouns <- pos <- tok <- NULL
   if (any(class(v) == "data.frame")) {
@@ -243,13 +207,14 @@ extract_related_terms <- function(v, subjects, n = 5) {
     quanteda::dfm() %>%
     quanteda::dfm_remove(quanteda::stopwords("en"))
   tok <- quanteda::dfm_subset(tok, quanteda::ntoken(tok) > 0)
-  out <- keyATM::keyATM(docs = keyATM::keyATM_read(texts = tok),
-                        no_keyword_topics = 0,
-                        keywords = .as_dictionary(subjects), model = "base")
+  out <- suppressMessages(keyATM::keyATM(docs = keyATM::keyATM_read(texts = tok),
+                                         no_keyword_topics = 0,
+                                         keywords = .as_dictionary(subjects, tok),
+                                         model = "base"))
   out <- as.list(keyATM::top_words(out))
   out <- lapply(out, function(x)
-    stringr::str_remove_all(ifelse(stringr::str_detect(x, " \\[([:digit:])"),
-                                   "", x), "\\[\\✓\\]"))
+    stringr::str_squish(stringr::str_remove_all(
+      ifelse(stringr::str_detect(x, " \\[([:digit:])"),  "", x), "\\[\\✓\\]")))
   out <- lapply(out, function(x) x[x!=""])
   names(out) <- stringr::str_remove_all(names(out), "[0-9]|\\_")
   class(out) <- c("related_subjects", class(out))
@@ -260,18 +225,20 @@ extract_related_terms <- function(v, subjects, n = 5) {
 }
 
 # helper function
-.as_dictionary <- function(a) {
+.as_dictionary <- function(v, dfm) {
   out <- list()
-  names <- ifelse(stringr::str_detect(a, "\\|"),
-                  stringr::str_split_i(a, "\\|", i = 1), a)
-  for (i in seq_len(length(a))) {
-    out[[i]] <- ifelse(stringr::str_detect(a[[i]], "\\|"),
-                       stringr::str_split(a[[i]], "\\|"),
-                       a[[i]])
+  names <- ifelse(stringr::str_detect(v, "\\|"), # split multiple elements
+                  stringr::str_split_i(v, "\\|", i = 1), v)
+  for (i in seq_len(length(v))) {
+    out[[i]] <- ifelse(stringr::str_detect(v[[i]], "\\|"),
+                       stringr::str_split(v[[i]], "\\|"),
+                       v[[i]])
   }
-  out <- lapply(out, function(x) unname(unlist(x)))
-  names(out) <- names
-  out
+  out <- lapply(out, function(x) stringr::str_replace_all(unname(unlist(x)),
+                                                          " ", "_"))
+  names(out) <- names # add names
+  out[unlist(lapply(out, function(x) any(x %in% colnames(dfm))))]
+  # todo: warn users that topics that do not match names in DFM are removed
 }
 
 #' Extract context for string matches
