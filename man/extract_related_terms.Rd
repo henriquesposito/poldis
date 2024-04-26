@@ -4,14 +4,12 @@
 \alias{extract_related_terms}
 \title{Extract terms related to subjects}
 \usage{
-extract_related_terms(v, subjects, n = 5)
+extract_related_terms(v, subjects)
 }
 \arguments{
 \item{v}{Text vector or annotated data frame.}
 
 \item{subjects}{Vector containing subjects.}
-
-\item{n}{Number of terms.}
 }
 \description{
 Extract terms related to subjects

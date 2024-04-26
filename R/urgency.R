@@ -27,8 +27,7 @@ get_urgency <- function(v, subjects) {
   if (any(class(v) == "data.frame") & !"doc_id" %in% names(v)) {
     stop("Please declare a text vector or an annotated object.")
   }
-  if (any(class(v) == "promises")) promises <- v
-  else {
+  if (any(class(v) == "promises")) promises <- v else {
     promises <- extract_promises(v)
     usethis::ui_done("Extracted promises.")
   }
@@ -39,12 +38,12 @@ get_urgency <- function(v, subjects) {
   if (is.list(subjects) | "related_subjects" %in% class(subjects)) {
     similar_words <- subjects
   } else {
-    similar_words <- tryCatch({
-      extract_related_terms(promises, subjects)
+    tryCatch({
+      similar_words <- extract_related_terms(promises, subjects)
       usethis::ui_done("Extracted similar topics for subjects.")
     }, error = function(e) {
       usethis::ui_info("Failed to identify related terms, subjects will be used to code topics.")
-      subjects
+      similar_words <- subjects
     })
   }
   usethis::ui_info("Coding urgency components...")
@@ -71,7 +70,7 @@ get_urgency <- function(v, subjects) {
   if (is.list(subjects)) {
     subjects <- lapply(subjects, function(x) paste0(x, collapse = "|"))
   } else names(subjects) <- subjects
-  out = list()
+  out <- list()
   for (i in names(subjects)) {
     out[[i]] <- stringr::str_count(promises[["promises"]], subjects[[i]])
   }
@@ -201,7 +200,7 @@ get_urgency_rank <- function(v, subjects) {
   if (any(class(v) != "urgency")) {
     v <- get_urgency(v, subjects)
   }
-  v |> dplyr::mutate(topic = ifelse(topic == "", "No topic", topic)) |>
+  v |> dplyr::mutate(topic = ifelse(topic == "" | is.na(topic), "No topic", topic)) |>
     tidyr::separate_rows(topic, sep = ", ") |>
     dplyr::group_by(topic) |>
     dplyr::summarise(urgency_sum = sum(urgency),
