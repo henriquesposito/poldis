@@ -33,7 +33,6 @@ Imports:
     spacyr, 
     keyATM,
     tm,
-    rlang,
     textstem,
     usethis,
     tidyr
