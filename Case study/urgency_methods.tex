@@ -1,0 +1,346 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Urgency Methods},
+  pdfauthor={Henrique Sposito},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Urgency Methods}
+\author{Henrique Sposito}
+\date{2024-04-28}
+
+\begin{document}
+\maketitle
+
+\hypertarget{urgency-theorymethods}{%
+\section{Urgency theory/methods}\label{urgency-theorymethods}}
+
+\hypertarget{political-promises}{%
+\subsection{Political promises}\label{political-promises}}
+
+Politicians make promises to gather and maintain political support.
+Political promises are statements delivered by politicians expressing
+their intent to take or continue a political action in the future. These
+promises inform electorates about what politician intend to do and can
+influence electoral behavior (see
+\href{https://www.jstor.org/stable/pdf/1827369.pdf}{Downs 1957}). When,
+and the extent to which, politicians keep or not their political
+promises has been widely studied in political science (see
+\href{https://ejpr.onlinelibrary.wiley.com/doi/abs/10.1111/1475-6765.12173}{Horn
+and Jensen 2017};
+\href{https://onlinelibrary.wiley.com/doi/10.1111/ajps.12789}{Schneider
+and Thomson 2023}). However, besides issues related to how promise
+keeping/breaking is measured (see cite), identifying promises is
+challenging in the first place. Politicians make promises in discourse
+but data on political promises is often collected from party manifestos
+(e.g.~the
+\href{https://manifesto-project.wzb.eu/information/documents/cmp_emp_mapping}{Manifesto
+Research on Political Representation} data). This means promises coded
+in research are aggregated at the party level and is often disconnected
+from the actual promises made by individual politicians. As well,
+promises are not always explicit in discourse. Politicians can be vague
+about their future intentions
+(\href{https://ejpr.onlinelibrary.wiley.com/doi/abs/10.1111/1475-6765.12173}{Horn
+and Jensen 2017}). Ambiguity regarding political positions and promises
+can be strategic for politicians
+(\href{https://www.cambridge.org/core/services/aop-cambridge-core/content/view/D0D301CD53950B2D7C9BC6B492D413B1/S2049847016000182a.pdf/strategic-ambiguity-of-party-positions-in-multi-party-competition.pdf}{Brauninger
+and Giger 2016}). Moreover, research frequently aggregate promises into
+broad categories (e.g.~social welfare) but disregard how they relate to
+one another (e.g.~which promises are more urgent), across categories
+(e.g.~how promises related the economy differ from promises about
+health), or in relation to politicians (e.g.~do certain politicians make
+more promises).
+
+Promises made by politicians are categorized and ranked by audiences.
+Political discourses are fundamentally different than other types of
+discourses as they are usually unstructured and cover multiple topics
+(\href{https://www.cambridge.org/core/services/aop-cambridge-core/content/view/F7AAC8B2909441603FEB25C156448F20/S1047198700013401a.pdf/div-class-title-text-as-data-the-promise-and-pitfalls-of-automatic-content-analysis-methods-for-political-texts-div.pdf}{Grimmer
+and Stewart 2013}). As well, politicians are not necessarily coherent or
+consistent over time, across settings, or when it comes to their
+ideological commitments when speaking (see
+\href{https://www.tandfonline.com/doi/full/10.1080/09644016.2023.2220639}{Silva-Muller
+and Sposito 2023}). However, there are certain common aspects of `doing
+politics' that politicians must perform in discourse (see
+\href{https://e-l.unifi.it/pluginfile.php/909651/mod_resource/content/1/Van\%20Dijk\%20Waht\%20is\%20political\%20discourse\%20analysis.pdf}{Dijk
+1997}), such as making future promises. Whereas politicians can be
+ambiguous when it comes to future actions, promises in discourse vary in
+how pressing they appear. That is, vagueness about future promises
+provides audiences with important information about how urgent specific
+future actions might be (i.e.~vague promises appear less urgent than
+precise promises). Urgency relates to the degree in which future
+political action is necessary and immediate. Audiences infer the
+ordering of future actions proposed by politicians based on how these
+are constructed in discourse. Grasping the degree of urgency related to
+promises allows to compare politicians' preferences related to future
+action. By extracting future preferences on expressed promises, rather
+than underlying preferences based on party manifestos, we can
+systematically investigate how, when, and where politicians make
+promises and how these relate to preferences stated elsewhere
+(e.g.~party manifestos). This article develops a new method for studying
+future promises in political discourses, namely urgency analysis.
+Urgency analysis does not assume a specific interpretation of the
+meanings associated with discourse, rather it focuses on how urgent
+promises about future actions expressed in discourses are.
+
+\hypertarget{urgency-analysis}{%
+\subsection{2. Urgency Analysis}\label{urgency-analysis}}
+
+Methodological choices made by social scientists studying political
+discourses can be inadequate and consequential. Besides borrowing text
+analysis methods from other disciplines without considering how
+political discourses are unique (see
+\href{https://www.cambridge.org/core/services/aop-cambridge-core/content/view/F7AAC8B2909441603FEB25C156448F20/S1047198700013401a.pdf/div-class-title-text-as-data-the-promise-and-pitfalls-of-automatic-content-analysis-methods-for-political-texts-div.pdf}{Grimmer
+and Stewart 2013}), studies in political science often suppose a
+specific interpretation of the meanings attributed to text. Instead,
+urgency analysis employs a combination of Natural Language Process
+(NLP), topic modelling, and dictionary approaches to text analysis to
+extract and ranks promises in political discourses. Urgency analysis
+provide a localized (section and issue specific), normalized (comparable
+by default), and inclusive (accounts for metadata as setting and timing)
+new method for the analysis of political discourses. Urgency analysis is
+implemented for R with the ``poldis'' package, making it an easy, free,
+and accessible tool for researchers interested in analyzing political
+discourses. Below we detail how urgency analysis works.
+
+Urgency analysis identifies and codes promises related to future action
+in political discourses. The first step in urgency analysis is to
+annotate texts. In practice, urgency analysis ``stands on the shoulders
+of giants'' by relying on
+\href{https://spacy.io/universe/project/spacyr}{spacy(r)} NLP algorithm
+to annotate texts. Text annotations are offered at the word (token) and
+sentence levels. That is, syntax metadata is extracted for words or
+sentences in political texts. The syntax metadata helps to code words or
+sentences when it makes sense rather than match all instances (e.g.~code
+adverbs or adjectives where/when present).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(poldis)}
+\NormalTok{words }\OtherTok{\textless{}{-}} \FunctionTok{annotate\_text}\NormalTok{(sample\_text}\SpecialCharTok{$}\NormalTok{text)}
+\NormalTok{sentences }\OtherTok{\textless{}{-}} \FunctionTok{annotate\_text}\NormalTok{(sample\_text}\SpecialCharTok{$}\NormalTok{text, }\AttributeTok{level =} \StringTok{"sentences"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Once annotated, promises can be extracted. Promises are captured by
+looking at sentences containing modal verbs and adverbs (e.g.~must) or
+other indications of future looking sentences based on dictionary
+(e.g.~going to). At the same time, sentences which include present
+actions (e.g.~are doing) or negative sentences (e.g.~should not do) are
+excluded. This is done to avoid capturing actions that are taking place
+and are, therefore, not promises (i.e.~politicians taking stock) or
+sentences that appear urgent but refer to actions that will not be taken
+(i.e.~talk about things they will never do/negative promises). Promises
+are coded at the sentence level because, as politicians often speak
+about multiple topics in discourse, extracting sentences allow us to be
+sure that we are capturing urgency for a specific promise. When promises
+refer to the same object in nearby sentences, they are merged. This is
+done by identifying sentences that are too short or start with sentence
+connectors (e.g.~first, second). Coding at the sentence level errs on
+the side of caution. Although we might miss some cases where urgency is
+declared in subsequent sentences or where deeper interpretation is
+required, we prefer to be sure that we are capturing urgency for
+specific promises (i.e.~avoid false negatives).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{promises }\OtherTok{\textless{}{-}} \FunctionTok{extract\_promises}\NormalTok{(sentences)}
+\end{Highlighting}
+\end{Shaded}
+
+With promises extracted, we can code their urgency. To grasp with the
+degree in which future political action is necessary and immediate, we
+code four dimensions of urgency using purpose-built dictionaries of
+terms developed explicitly for each of these dimensions. On the one
+hand, in relation to the immediacy of a promise, we code the frequency
+and the timing of a promise. The frequency refers to reiteration of the
+topic, solution, or context in a promise. This implies reiterated
+promises are more urgent (e.g.~we must act constantly to vs.~sometimes
+we must act). Relatedly, timing refers to the time orientation of a
+promise. This implies that short term promises are more urgent than long
+term (e.g.~we must act now vs.~we must act in the future). On the other
+hand, in relation to the necessity of a promise, we code the degree and
+the commitment levels of a promise. Degree refers to the level at which
+a promise is urgent. This implies more urgent promises come accompanied
+with stronger degree adjectives and adverbs (e.g.~extremely important
+vs.~rather important). Degree adjectives and adverbs are scored with the
+help of the SO-CALL dictionary (cite). Similarly, the commitment level
+of a promise refers to the intensity of the promise commitment. This
+implies a stronger level of commitment to action means a promise is more
+urgent (e.g.~we should act vs.~we must act). Once each of these
+dimensions are scored based on the purpose-built dictionary of terms,
+scores are added and normalized by the number of words in the promise
+they appear in. This approach to normalization is purposely biased
+towards short promises. We believe that when politicians make concise
+and strong promises, these appear more urgent to audiences than promises
+embedded in longer sentences. Though, urgency scores are also available
+for each of the dimensions separately or not normalized if users prefer
+such.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{urgency }\OtherTok{\textless{}{-}} \FunctionTok{get\_urgency}\NormalTok{(promises)}
+\end{Highlighting}
+\end{Shaded}
+
+To be able to compare promises over time, across settings, or for
+different politicians, they need to be organized into categories. That
+is, what do these promises talk about. To do so, we extract objects from
+promises by identifying the entities they refer to. We then select the
+most common entities in texts, we call these subjects. Importantly, if
+subjects are very similar, they are also merged. Once subjects are
+gathered, we employ a keyword- assisted topic modelling to find related
+terms to each of these subjects (Eshima, Imai, Sasaki 2023). This allows
+that coherent topics are gathered that make sense considering the main
+objects in promises. The number of subjects and related terms to these
+subjects can be adjusted by users. The collection of subjects and
+related terms is used to classify promises according to topic. However,
+topics are assigned only when words related to subjects appear in
+promise. This means if promises do not match any of the subjects and
+related terms topics are not assigned. Promises can then be ranked
+according to their urgency scores or aggregated into topics to get the
+urgency of promises by topic. Users can rank the urgency of topics by
+their sum, median, or mean.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{subjects }\OtherTok{\textless{}{-}} \FunctionTok{extract\_subjects}\NormalTok{(promises)}
+\NormalTok{related\_terms }\OtherTok{\textless{}{-}} \FunctionTok{extract\_related\_terms}\NormalTok{(promises, subjects)}
+\NormalTok{urgency\_rank }\OtherTok{\textless{}{-}} \FunctionTok{get\_urgency\_rank}\NormalTok{(urgency)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{validation}{%
+\subsection{Validation}\label{validation}}
+
+\begin{itemize}
+\tightlist
+\item
+  ROC plots (hand coding vs.~package)
+\item
+  Surveys for urgency rankings (Could we run an online survey with mturk
+  maybe to check if people agree with poldis rankings?)
+\end{itemize}
+
+\hypertarget{limitations}{%
+\subsection{Limitations}\label{limitations}}
+
+Our approach to extracting promises and ranking preferences from
+political discourses has two main limitations. First, we focus promises
+in discourse but not on the build-up or context surrounding and
+justifying the action. This makes it easier to rank preferences for
+objects of policy and avoid deep interpretation while facilitating
+reproducibility. Although we might miss some context, it makes sure we
+are coding urgency related to a promise instead of a context that can be
+used to justify many promises or no actions at all. Second, we do not
+investigate present actions or past actions that will continue. While
+present actions could arguably be considered urgent, they could also
+reflect feasibility or easiness of political action (i.e.~low hanging
+fruits). This choice of coding future promises only is both conceptual
+and methodological. Conceptually, it is difficult to theoretically
+distinct and compare the urgency of an action taken and an action that
+has not yet been taken. Methodologically, it is easier to code future
+actions proposed in discourse rather than present action since these can
+come in the present and past tenses (e.g.~past continuous).
+
+\end{document}

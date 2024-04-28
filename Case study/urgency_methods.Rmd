@@ -1,0 +1,64 @@
+---
+title: "Urgency Methods"
+author: "Henrique Sposito"
+date: "2024-04-28"
+output: 
+  pdf_document: 
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(readr)
+sample_text <- readr::read_csv("sample_text.csv")
+```
+
+# Urgency theory/methods
+
+##	Political promises
+
+Politicians make promises to gather and maintain political support. Political promises are statements delivered by politicians expressing their intent to take or continue a political action in the future. These promises inform electorates about what politician intend to do and can influence electoral behavior (see [Downs 1957](https://www.jstor.org/stable/pdf/1827369.pdf)). When, and the extent to which, politicians keep or not their political promises has been widely studied in political science (see [Horn and Jensen 2017](https://ejpr.onlinelibrary.wiley.com/doi/abs/10.1111/1475-6765.12173); [Schneider and Thomson 2023](https://onlinelibrary.wiley.com/doi/10.1111/ajps.12789)). However, besides issues related to how promise keeping/breaking is measured (see cite), identifying promises is challenging in the first place. Politicians make promises in discourse but data on political promises is often collected from party manifestos (e.g. the [Manifesto Research on Political Representation](https://manifesto-project.wzb.eu/information/documents/cmp_emp_mapping) data). This means promises coded in research are aggregated at the party level and is often disconnected from the actual promises made by individual politicians. As well, promises are not always explicit in discourse. Politicians can be vague about their future intentions ([Horn and Jensen 2017](https://ejpr.onlinelibrary.wiley.com/doi/abs/10.1111/1475-6765.12173)). Ambiguity regarding political positions and promises can be strategic for politicians ([Brauninger and Giger  2016](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/D0D301CD53950B2D7C9BC6B492D413B1/S2049847016000182a.pdf/strategic-ambiguity-of-party-positions-in-multi-party-competition.pdf)). Moreover, research frequently aggregate promises into broad categories (e.g. social welfare) but disregard how they relate to one another (e.g. which promises are more urgent), across categories (e.g. how promises related the economy differ from promises about health), or in relation to politicians (e.g. do certain politicians make more promises).
+
+Promises made by politicians are categorized and ranked by audiences. Political discourses are fundamentally different than other types of discourses as they are usually unstructured and cover multiple topics ([Grimmer and Stewart 2013](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/F7AAC8B2909441603FEB25C156448F20/S1047198700013401a.pdf/div-class-title-text-as-data-the-promise-and-pitfalls-of-automatic-content-analysis-methods-for-political-texts-div.pdf)). As well, politicians are not necessarily coherent or consistent over time, across settings, or when it comes to their ideological commitments when speaking (see [Silva-Muller and Sposito 2023](https://www.tandfonline.com/doi/full/10.1080/09644016.2023.2220639)). However, there are certain common aspects of ‘doing politics’ that politicians must perform in discourse (see [Dijk 1997](https://e-l.unifi.it/pluginfile.php/909651/mod_resource/content/1/Van%20Dijk%20Waht%20is%20political%20discourse%20analysis.pdf)), such as making future promises. Whereas politicians can be ambiguous when it comes to future actions, promises in discourse vary in how pressing they appear. That is, vagueness about future promises provides audiences with important information about how urgent specific future actions might be (i.e. vague promises appear less urgent than precise promises). Urgency relates to the degree in which future political action is necessary and immediate. Audiences infer the ordering of future actions proposed by politicians based on how these are constructed in discourse. Grasping the degree of urgency related to promises allows to compare politicians’ preferences related to future action. By extracting future preferences on expressed promises, rather than underlying preferences based on party manifestos, we can systematically investigate how, when, and where politicians make promises and how these relate to preferences stated elsewhere (e.g. party manifestos). This article develops a new method for studying future promises in political discourses, namely urgency analysis. Urgency analysis does not assume a specific interpretation of the meanings associated with discourse, rather it focuses on how urgent promises about future actions expressed in discourses are. 
+
+## 2.	Urgency Analysis
+
+ Methodological choices made by social scientists studying political discourses can be inadequate and consequential. Besides borrowing text analysis methods from other disciplines without considering how political discourses are unique (see [Grimmer and Stewart 2013](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/F7AAC8B2909441603FEB25C156448F20/S1047198700013401a.pdf/div-class-title-text-as-data-the-promise-and-pitfalls-of-automatic-content-analysis-methods-for-political-texts-div.pdf)), studies in political science often suppose a specific interpretation of the meanings attributed to text. Instead, urgency analysis employs a combination of Natural Language Process (NLP), topic modelling, and dictionary approaches to text analysis to extract and ranks promises in political discourses. Urgency analysis provide a localized (section and issue specific), normalized (comparable by default), and inclusive (accounts for metadata as setting and timing) new method for the analysis of political discourses. Urgency analysis is implemented for R with the “poldis” package, making it an easy, free, and accessible tool for researchers interested in analyzing political discourses. Below we detail how urgency analysis works.
+
+Urgency analysis identifies and codes promises related to future action in political discourses. The first step in urgency analysis is to annotate texts. In practice, urgency analysis “stands on the shoulders of giants” by relying on [spacy(r)](https://spacy.io/universe/project/spacyr) NLP algorithm to annotate texts. Text annotations are offered at the word (token) and sentence levels. That is, syntax metadata is extracted for words or sentences in political texts. The syntax metadata helps to code words or sentences when it makes sense rather than match all instances (e.g. code adverbs or adjectives where/when present).
+
+```{r}
+library(poldis)
+words <- annotate_text(sample_text$text)
+sentences <- annotate_text(sample_text$text, level = "sentences")
+```
+
+Once annotated, promises can be extracted. Promises are captured by looking at sentences containing modal verbs and adverbs (e.g. must) or other indications of future looking sentences based on dictionary (e.g. going to). At the same time, sentences which include present actions (e.g. are doing) or negative sentences (e.g. should not do) are excluded. This is done to avoid capturing actions that are taking place and are, therefore, not promises (i.e. politicians taking stock) or sentences that appear urgent but refer to actions that will not be taken (i.e. talk about things they will never do/negative promises). Promises are coded at the sentence level because, as politicians often speak about multiple topics in discourse, extracting sentences allow us to be sure that we are capturing urgency for a specific promise. When promises refer to the same object in nearby sentences, they are merged. This is done by identifying sentences that are too short or start with sentence connectors (e.g. first, second). Coding at the sentence level errs on the side of caution. Although we might miss some cases where urgency is declared in subsequent sentences or where deeper interpretation is required, we prefer to be sure that we are capturing urgency for specific promises (i.e. avoid false negatives).
+
+```{r}
+promises <- extract_promises(sentences)
+```
+
+With promises extracted, we can code their urgency. To grasp with the degree in which future political action is necessary and immediate, we code four dimensions of urgency using purpose-built dictionaries of terms developed explicitly for each of these dimensions. On the one hand, in relation to the immediacy of a promise, we code the frequency and the timing of a promise. The frequency refers to reiteration of the topic, solution, or context in a promise. This implies reiterated promises are more urgent (e.g. we must act constantly to vs. sometimes we must act). Relatedly, timing refers to the time orientation of a promise. This implies that short term promises are more urgent than long term (e.g. we must act now vs. we must act in the future). On the other hand, in relation to the necessity of a promise, we code the degree and the commitment levels of a promise. Degree refers to the level at which a promise is urgent. This implies more urgent promises come accompanied with stronger degree adjectives and adverbs (e.g. extremely important vs. rather important). Degree adjectives and adverbs are scored with the help of the SO-CALL dictionary (cite). Similarly, the commitment level of a promise refers to the intensity of the promise commitment. This implies a stronger level of commitment to action means a promise is more urgent (e.g. we should act vs. we must act). Once each of these dimensions are scored based on the purpose-built dictionary of terms, scores are added and normalized by the number of words in the promise they appear in. This approach to normalization is purposely biased towards short promises. We believe that when politicians make concise and strong promises, these appear more urgent to audiences than promises embedded in longer sentences. Though, urgency scores are also available for each of the dimensions separately or not normalized if users prefer such.
+
+```{r}
+urgency <- get_urgency(promises)
+```
+
+To be able to compare promises over time, across settings, or for different politicians, they need to be organized into categories. That is, what do these promises talk about. To do so, we extract objects from promises by identifying the entities they refer to. We then select the most common entities in texts, we call these subjects. Importantly, if subjects are very similar, they are also merged. Once subjects are gathered, we employ a keyword- assisted topic modelling to find related terms to each of these subjects (Eshima, Imai, Sasaki 2023). This allows that coherent topics are gathered that make sense considering the main objects in promises. The number of subjects and related terms to these subjects can be adjusted by users. The collection of subjects and related terms is used to classify promises according to topic. However, topics are assigned only when words related to subjects appear in promise. This means if promises do not match any of the subjects and related terms topics are not assigned. Promises can then be ranked according to their urgency scores or aggregated into topics to get the urgency of promises by topic. Users can rank the urgency of topics by their sum, median, or mean.
+
+```{r}
+subjects <- extract_subjects(promises)
+related_terms <- extract_related_terms(promises, subjects)
+urgency_rank <- get_urgency_rank(urgency)
+```
+
+
+## Validation
+
+- ROC plots (hand coding vs. package)
+- Surveys for urgency rankings (Could we run an online survey with mturk maybe to check if people agree with poldis rankings?)
+
+## Limitations
+
+Our approach to extracting promises and ranking preferences from political discourses has two main limitations. First, we focus promises in discourse but not on the build-up or context surrounding and justifying the action. This makes it easier to rank preferences for objects of policy and avoid deep interpretation while facilitating reproducibility. Although we might miss some context, it makes sure we are coding urgency related to a promise instead of a context that can be used to justify many promises or no actions at all. Second, we do not investigate present actions or past actions that will continue. While present actions could arguably be considered urgent, they could also reflect feasibility or easiness of political action (i.e. low hanging fruits). This choice of coding future promises only is both conceptual and methodological. Conceptually, it is difficult to theoretically distinct and compare the urgency of an action taken and an action that has not yet been taken. Methodologically, it is easier to code future actions proposed in discourse rather than present action since these can come in the present and past tenses (e.g. past continuous).
