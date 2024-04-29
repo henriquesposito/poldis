@@ -75,10 +75,12 @@ extract_promises <- function(v) {
                                    NA, promises)) |>
     dplyr::filter(!is.na(promises)) |>
     dplyr::group_by(seg_id) |>
-    dplyr::mutate(dplyr::across(sentence:promises, # paste promises connected to one another
+    dplyr::mutate(sentence_id = paste(sentence_id, collapse = " - "),
+                  dplyr::across(sentence:promises, # paste promises connected to one another
                                 ~ paste(.x, collapse = " ")),
                   ntoken = sum(ntoken)) |>
-    dplyr::ungroup()
+    dplyr::ungroup() |>
+    dplyr::distinct()
   class(v) <- c("promises", class(v))
   v
 }
