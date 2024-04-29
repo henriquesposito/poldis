@@ -9,8 +9,7 @@
 #' }
 #' @export
 extract_promises <- function(v) {
-  tags <- tokens <- sentence <- seg_id <- poss <- lemmas <- segment <-
-    sentence_id <- doc_id <- entities <- problems <- promises <- problem <- NULL
+  tags <- sentence <- seg_id <- lemmas <- sentence_id <- doc_id <- promises <- problem <- NULL
   if (any(class(v) == "data.frame")) {
     if ("token_id" %in% names(v))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
@@ -30,9 +29,9 @@ extract_promises <- function(v) {
                                                         |further|however|addition|alternate|
                                                         |anyway|while|ladies|gentlemen|
                                                         |sir|madam|now|every|another|
-                                                        |one hand|on the other hand|compared to
-                                                        |let me|greet"),
-                                  1:dplyr::n(), NA),
+                                                        |one hand|on the other hand|
+                                                        |compared to|let me|greet"),
+                                  1:dplyr::n(), NA),  # first attempt to identify breaks in the text
                   problem = ifelse(stringr::str_detect(lemmas,
                                                        "problem|issue|challenge|
                                                         |matter|can of worms|
@@ -54,27 +53,30 @@ extract_promises <- function(v) {
                                                         |recognise|reject|ignore|
                                                         |act on|give attention|
                                                         |direct attention|handle|
-                                                        |treat|deal with"),
-                                   paste(sentence), NA)) |> # first attempt to identify breaks in the text
+                                                        |treat|deal with|
+                                                        |gratitude|thank|
+                                                        |apologies|apologise|
+                                                        |congratulate"),
+                                   paste(sentence), NA), # mark out problems/context
+                  promises = ifelse(stringr::str_detect(tags, "PRP MD ")|
+                                      stringr::str_detect(lemmas,
+                                                          "going to|need to|ready to|
+                                     |is time to|commit to|promise to|have to|
+                                     |plan to|intend to|let 's"),
+                                    paste(sentence), NA), # detect promises
+                  promises = ifelse(stringr::str_detect(promises, " not ") |
+                                      stringr::str_detect(tags, "MD VB( RB)? VBN|
+                                                         |VBD( RB)? VBN|VBZ( RB)? VBN|
+                                                         |VBD( RB)? JJ|PRP( RB)? VBD TO"),
+                                    NA, promises),
+                  promises = ifelse(!is.na(problem), NA, promises)) |>
     tidyr::fill(seg_id) |>
     dplyr::mutate(seg_id = ifelse(!is.na(seg_id), paste0(doc_id, "-", seg_id), NA)) |>
     dplyr::group_by(seg_id) |>
-    dplyr::mutate(problem = stringr::str_remove_all(paste(problem, collapse = " "),
-                                                    "^NA$| NA |^NA |NA$|NANA|NA NA")) |>
-    dplyr::ungroup() |> # mark out problems/context rather than removing them
-    dplyr::mutate(promises = ifelse(stringr::str_detect(tags, "PRP MD ")|
-                                     stringr::str_detect(lemmas,
-                                     "going to|need to|ready to|
-                                     |is time to|commit to|promise to|
-                                     |plan to|intend to|let 's"),
-                                   paste(sentence), NA), # detect promises
-                  promises = ifelse(stringr::str_detect(promises, " not ") |
-                                     stringr::str_detect(tags, "MD VB [RB]? VBN|
-                                                         |VBD [RB]? VBN|VBZ [RB]? VBN|
-                                                         |VBD [RB]? JJ|PRP [RB]? VBD"),
-                                   NA, promises)) |>
+    dplyr::mutate(problem = trimws(stringr::str_remove_all(paste(problem,
+                                                                 collapse = " "),
+                                                           "NA"))) |>
     dplyr::filter(!is.na(promises)) |>
-    dplyr::group_by(seg_id) |>
     dplyr::mutate(sentence_id = paste(sentence_id, collapse = " - "),
                   dplyr::across(sentence:promises, # paste promises connected to one another
                                 ~ paste(.x, collapse = " ")),
