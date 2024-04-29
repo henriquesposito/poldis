@@ -10,7 +10,7 @@
 #' @export
 extract_promises <- function(v) {
   tags <- tokens <- sentence <- seg_id <- poss <- lemmas <- segment <-
-    doc_id <- entities <- problems <- promises <- problem <- NULL
+    sentence_id <- doc_id <- entities <- problems <- promises <- problem <- NULL
   if (any(class(v) == "data.frame")) {
     if ("token_id" %in% names(v))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
