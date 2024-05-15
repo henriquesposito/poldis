@@ -1,0 +1,9 @@
+pandoc: 3.1.1
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles: {}
+last_built: 2024-05-15T08:05Z
+urls:
+  reference: https://henriquesposito.github.io/poldis/reference
+  article: https://henriquesposito.github.io/poldis/articles
+

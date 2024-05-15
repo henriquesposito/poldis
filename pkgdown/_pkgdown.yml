@@ -1,0 +1,56 @@
+url: https://henriquesposito.github.io/poldis/
+development:
+    mode: auto
+template:
+  params:
+    bootswatch: paper
+authors:
+  Henrique Sposito:
+    href: http://henriquesposito.com/
+navbar:
+  structure:
+    left: [home, reference, articles, news]
+    right: [search, github]
+  components:
+    home:
+      icon: fa-home fa-lg
+      href: index.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    # articles:
+    #   text: Articles
+    #   menu:
+    #   - text: How Do Environmental Treaties Connect?
+    #     href: articles/connect.html
+    #   - text: Lineage of Environmental Treaties
+    #     href: articles/lineage_dashboard.html
+    #   - text: Types of Environmental Treaties
+    #     href: articles/membership_dashboard.html
+    news:
+      text: News
+      href: news/index.html
+    github:
+      icon: "fab fa-github fa-lg"
+      href: https://github.com/henriquesposito/poldis
+reference:
+  - title: "Functions"
+    desc: "The following functions are contained in poldis:"
+    contents:
+    - load_pdf
+    - split_text
+    - annotate_text
+    - starts_with("extract_")
+    - starts_with("get_")
+  - title: "Data"
+    desc: "The package contains some cleaned text corpuses for analysis."
+    contents:
+    - US_News_Conferences_1960_1980
+
+# footer:
+#   structure:
+#     left: devs
+#     right: panarchic
+#   components:
+#     devs: Developed by [James Hollway](https://jameshollway.com/).
+#     panarchic: Part of the [PANARCHIC project](https://panarchic.ch/).

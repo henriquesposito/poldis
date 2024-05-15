@@ -1,11 +1,14 @@
 ---
 output: github_document
 ---
-# poldis <img src="inst/poldishexlogo.png" align="right" width="220"/>
+# poldis <img src="man/figures/poldishexlogo.png" align="right" width="220"/>
 
 <!-- badges: start -->
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/henriquesposito/poldis)
 ![GitHub issues](https://img.shields.io/github/issues-raw/henriquesposito/poldis)
+<!--[![Codecov test coverage](https://codecov.io/gh/henriquesposito/poldis/branch/main/graph/badge.svg)](https://app.codecov.io/gh/henriquesposito/poldis?branch=main)-->
+<!--[![CodeFactor](https://www.codefactor.io/repository/github/henriquesposito/poldis/badge)](https://www.codefactor.io/repository/github/henriquesposito/poldis)-->
+<!--[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4562/badge)](https://bestpractices.coreinfrastructure.org/projects/4562)-->
 <!-- badges: end -->
 
 `{poldis}` provides text data and tools for analysing on political discourses in time with R. 
