@@ -34,9 +34,6 @@ load_pdf <- function(path) {
 #' @export
 annotate_text <- function(v, level = "words") {
   doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- entity <- NULL
-  if (is.null(level)) {
-    stop("Please declare the level of the text to be returned, option are sentences, words or paragraph")
-  }
   suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
   parse <- spacyr::spacy_parse(v, tag = TRUE)
   suppressWarnings(spacyr::spacy_finalize())

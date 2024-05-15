@@ -1,0 +1,70 @@
+---
+title: "COP 21 - Leaders' Statements"
+author: "Henrique Sposito"
+date: "2024-05-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(poldis)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(messydates)
+```
+
+```{r}
+Paris_leader_statements <- 
+  read_excel("Paris-leader-statements.xlsx") |>
+  select(Country, Speaker, 'Text EN') |>
+  na.omit()
+sentences <- annotate_text(Paris_leader_statements$`Text EN`,
+                           level = "sentences")
+promises <- extract_promises(sentences)
+subjects <- extract_subjects(promises)
+related_terms <- extract_related_terms(promises, subjects = c("climate",
+                                                              "poverty",
+                                                              "development"))
+urgency <- get_urgency(promises, related_terms)
+get_urgency_rank(urgency)
+```
+
+
+```{r}
+load("US_Oral_Remarks.rda")
+US_Oral_Remarks_CC <- US_Oral_Remarks |>
+  filter(grepl("climate change|global warming", text)) |>
+  mutate(id = paste0("text", row_number()),
+         year = stringr::str_extract(date, "[:digit:]{4}"))
+sentences <- annotate_text(US_Oral_Remarks_CC$text,
+                           level = "sentences")
+promises <- extract_promises(sentences)
+subjects <- extract_subjects(promises)
+related_terms <- extract_related_terms(promises, subjects = c("climate",
+                                                              "poverty",
+                                                              "development"))
+urgency <- get_urgency(promises, related_terms)
+get_urgency_rank(urgency)
+urgency_text <- urgency |> 
+  group_by(doc_id) |> 
+  summarize(m_urgency = mean(urgency), t_urgency = sum(urgency)) |>
+  rename(id = doc_id)
+US_Oral_Remarks_CC_U <- dplyr::left_join(US_Oral_Remarks_CC, urgency_text)
+US_Oral_Remarks_CC_U |>
+  ggplot(aes(x = as.numeric(year), y = m_urgency)) + 
+  geom_smooth() +
+  theme_classic() +
+  labs(title = "Urgency in Climate Change related speeches",
+       subtitle = "US presidential speeches since 1995",
+       x = "Year", y = "Mean Urgency Score")
+US_Oral_Remarks_CC_U |>
+  filter(speaker == "Barack Obama"|speaker == "Joseph R. Biden") |>
+  ggplot(aes(x = as.numeric(year), y = m_urgency)) + 
+  geom_smooth(aes(color = speaker), se = FALSE) +
+  theme_classic() +
+  labs(title = "Urgency in Climate Change related speeches for Biden and Obama",
+       subtitle = "US presidential speeches since 2008",
+       x = "Year", y = "Mean Urgency Score", color = "")
+```
+
