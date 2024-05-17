@@ -68,3 +68,27 @@ US_Oral_Remarks_CC_U |>
        x = "Year", y = "Mean Urgency Score", color = "")
 ```
 
+```{r}
+library(deeplr)
+library(quanteda)
+# load EU speeches data
+load("EUspeech_V2.RData") 
+EU_speeches <- convert(corpus, to = "data.frame")
+table(EU_speeches$country) # see obs by country
+EU_speeches <- EU_speeches |>
+  filter(country == "Great Britain"|country == "France"|
+           country == "Denmark"|country == "Netherlands",
+         date >= "2010-01-01") |>
+  mutate(translated_text = ifelse(language == "en", text, NA))
+out <- list()
+for(i in seq_len(nrow(EU_speeches))) {
+  out[[i]] <- ifelse(is.na(EU_speeches$translated_text[[i]]),
+                     deeplr::translate2(EU_speeches$text[[i]],
+                                        source_lang = toupper(EU_speeches$language[[i]]),
+                                        auth_key = my_key),
+                     EU_speeches$translated_text[[i]])
+}
+
+```
+
+
