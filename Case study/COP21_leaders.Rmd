@@ -173,3 +173,16 @@ wrap_plots(p5, p6, guides = "collect") +
                   subtitle = "Barack Obama vs. David Cameron Speeches 2010-2016")
 ```
 
+```{r}
+library(scales)
+sent_urg |>
+  filter(speaker == "Barack Obama" | speaker == "D.Cameron") |>
+  ggplot(aes(x = as.numeric(year))) + 
+  geom_smooth(aes(y = rescale(m_sentiment)), color = "red", se = FALSE) +
+  geom_smooth(aes(y = rescale(m_urgency)), color = "blue", se = FALSE)  +              
+  theme_classic() +
+  annotate("text", x = 2015.8, y = 0.38, label = "Sentiment") +
+  annotate("text", x = 2015.8, y = 0.58, label = "Urgency") +
+  labs(x = "Year", y = "Mean")
+```
+

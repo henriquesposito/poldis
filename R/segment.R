@@ -16,48 +16,7 @@ extract_promises <- function(v) {
   } else v <- suppressMessages(annotate_text(v, level = "sentences"))
   # assign IDs for segments
   v <- v |>
-    dplyr::group_by(doc_id) |>
     dplyr::mutate(lemmas = tolower(lemmas),
-                  seg_id = ifelse(stringr::str_detect(lemmas,
-                                                      "first|second|third(?!s)|
-                                                        |fourth(?!s)|fifth(?!s)|
-                                                        |sixth(?!s)|finally|end|
-                                                        |lastly|begin by|start by|
-                                                        |begin with |otherwise|apart from|
-                                                        |besides|other than|contrary|
-                                                        |conversely|moreover|furthermore|
-                                                        |further|however|addition|alternate|
-                                                        |anyway|while|ladies|gentlemen|
-                                                        |sir|madam|now|every|another|
-                                                        |one hand|on the other hand|
-                                                        |compared to|let me|greet"),
-                                  1:dplyr::n(), NA),  # first attempt to identify breaks in the text
-                  problem = ifelse(stringr::str_detect(lemmas,
-                                                       "problem|issue|challenge|
-                                                        |matter|can of worms|
-                                                        |deep water|pain|hydra|
-                                                        |matter|difficulty|
-                                                        |trouble|killer|kink|
-                                                        |pitfall|trap|hindrance|
-                                                        |impediment|deterrent|
-                                                        |wrinkle|puzzle|case|
-                                                        |conundrum|dilemma|
-                                                        |question|hazard|
-                                                        |predicament|plight|
-                                                        |quandary|hard time|
-                                                        |stress|strain|crisis|
-                                                        |mire|complex|address|
-                                                        |solve|to resolve|tackle|
-                                                        |fix|confront|face|
-                                                        |take care of|consider|
-                                                        |recognise|reject|ignore|
-                                                        |act on|give attention|
-                                                        |direct attention|handle|
-                                                        |treat|deal with|
-                                                        |gratitude|thank|
-                                                        |apologies|apologise|
-                                                        |congratulate"),
-                                   paste(sentence), NA), # mark out problems/context
                   promises = ifelse(stringr::str_detect(tags, "PRP MD ")|
                                       stringr::str_detect(lemmas,
                                                           "going to|need to|ready to|
@@ -69,19 +28,7 @@ extract_promises <- function(v) {
                                                          |VBD( RB)? VBN|VBZ( RB)? VBN|
                                                          |VBD( RB)? JJ|PRP( RB)? VBD TO"),
                                     NA, promises),
-                  promises = ifelse(!is.na(problem), NA, promises)) |>
-    tidyr::fill(seg_id) |>
-    dplyr::mutate(seg_id = ifelse(!is.na(seg_id), paste0(doc_id, "-", seg_id), NA)) |>
-    dplyr::group_by(seg_id) |>
-    dplyr::mutate(problem = trimws(stringr::str_remove_all(paste(problem,
-                                                                 collapse = " "),
-                                                           "NA"))) |>
-    dplyr::filter(!is.na(promises)) |>
-    dplyr::mutate(sentence_id = paste(sentence_id, collapse = " - "),
-                  dplyr::across(sentence:promises, # paste promises connected to one another
-                                ~ paste(.x, collapse = " ")),
                   ntoken = sum(ntoken)) |>
-    dplyr::ungroup() |>
     dplyr::distinct()
   class(v) <- c("promises", class(v))
   v
