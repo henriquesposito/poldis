@@ -9,26 +9,24 @@
 #' }
 #' @export
 extract_promises <- function(v) {
-  tags <- sentence <- seg_id <- lemmas <- sentence_id <- doc_id <- promises <- problem <- NULL
+  tags <- sentence <- lemmas <- sentence_id <- doc_id <- promises <- NULL
   if (any(class(v) == "data.frame")) {
     if ("token_id" %in% names(v))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
   } else v <- suppressMessages(annotate_text(v, level = "sentences"))
-  # assign IDs for segments
   v <- v |>
     dplyr::mutate(lemmas = tolower(lemmas),
                   promises = ifelse(stringr::str_detect(tags, "PRP MD ")|
                                       stringr::str_detect(lemmas,
                                                           "going to|need to|ready to|
                                      |is time to|commit to|promise to|have to|
-                                     |plan to|intend to|let 's"),
+                                     |plan to|intend to|let 's|require|want to"),
                                     paste(sentence), NA), # detect promises
                   promises = ifelse(stringr::str_detect(promises, " not ") |
                                       stringr::str_detect(tags, "MD VB( RB)? VBN|
                                                          |VBD( RB)? VBN|VBZ( RB)? VBN|
                                                          |VBD( RB)? JJ|PRP( RB)? VBD TO"),
-                                    NA, promises),
-                  ntoken = sum(ntoken)) |>
+                                    NA, promises)) |>
     dplyr::distinct()
   class(v) <- c("promises", class(v))
   v
