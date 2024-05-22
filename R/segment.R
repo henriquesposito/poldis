@@ -25,9 +25,9 @@ extract_promises <- function(v) {
                   promises = ifelse(stringr::str_detect(promises, " not |
                                                         |yesterday|last week|
                                                         |last month|last year|
-                                                        |minister|president|
+                                                        |prime minister|president|
                                                         |thank|honor|honour|
-                                                        |applause|greet|
+                                                        |applause|greet|laugh|
                                                         |privilege to|great to|
                                                         |good to") |
                                       stringr::str_detect(tags, "MD VB( RB)? VBN|
