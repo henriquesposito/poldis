@@ -185,4 +185,3 @@ sent_urg |>
   annotate("text", x = 2015.8, y = 0.58, label = "Urgency") +
   labs(x = "Year", y = "Mean")
 ```
-
