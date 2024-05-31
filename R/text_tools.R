@@ -121,7 +121,7 @@ extract_location <- function(v) {
 extract_match <- function(v, match, invert = FALSE,
                           ignore.case = TRUE) {
   doc_id <- token <- text <- NULL
-  if (any(class(v) == "data.frame")) {
+  if (inherits(v, "data.frame")) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated data frame.")
     }
@@ -152,36 +152,47 @@ extract_match <- function(v, match, invert = FALSE,
 #' Extract context for string matches
 #'
 #' A function for getting string matches and the context in which they occur.
+#' @param v Text vector or annotated data frame.
 #' @param match Character string to be matched.
 #' For multiple strings, please use "|" as a separator.
-#' @param v Text vector.
 #' @param level At which text level do you want matches to be returned?
+#' Defaults to "sentences".
 #' Options are sentences, words, and paragraph.
 #' @param n Number of sentences or words matched before and after string match.
-#' 1 by default.
+#' Defaults to 1.
 #' That is, one word or one sentence before, and after, string match.
 #' For paragraphs, n is always set to one.
 #' @importFrom stringr str_detect str_extract_all
+#' @importFrom dplyr group_by summarise select
 #' @examples
+#' \donttest{
 #' extract_context(match = "war|weapons of mass destruction|conflict|NATO|peace",
-#' v = US_News_Conferences_1960_1980$text[100],
-#' level = "sentences",
-#' n = 2)
+#'                 v = US_News_Conferences_1960_1980$text[100],
+#'                 level = "sentences", n = 2)
+#' }
 #' @return A list of string matches an their context
 #' @export
-extract_context <- function(match, v,
-                            level = c("sentences", "words", "paragraph"),
-                            n = 1) {
-  if (is.null(level)) {
-    stop("Please declare the level of the text to be returned, option are sentences, words or paragraph")
+extract_context <- function(match, v, level = "sentences", n = 1) {
+  doc_id <- sentence <- text <- token <- NULL
+  if (inherits(v, "data.frame")) {
+    if (!"doc_id" %in% names(v)) {
+      stop("Please declare a text vector or an annotated data frame.")
+    }
+    if ("sentence" %in% names(v)) {
+      v <- dplyr::group_by(doc_id) |>
+        dplyr::summarise(text = paste(sentence, collapse = " ")) |>
+        dplyr::select(text)
+    } else if ("token_id" %in% names(v)) {
+      v <- dplyr::group_by(doc_id) |>
+        dplyr::summarise(text = paste(token, collapse = " ")) |>
+        dplyr::select(text)
+    }
   }
   if (level == "sentences") {
     s <- stringr::str_extract_all(v, paste0("([^.]+\\.){0,", n, "}[^.]+(", match, ").*?\\.([^.]+\\.){0,", n, "}"))
-  }
-  if (level == "words") {
+  } else if (level == "words") {
     s <- stringr::str_extract_all(v, paste0("([^\\s]+\\s+){", n,"}", match, "(\\s+[^\\s]+){", n, "}"))
-  }
-  if (level == "paragraph") {
+  } else if (level == "paragraph") {
     if (stringr::str_detect(v, "\\.\n", negate = TRUE))
     {
       stop("No paragraph markings were found in text variable, please set level to sentences or words")
@@ -214,7 +225,7 @@ extract_context <- function(match, v,
 #' @export
 extract_similarities <- function(v, comparison = "similarities", method) {
   doc_id <- token <- text <- NULL
-  if (any(class(v) == "data.frame")) {
+  if (inherits(v, "data.frame")) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated data frame.")
     }
@@ -255,7 +266,7 @@ extract_similarities <- function(v, comparison = "similarities", method) {
 #' @export
 split_text <- function(v, splitsign = "\\.") {
   doc_id <- sentence <- token <- text <- NULL
-  if (any(class(v) == "data.frame")) {
+  if (inherits(v, "data.frame")) {
     if (!"doc_id" %in% names(v)) {
       stop("Please declare a text vector or an annotated data frame.")
     }
@@ -305,7 +316,6 @@ load_pdf <- function(path) {
 #' @import spacyr
 #' @importFrom dplyr group_by summarise ungroup
 #' @importFrom stringr str_squish
-#' @importFrom usethis ui_info
 #' @examples
 #' \donttest{
 #' annotate_text(US_News_Conferences_1960_1980[1:2, 3])
@@ -317,7 +327,6 @@ annotate_text <- function(v, level = "words") {
   parse <- spacyr::spacy_parse(v, tag = TRUE)
   suppressWarnings(spacyr::spacy_finalize())
   if (level == "sentences" | level == "sentence") {
-    usethis::ui_info("Annotating sentences...")
     entity <- spacyr::entity_extract(parse) |>
       dplyr::group_by(sentence_id, doc_id) |>
       dplyr::summarise(entities = unique(paste(entity, collapse = " ")))

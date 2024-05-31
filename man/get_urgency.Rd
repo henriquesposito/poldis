@@ -4,19 +4,18 @@
 \alias{get_urgency}
 \title{Urgency Analysis}
 \usage{
-get_urgency(v, subjects)
+get_urgency(.data, dictionary, normalize)
 }
 \arguments{
-\item{v}{Text vector or annotated data frame.}
+\item{.data}{A data frame, promises, or text vector.
+For data frames, function will search for "text" variable.
+For promises data, function will search for "promises" variable.}
 
-\item{subjects}{A vector or a list of subjects and related terms.
-If not declared, package will try to automatically detect subjects
-and related terms to these subjects.
-If users declare a vector, each element is treated as a independent topic
-and related terms to each of the elements will be automatically
-identified if possible.
-If users declare a list of subjects and related terms, function understands
-these as the topics and the related terms.}
+\item{normalization}{Would you like urgency scores to be normalized?
+By default, urgency scores are normalized by number of words in urgency
+dimension and the number of words in text observation.
+Other options include "tokens" for the number of words in text observation.
+Users can also declare "none", for no normalization.}
 }
 \value{
 A scored data frame.
@@ -27,10 +26,5 @@ Urgency Analysis
 \examples{
 \donttest{
 get_urgency(US_News_Conferences_1960_1980[1:10,3])
-get_urgency(US_News_Conferences_1960_1980[1:10,3],
-            subjects = c("war", "inflation"))
-get_urgency(US_News_Conferences_1960_1980[1:10,3],
-            subjects = list("war" = c("war", "military", "guns"),
-                            "inflation" = c("inflation", "interest rates", "prices")))
 }
 }

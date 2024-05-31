@@ -1,64 +1,46 @@
 #' Urgency Analysis
 #'
-#' @param v Text vector or annotated data frame.
-#' @param subjects A vector or a list of subjects and related terms.
-#' If not declared, package will try to automatically detect subjects
-#' and related terms to these subjects.
-#' If users declare a vector, each element is treated as a independent topic
-#' and related terms to each of the elements will be automatically
-#' identified if possible.
-#' If users declare a list of subjects and related terms, function understands
-#' these as the topics and the related terms.
+#' @param .data A data frame, promises, or text vector.
+#' For data frames, function will search for "text" variable.
+#' For promises data, function will search for "promises" variable.
+#' @param normalization Would you like urgency scores to be normalized?
+#' By default, urgency scores are normalized by number of words in urgency
+#' dimension and the number of words in text observation.
+#' Other options include "tokens" for the number of words in text observation.
+#' Users can also declare "none", for no normalization.
 #' @return A scored data frame.
 #' @import dplyr
-#' @importFrom usethis ui_done ui_info
 #' @examples
 #' \donttest{
 #' get_urgency(US_News_Conferences_1960_1980[1:10,3])
-#' get_urgency(US_News_Conferences_1960_1980[1:10,3],
-#'             subjects = c("war", "inflation"))
-#' get_urgency(US_News_Conferences_1960_1980[1:10,3],
-#'             subjects = list("war" = c("war", "military", "guns"),
-#'                             "inflation" = c("inflation", "interest rates", "prices")))
 #' }
 #' @export
-get_urgency <- function(v, subjects) {
-  frequency <- timing <- topic <- degree <- urgency <- commit <- NULL
-  if (any(class(v) == "data.frame") & !"doc_id" %in% names(v)) {
-    stop("Please declare a text vector or an annotated object.")
-  }
-  if (any(class(v) == "promises")) promises <- v else {
-    promises <- extract_promises(v)
-    usethis::ui_done("Extracted promises.")
-  }
-  if (missing(subjects)) {
-    subjects <- extract_subjects(promises)
-    usethis::ui_done("Extracted subjects.")
-  }
-  if (is.list(subjects) | "related_subjects" %in% class(subjects)) {
-    similar_words <- subjects
-  } else {
-    tryCatch({
-      similar_words <- extract_related_terms(promises, subjects)
-      usethis::ui_done("Extracted similar topics for subjects.")
-    }, error = function(e) {
-      usethis::ui_info("Failed to identify related terms, subjects will be used to code topics.")
-      similar_words <- subjects
-    })
-  }
-  usethis::ui_info("Coding urgency components...")
-  out <- promises
-  out$topic <- .assign_subjects(promises, similar_words)
+get_urgency <- function(.data, dictionary, normalize) {
+  # get text variable
+  if (inherits(.data, "data.frame")) {
+    text <- .data["text"]
+  } else if (inherits(.data, "promises")) {
+    text <- data["promises"]
+  } else text <- .data
+  # assign urgency dimensions
+  out <- text
   out$frequency <- .assign_frequencies(promises)
   out$timing <- .assign_time(promises)
   out$degree <- .assign_degree(promises)
   out$commit <- .assign_commitment(promises)
-  out$adjectives <- .assign_adj(promises)
-  out$adverbs <- .assign_adv(promises)
-  out <- out |>
-    dplyr::mutate(urgency = (frequency + timing + degree + commit +
-                               adjectives + adverbs)/ntoken) |>
-    dplyr::arrange(-urgency)
+  if (missing(normalize)) {
+    out <- out |>
+      dplyr::mutate(urgency = (frequency + timing + degree + commit)/nchar(text)) |>
+      dplyr::arrange(-urgency)
+  } else if (normalize == "tokens") {
+    out <- out |>
+      dplyr::mutate(urgency = (frequency + timing + degree + commit)/nchar(text)) |>
+      dplyr::arrange(-urgency)
+  } else {
+    out <- out |>
+      dplyr::mutate(urgency = (frequency + timing + degree + commit)) |>
+      dplyr::arrange(-urgency)
+  }
   class(out) <- c("urgency", class(out))
   out
   # todo: fix how the function works for small numbers of text
@@ -66,39 +48,8 @@ get_urgency <- function(v, subjects) {
   # todo: fix normalization scores, how to best do it?
 }
 
-.assign_subjects <- function(promises, subjects) {
-  if (is.list(subjects)) {
-    subjects <- lapply(subjects, function(x) paste0(x, collapse = "|"))
-  } else names(subjects) <- subjects
-  out <- list()
-  for (i in names(subjects)) {
-    out[[i]] <- stringr::str_count(promises[["promises"]], subjects[[i]])
-  }
-  out <- apply(data.frame(out), 1, function(i) which(i > 0))
-  out <- lapply(out, function(x) paste0(names(x), collapse = ", "))
-  # todo: get nouns if empty?
-  out
-}
-
 .assign_frequencies <- function(promises) {
-  freq_adverbs <- list(definite = list("by the minute|by the hour|hourly" = 1,
-                                       "daily|nightly" = 365/8765,
-                                       "weekly" = 52/8765,
-                                       "fortnightly" = 26/8765,
-                                       "monthly" = 12/8765,
-                                       "quarterly" = 4/8765,
-                                       "annually|yearly" = 1/8765),
-                       indefinite = list("always|constantly" = 1,
-                                         "usually|regularly" = 0.9,
-                                         "generally|normally" = 0.8,
-                                         "often|frequently" = 0.7,
-                                         "sometimes" = 0.5,
-                                         "occasionally" = 0.3,
-                                         "seldom" = 0.2,
-                                         "infrequently" = 0.1,
-                                         "rarely" = 0.05,
-                                         "hardly ever" = 0.02,
-                                         "never" = 0))
+  frequency_words <-
   out <- data.frame(sentence = 1:(length(promises[["promises"]])))
   for (i in names(unlist(unname(freq_adverbs)))) {
     out[[i]] <- stringr::str_count(promises[["lemmas"]], textstem::lemmatize_strings(i))*
@@ -166,27 +117,11 @@ get_urgency <- function(v, subjects) {
   rowSums(out[-1])
 }
 
-.assign_adv <- function(promises) {
-  out <- data.frame(sentence = 1:(length(promises[["promises"]])))
-  for (i in 1:length(adverbs[,1])) {
-    out[[adverbs[,1][i]]] <- stringr::str_count(promises[["adverbs"]], adverbs[,3][i])*
-      abs(adverbs[,2][i]/5) # absolute value since we do not care about direction
-  }
-  rowSums(out[-1])
-}
-
-.assign_adj <- function(promises) {
-  out <- data.frame(sentence = 1:(length(promises[["promises"]])))
-  for (i in 1:length(adjectives[,1])) {
-    out[[adjectives[,1][i]]] <- stringr::str_count(promises[["adjectives"]], adjectives[,3][i])*
-      abs(adjectives[,2][i]/5) # absolute value since we do not care about direction
-  }
-  rowSums(out[-1])
-}
-
 #' Rank urgent topics
 #'
-#' @param v Text vector or annotated data frame.
+#' @param .data A data frame, promises, or text vector.
+#' For data frames, function will search for "text" variable.
+#' For promises data, function will search for "promises" variable.
 #' @param subjects List of subjects.
 #' @import dplyr
 #' @importFrom tidyr separate_rows
@@ -197,7 +132,7 @@ get_urgency <- function(v, subjects) {
 #' @export
 get_urgency_rank <- function(v, subjects) {
   topic <- urgency <- urgency_sum <- NULL
-  if (any(class(v) != "urgency")) {
+  if (!inherits(v, "urgency")) {
     v <- get_urgency(v, subjects)
   }
   v |> dplyr::mutate(topic = ifelse(topic == "" | is.na(topic), "No topic", topic)) |>

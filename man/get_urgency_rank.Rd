@@ -7,9 +7,11 @@
 get_urgency_rank(v, subjects)
 }
 \arguments{
-\item{v}{Text vector or annotated data frame.}
-
 \item{subjects}{List of subjects.}
+
+\item{.data}{A data frame, promises, or text vector.
+For data frames, function will search for "text" variable.
+For promises data, function will search for "promises" variable.}
 }
 \description{
 Rank urgent topics
