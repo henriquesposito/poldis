@@ -34,7 +34,6 @@ Imports:
     keyATM,
     tm,
     textstem,
-    usethis,
     tidyr
 Suggests:
     rmarkdown,
