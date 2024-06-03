@@ -15,5 +15,7 @@ For promises data, function will search for "promises" variable.}
 Extract future promises from political discourses
 }
 \examples{
-\donttest extract_promises(US_News_Conferences_1960_1980[1:2,3])
+\donttest{
+extract_promises(US_News_Conferences_1960_1980[1:2,3])
+}
 }
