@@ -1,22 +1,22 @@
 #' Extract future promises from political discourses
 #'
-#' @param .data A data frame, promises, or text vector.
+#' @param .data A (annotated) data frame or text vector.
 #' For data frames, function will search for "text" variable.
-#' For promises data, function will search for "promises" variable.
-#' @import dplyr
+#' For annotated data frames, please declare an annotated data frame
+#' at the sentence level.
 #' @importFrom stringr str_detect str_remove_all
 #' @examples
 #' \donttest{
 #' extract_promises(US_News_Conferences_1960_1980[1:2,3])
 #' }
 #' @export
-extract_promises <- function(v) {
+extract_promises <- function(.data) {
   tags <- sentence <- lemmas <- sentence_id <- doc_id <- promises <- NULL
-  if (any(inherits(v) == "data.frame")) {
-    if ("token_id" %in% names(v))
+  if (inherits(.data, "data.frame")) {
+    if ("token_id" %in% names(.data))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
-  } else v <- suppressMessages(annotate_text(v, level = "sentences"))
-  v <- v |>
+  } else .data <- suppressMessages(annotate_text(.data, level = "sentences"))
+  out <- .data |>
     dplyr::mutate(lemmas = tolower(lemmas),
                   promises = ifelse(stringr::str_detect(tags, "PRP MD ")|
                                       stringr::str_detect(lemmas,
@@ -37,6 +37,6 @@ extract_promises <- function(v) {
                                                          |VBD( RB)? JJ|PRP( RB)? VBD TO"),
                                     NA, promises)) |>
     dplyr::distinct()
-  class(v) <- c("promises", class(v))
-  v
+  class(out) <- c("promises", class(out))
+  out
 }

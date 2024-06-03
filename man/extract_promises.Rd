@@ -4,12 +4,13 @@
 \alias{extract_promises}
 \title{Extract future promises from political discourses}
 \usage{
-extract_promises(v)
+extract_promises(.data)
 }
 \arguments{
-\item{.data}{A data frame, promises, or text vector.
+\item{.data}{A (annotated) data frame or text vector.
 For data frames, function will search for "text" variable.
-For promises data, function will search for "promises" variable.}
+For annotated data frames, please declare an annotated data frame
+at the sentence level.}
 }
 \description{
 Extract future promises from political discourses
