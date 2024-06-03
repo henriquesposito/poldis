@@ -1,8 +1,9 @@
 #' Extract topic from political discourses
 #'
-#' @param .data A data frame, promises, or text vector.
+#' @param .data A data frame, "promises" data frame, or text vector.
 #' For data frames, function will search for "text" variable.
-#' For promises data, function will search for "promises" variable.
+#' For promises data frames coded using `extract_promises()`,
+#' function will search for "promises" variable.
 #' @param dictionary The dictionary of 20 major political topics from the
 #' Comparative Agendas Project is used by default.
 #' Users can also declare a custom dictionary as a vector or a list.
@@ -24,16 +25,16 @@
 extract_topics <- function(.data, dictionary = "CAP") {
   Words <- NULL
   # get text variable
-  if (inherits(.data, "data.frame")) {
-    text <- .clean_token(.data["text"])
-  } else if (inherits(.data, "promises")) {
-    text <- .clean_token(.data["promises"])
+  if (inherits(.data, "promises")) {
+    text <- .clean_token(getElement(.data, "promises"))
+  } else if (inherits(.data, "data.frame")) {
+    text <- .clean_token(getElement(.data, "text"))
   } else text <- .clean_token(.data)
   # get dictionary
   if (any(dictionary ==  "CAP")) {
-    dictionary <- CAP_topics |>
-      dplyr::mutate(Words = stringr::str_replace_all(
-        textstem::lemmatize_words(tolower(Words)), ", ", "|"))
+    dictionary <- CAP_topics %>%
+      dplyr::mutate(Words = stringr::str_replace_all(textstem::lemmatize_words(
+        stringr::str_squish(tolower(Words))), ", ", "|"))
     subjects <- dictionary$Words
     names(subjects) <- dictionary$Topic
     } else if (is.list(dictionary)) {
@@ -45,7 +46,7 @@ extract_topics <- function(.data, dictionary = "CAP") {
   # match terms
   out <- list()
   for (i in names(subjects)) {
-    out[[i]] <- stringr::str_count(.data, subjects[[i]])
+    out[[i]] <- stringr::str_count(text, subjects[[i]])
     }
   out <- apply(data.frame(out), 1, function(i) which(i > 0))
   out <- lapply(out, function(x) paste0(names(x), collapse = ", "))
@@ -85,7 +86,7 @@ extract_topics <- function(.data, dictionary = "CAP") {
 #' extract_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
 #' extract_related_terms(US_News_Conferences_1960_1980[1:5, 3],
 #'                       dictionary = c("military", "development"))
-#' extract_related_terms(.data = US_News_Conferences_1960_1980[1:5, 3],
+#' extract_related_terms(US_News_Conferences_1960_1980[1:5, 3],
 #'                       dictionary = list("military" = c("military", "gun", "war"),
 #'                                         "development" = c("development", "interest rate", "banks")))
 #' }
@@ -100,7 +101,7 @@ extract_related_terms <- function(.data, dictionary) {
   } else text <- .clean_token(.data)
   # check dictionary
   if (any(dictionary ==  "CAP")) {
-    subjects <- CAP_topics |>
+    subjects <- CAP_topics %>%
       dplyr::mutate(Words = stringr::str_replace_all(
         textstem::lemmatize_words(tolower(Words)), ", ", "|"))
     dictionary <- subjects$Words

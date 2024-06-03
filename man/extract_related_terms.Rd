@@ -26,7 +26,7 @@ Extract terms related to subjects
 extract_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
 extract_related_terms(US_News_Conferences_1960_1980[1:5, 3],
                       dictionary = c("military", "development"))
-extract_related_terms(.data = US_News_Conferences_1960_1980[1:5, 3],
+extract_related_terms(US_News_Conferences_1960_1980[1:5, 3],
                       dictionary = list("military" = c("military", "gun", "war"),
                                         "development" = c("development", "interest rate", "banks")))
 }
