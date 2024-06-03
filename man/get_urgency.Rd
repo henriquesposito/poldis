@@ -4,7 +4,7 @@
 \alias{get_urgency}
 \title{Urgency Analysis}
 \usage{
-get_urgency(.data, dictionary, normalize)
+get_urgency(.data, dictionary, normalize = "tokens")
 }
 \arguments{
 \item{.data}{A data frame, promises, or text vector.
@@ -12,9 +12,8 @@ For data frames, function will search for "text" variable.
 For promises data, function will search for "promises" variable.}
 
 \item{normalization}{Would you like urgency scores to be normalized?
-By default, urgency scores are normalized by number of words in urgency
-dimension and the number of words in text observation.
-Other options include "tokens" for the number of words in text observation.
+By default, urgency scores are normalized by "tokens",
+the number of words in text observation.
 Users can also declare "none", for no normalization.}
 }
 \value{
