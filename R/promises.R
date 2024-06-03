@@ -5,6 +5,7 @@
 #' For annotated data frames, please declare an annotated data frame
 #' at the sentence level.
 #' @importFrom stringr str_detect str_remove_all
+#' @importFrom dplyr mutate distinct %>%
 #' @examples
 #' \donttest{
 #' extract_promises(US_News_Conferences_1960_1980[1:2,3])
@@ -16,7 +17,7 @@ extract_promises <- function(.data) {
     if ("token_id" %in% names(.data))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
   } else .data <- suppressMessages(annotate_text(.data, level = "sentences"))
-  out <- .data |>
+  out <- .data %>%
     dplyr::mutate(lemmas = tolower(lemmas),
                   promises = ifelse(stringr::str_detect(tags, "PRP MD ")|
                                       stringr::str_detect(lemmas,
@@ -35,7 +36,7 @@ extract_promises <- function(.data) {
                                       stringr::str_detect(tags, "MD VB( RB)? VBN|
                                                          |VBD( RB)? VBN|VBZ( RB)? VBN|
                                                          |VBD( RB)? JJ|PRP( RB)? VBD TO"),
-                                    NA, promises)) |>
+                                    NA, promises)) %>%
     dplyr::distinct()
   class(out) <- c("promises", class(out))
   out

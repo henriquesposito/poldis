@@ -110,6 +110,7 @@ extract_location <- function(v) {
 #' @param ignore.case Should case be ignored?
 #' By default, TRUE.
 #' @importFrom purrr map_chr
+#' @importFrom dplyr group_by summarise select %>%
 #' @return A list of matches of the same length as text variable
 #' @examples
 #' \donttest{
@@ -128,8 +129,8 @@ extract_match <- function(v, match, invert = FALSE,
     if ("sentence" %in% names(v)) {
       v <- v[["sentence"]]
     } else if ("token_id" %in% names(v)) {
-      v <- dplyr::group_by(doc_id) |>
-        dplyr::summarise(text = paste(token, collapse = " ")) |>
+      v <- dplyr::group_by(doc_id) %>%
+        dplyr::summarise(text = paste(token, collapse = " ")) %>%
         dplyr::select(text)
     }
   }
@@ -163,7 +164,7 @@ extract_match <- function(v, match, invert = FALSE,
 #' That is, one word or one sentence before, and after, string match.
 #' For paragraphs, n is always set to one.
 #' @importFrom stringr str_detect str_extract_all
-#' @importFrom dplyr group_by summarise select
+#' @importFrom dplyr group_by summarise select %>%
 #' @examples
 #' \donttest{
 #' extract_context(match = "war|weapons of mass destruction|conflict|NATO|peace",
@@ -179,12 +180,12 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
       stop("Please declare a text vector or an annotated data frame.")
     }
     if ("sentence" %in% names(v)) {
-      v <- dplyr::group_by(doc_id) |>
-        dplyr::summarise(text = paste(sentence, collapse = " ")) |>
+      v <- dplyr::group_by(doc_id) %>%
+        dplyr::summarise(text = paste(sentence, collapse = " ")) %>%
         dplyr::select(text)
     } else if ("token_id" %in% names(v)) {
-      v <- dplyr::group_by(doc_id) |>
-        dplyr::summarise(text = paste(token, collapse = " ")) |>
+      v <- dplyr::group_by(doc_id) %>%
+        dplyr::summarise(text = paste(token, collapse = " ")) %>%
         dplyr::select(text)
     }
   }
@@ -218,6 +219,7 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' Other methods from `quanteda.textstats::textstat_dist()` include
 #' "manhattan", "maximum", "canberra", and "minkowski".
 #' @importFrom quanteda.textstats textstat_simil textstat_dist
+#' @importFrom dplyr group_by summarise select %>%
 #' @examples
 #' \donttest{
 #' extract_similarities(US_News_Conferences_1960_1980[1:2,3])
@@ -232,8 +234,8 @@ extract_similarities <- function(v, comparison = "similarities", method) {
     if ("sentence" %in% names(v)) {
       v <- v[["sentence"]]
     } else if ("token_id" %in% names(v)) {
-      v <- dplyr::group_by(doc_id) |>
-        dplyr::summarise(text = paste(token, collapse = " ")) |>
+      v <- dplyr::group_by(doc_id) %>%
+        dplyr::summarise(text = paste(token, collapse = " ")) %>%
         dplyr::select(text)
     }
   }
@@ -257,7 +259,7 @@ extract_similarities <- function(v, comparison = "similarities", method) {
 #' This can also be words, signals or other markers you want.
 #' For special characters, please use escape sign before (i.e. "\\").
 #' @return A splitted list for each row
-#' @importFrom dplyr group_by summarise select
+#' @importFrom dplyr group_by summarise select %>%
 #' @examples
 #' \donttest{
 #' text <- "This is the first sentence. This is the second sentence."
@@ -271,12 +273,12 @@ split_text <- function(v, splitsign = "\\.") {
       stop("Please declare a text vector or an annotated data frame.")
     }
     if ("sentence" %in% names(v)) {
-      v <- dplyr::group_by(doc_id) |>
-        dplyr::summarise(text = paste(sentence, collapse = " ")) |>
+      v <- dplyr::group_by(doc_id) %>%
+        dplyr::summarise(text = paste(sentence, collapse = " ")) %>%
         dplyr::select(text)
     } else if ("token_id" %in% names(v)) {
-      v <- dplyr::group_by(doc_id) |>
-        dplyr::summarise(text = paste(token, collapse = " ")) |>
+      v <- dplyr::group_by(doc_id) %>%
+        dplyr::summarise(text = paste(token, collapse = " ")) %>%
         dplyr::select(text)
     }
   }
@@ -314,7 +316,7 @@ load_pdf <- function(path) {
 #' @param v Text vector
 #' @param level Do you want to parse words or sentences? Words by default.
 #' @import spacyr
-#' @importFrom dplyr group_by summarise ungroup
+#' @importFrom dplyr group_by summarise ungroup %>%
 #' @importFrom stringr str_squish
 #' @examples
 #' \donttest{
@@ -327,10 +329,10 @@ annotate_text <- function(v, level = "words") {
   parse <- spacyr::spacy_parse(v, tag = TRUE)
   suppressWarnings(spacyr::spacy_finalize())
   if (level == "sentences" | level == "sentence") {
-    entity <- spacyr::entity_extract(parse) |>
-      dplyr::group_by(sentence_id, doc_id) |>
+    entity <- spacyr::entity_extract(parse) %>%
+      dplyr::group_by(sentence_id, doc_id) %>%
       dplyr::summarise(entities = unique(paste(entity, collapse = " ")))
-    parse <- dplyr::group_by(parse, doc_id, sentence_id) |>
+    parse <- dplyr::group_by(parse, doc_id, sentence_id) %>%
       dplyr::summarise(ntoken = max(token_id),
                        sentence = paste(token, collapse = " "),
                        poss = paste(pos, collapse = " "),
@@ -342,8 +344,8 @@ annotate_text <- function(v, level = "words") {
                          pos == "ADJ", lemma, ""), collapse = " ")),
                        nouns = stringr::str_squish(paste(ifelse(
                          pos == "NOUN" & entity == "", lemma, ""),
-                         collapse = " "))) |>
-      dplyr::left_join(entity, by = c("doc_id", "sentence_id")) |>
+                         collapse = " "))) %>%
+      dplyr::left_join(entity, by = c("doc_id", "sentence_id")) %>%
       dplyr::ungroup()
   }
   parse
