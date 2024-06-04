@@ -67,13 +67,12 @@ extract_date <- function(v) {
 
 #' Extract location from strings
 #'
-#' Extracts location from strings.
-#' Works for Brazilian states and other countries.
-#' Texts must be in English or Portuguese.
 #' @param v Text variable/object
 #' @importFrom stringi stri_trans_general
 #' @importFrom stringr str_extract
 #' @importFrom purrr map_chr
+#' @details Works well for Brazilian states and other countries.
+#' Texts must be in English or Portuguese.
 #' @return A list of the first locations
 #' @details If more than one location is found,
 #' returns only the first match.

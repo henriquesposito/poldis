@@ -13,11 +13,12 @@ extract_location(v)
 A list of the first locations
 }
 \description{
-Extracts location from strings.
-Works for Brazilian states and other countries.
-Texts must be in English or Portuguese.
+Extract location from strings
 }
 \details{
+Works well for Brazilian states and other countries.
+Texts must be in English or Portuguese.
+
 If more than one location is found,
 returns only the first match.
 }
