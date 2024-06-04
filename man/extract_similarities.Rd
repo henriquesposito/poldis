@@ -26,7 +26,7 @@ Other methods from `quanteda.textstats::textstat_dist()` include
 Extract similarities and differences in texts/segments
 }
 \examples{
-\donttest{
+\dontrun{
 extract_similarities(US_News_Conferences_1960_1980[1:2,3])
 }
 }

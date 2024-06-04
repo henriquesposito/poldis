@@ -46,34 +46,31 @@
     <loc>https://henriquesposito.github.io/poldis/reference/extract_match.html</loc>
   </url>
   <url>
-    <loc>https://henriquesposito.github.io/poldis/reference/extract_promises.html</loc>
-  </url>
-  <url>
-    <loc>https://henriquesposito.github.io/poldis/reference/extract_related_terms.html</loc>
-  </url>
-  <url>
     <loc>https://henriquesposito.github.io/poldis/reference/extract_similarities.html</loc>
   </url>
   <url>
     <loc>https://henriquesposito.github.io/poldis/reference/extract_speaker.html</loc>
   </url>
   <url>
-    <loc>https://henriquesposito.github.io/poldis/reference/extract_subjects.html</loc>
-  </url>
-  <url>
     <loc>https://henriquesposito.github.io/poldis/reference/extract_title.html</loc>
   </url>
   <url>
-    <loc>https://henriquesposito.github.io/poldis/reference/get_urgency.html</loc>
+    <loc>https://henriquesposito.github.io/poldis/reference/gather_related_terms.html</loc>
   </url>
   <url>
-    <loc>https://henriquesposito.github.io/poldis/reference/get_urgency_rank.html</loc>
+    <loc>https://henriquesposito.github.io/poldis/reference/gather_topics.html</loc>
+  </url>
+  <url>
+    <loc>https://henriquesposito.github.io/poldis/reference/get_urgency.html</loc>
   </url>
   <url>
     <loc>https://henriquesposito.github.io/poldis/reference/index.html</loc>
   </url>
   <url>
     <loc>https://henriquesposito.github.io/poldis/reference/load_pdf.html</loc>
+  </url>
+  <url>
+    <loc>https://henriquesposito.github.io/poldis/reference/select_promises.html</loc>
   </url>
   <url>
     <loc>https://henriquesposito.github.io/poldis/reference/split_text.html</loc>
