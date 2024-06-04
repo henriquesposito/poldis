@@ -1,8 +1,8 @@
-#' Extract topic from political discourses
+#' Gather topic from political discourses
 #'
 #' @param .data A data frame, "promises" data frame, or text vector.
 #' For data frames, function will search for "text" variable.
-#' For promises data frames coded using `extract_promises()`,
+#' For promises data frames coded using `gather_promises()`,
 #' function will search for "promises" variable.
 #' @param dictionary The dictionary of 20 major political topics from the
 #' Comparative Agendas Project is used by default.
@@ -13,16 +13,16 @@
 #' @import dplyr
 #' @examples
 #' \donttest{
-#' extract_topics(US_News_Conferences_1960_1980[1:5, 3])
-#' extract_topics(US_News_Conferences_1960_1980[1:5, 3],
+#' gather_topics(US_News_Conferences_1960_1980[1:5, 3])
+#' gather_topics(US_News_Conferences_1960_1980[1:5, 3],
 #'                dictionary = c("military", "development"))
-#' extract_topics(.data = US_News_Conferences_1960_1980[1:5, 3],
+#' gather_topics(.data = US_News_Conferences_1960_1980[1:5, 3],
 #'                dictionary = list("military" = c("military", "gun", "war"),
 #'                                  "development" = c("development", "interest rate", "banks")))
 #' }
 #'
 #' @export
-extract_topics <- function(.data, dictionary = "CAP") {
+gather_topics <- function(.data, dictionary = "CAP") {
   Words <- NULL
   # get text variable
   if (inherits(.data, "promises")) {
@@ -66,7 +66,7 @@ extract_topics <- function(.data, dictionary = "CAP") {
     tm::removeWords(tolower(v), quanteda::stopwords()))))
 }
 
-#' Extract terms related to subjects
+#' Gather terms related to subjects
 #'
 #' @param .data A data frame, promises, or text vector.
 #' For data frames, function will search for "text" variable.
@@ -83,15 +83,15 @@ extract_topics <- function(.data, dictionary = "CAP") {
 #' @importFrom stringr str_detect str_remove_all
 #' @examples
 #' \donttest{
-#' extract_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
-#' extract_related_terms(US_News_Conferences_1960_1980[1:5, 3],
+#' gather_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
+#' gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
 #'                       dictionary = c("military", "development"))
-#' extract_related_terms(US_News_Conferences_1960_1980[1:5, 3],
+#' gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
 #'                       dictionary = list("military" = c("military", "gun", "war"),
 #'                                         "development" = c("development", "interest rate", "banks")))
 #' }
 #' @export
-extract_related_terms <- function(.data, dictionary) {
+gather_related_terms <- function(.data, dictionary) {
   Words <- NULL
   # get text variable
   if (inherits(.data, "data.frame")) {
@@ -124,7 +124,8 @@ extract_related_terms <- function(.data, dictionary) {
   out <- as.list(keyATM::top_words(out))
   out <- lapply(out, function(x)
     stringr::str_squish(stringr::str_remove_all(
-      ifelse(stringr::str_detect(x, " \\[([:digit:])"),  "", x), "\\[\\✓\\]")))
+      ifelse(stringr::str_detect(x, " \\[([:digit:])"),  "", x),
+      "\\[\\u2713\\]")))
   out <- lapply(out, function(x) x[x!=""])
   names(out) <- stringr::str_remove_all(names(out), "[0-9]|\\_")
   class(out) <- c("related_subjects", class(out))
