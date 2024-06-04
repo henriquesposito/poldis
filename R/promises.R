@@ -1,4 +1,4 @@
-#' Extract future promises from political discourses
+#' Select future promises from political discourses
 #'
 #' @param .data A (annotated) data frame or text vector.
 #' For data frames, function will search for "text" variable.
@@ -8,10 +8,10 @@
 #' @importFrom dplyr mutate distinct %>%
 #' @examples
 #' \donttest{
-#' extract_promises(US_News_Conferences_1960_1980[1:2,3])
+#' select_promises(US_News_Conferences_1960_1980[1:2,3])
 #' }
 #' @export
-extract_promises <- function(.data) {
+select_promises <- function(.data) {
   tags <- sentence <- lemmas <- sentence_id <- doc_id <- promises <- NULL
   if (inherits(.data, "data.frame")) {
     if ("token_id" %in% names(.data))
