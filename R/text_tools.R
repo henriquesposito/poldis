@@ -221,7 +221,7 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' @importFrom quanteda.textstats textstat_simil textstat_dist
 #' @importFrom dplyr group_by summarise select %>%
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' extract_similarities(US_News_Conferences_1960_1980[1:2,3])
 #' }
 #' @export
