@@ -1,103 +1,75 @@
 ﻿frequency,score,timing,score,intensity,score,commitment,score
 by the minute,1,today,1,especially,1,must,1
-by the hour,1,now,1,completely,1,will,1
-hourly,1,tonight,1,decidedly,1,going to,1
-daily,1,first,1,deeply,1,need to,1
-nightly,1,hasty/hastily,1,high(ly),1,ready to,1
-always,1,immediate(ly),1,entirely,1,is time to,1
-constantly,1,imminent(ly),1,practically,1,commit to,1
-persistently,1,tomorrow,0.9,really,1,promise to,1
-relentlessly,1,promptly/prompt,0.9,simply,1,intend to,1
-incessantly,1,this week,0.8,strongly,1,have to,1
-unrelentingly,1,next,0.8,totally,1,urge,1
-interminably,1,quick/quickly,0.8,utterly,1,stand for,1
-intermittent,1,fast,0.8,virtually,1,address,1
-weekly,0.9,speedily/speedy,0.8,urgently,1,take care of,1
-fortnightly,0.8,short,0.8,obvious,1,tackle,1
-monthly,0.7,next week,0.7,serious,1,fix,1
-quarterly,0.6,before,0.7,significant,1,solve,1
-annually,0.5,early,0.7,major,1,to resolve,1
-yearly,0.5,earlier,0.6,severe,1,confront,1
-usually,0.9,this year,0.5,extremely,1,face,1
-regularly,0.9,soon,0.5,great,1,reject,1
-generally,0.8,straightforward,0.5,desperately,1,ignore,1
-normally,0.8,after,0.4,vigorously,1,necessary,1
-steadily,0.8,afterwards,0.4,fanatically,1,important,1
-often,0.7,late,0.2,extra,1,relevant,1
-frequently,0.7,later,0.2,huge,1,eminent,1
-progressively,0.6,slow/slowly,0.2,enormous,1,prominent,1
-gradually,0.5,long,0.2,global,1,eminent,1
-sometimes,0.5,finally,0.1,everywhere,1,pre(-)?eminent,1
-occasionally,0.3,eventually,0.05,pervasive,1,worthy,1
-sporadically,0.3,at some stage,0.05,prevalent,1,quintessential,1
-irregularly,0.3,,,intense(ly),1,invaluable,1
-seldom,0.2,,,exceptional,1,essential,1
-infrequently,0.1,,,extensive(ly),1,valuable,1
-rarely,0.05,,,tremendous,1,imperative,1
-rarely,0.05,,,extraordinary,1,unavoidable,1
-unusual,0.05,,,remarkably,1,inevitable,1
-hardly ever,0.02,,,intensive,1,inexorable,1
-scarcely,0.02,,,immense,1,obligatory,1
-hardly,0.02,,,monumental,1,consider,0.5
-barely,0.02,,,ideal(ly),1,recognise,0.5
-,,,,optimum,1,act on,0.5
-,,,,supreme,1,give attention,0.5
-,,,,matchless,1,direct attention,0.5
-,,,,momentous,1,handle,0.5
-,,,,majestic,1,treat,0.5
-,,,,inestimable,1,deal with,0.5
-,,,,good/better/best,1,should,0.5
-,,,,maximum,1,let's,0.5
-,,,,vast,1,let us,0.5
-,,,,ultimate,1,want to,0.5
-,,,,certain,1,might,0.5
-,,,,willing,0.5,shall,0.5
-,,,,able,0.5,would,0.5
-,,,,ambitiously,0.5,could,0.5
-,,,,realistically,0.5,can,0.5
-,,,,more,0.5,may,0.5
-,,,,insufficient,0.5,optional,0.5
-,,,,moderately,0.5,marginal,0.5
-,,,,large,0.5,tenable,0.5
-,,,,sure/surely,0.5,doable,0.5
-,,,,substantial,0.5,cautious,0.5
-,,,,thorough,0.5,plausibly/plausible,0.5
-,,,,superior,0.5,possibly/possible,0.5
-,,,,virtuous,0.5,preferable,0.5
-,,,,above,0.5,useful/useable,0.5
-,,,,opportune,0.5,,
-,,,,timely,0.5,,
-,,,,lots,0.5,,
-,,,,very,0.5,,
-,,,,much,0.5,,
-,,,,most,0.5,,
-,,,,fully,0.5,,
-,,,,far,0.5,,
-,,,,clearly,0.5,,
-,,,,somewhat,0.2,,
-,,,,almost,0.2,,
-,,,,least,0.2,,
-,,,,less,0.2,,
-,,,,indeed,0.2,,
-,,,,quite,0.2,,
-,,,,rather,0.2,,
-,,,,little,0.2,,
-,,,,minimal,0.2,,
-,,,,minimum,0.2,,
-,,,,merely,0.2,,
-,,,,weakly,0.2,,
-,,,,sufficient,0.2,,
-,,,,enough,0.2,,
+by the hour,1,now,1,determined,1,will,1
+hourly,1,tonight,1,deeply,1,going to,1
+everyday,1,first,1,high(ly),1,need to,1
+daily,1,hasty/hastily,1,definitely,1,ready to,1
+nightly,1,immediate(ly),1,practically,1,is time to,1
+always,1,imminent(ly),1,really,1,commit to,1
+constantly,1,tomorrow,0.9,simply,1,promise to,1
+persistently,1,promptly/prompt,0.9,strongly,1,intend to,1
+relentlessly,1,this week,0.8,utterly,1,have to,1
+incessantly,1,next,0.8,urgently,1,urge,1
+unrelentingly,1,quick/quickly,0.8,extremely,1,necessary,1
+interminably,1,fast,0.8,desperately,1,important,1
+intermittent,1,speedily/speedy,0.8,vigorously,1,relevant,1
+weekly,0.9,short,0.8,firmly,1,eminent,1
+fortnightly,0.8,next week,0.7,extra,1,prominent,1
+monthly,0.7,before,0.7,huge,1,pre(-)?eminent,1
+quarterly,0.6,early,0.7,enormous,1,worthy,1
+annually,0.5,earlier,0.6,global,1,quintessential,1
+yearly,0.5,this year,0.5,everywhere,1,invaluable,1
+every year,0.5,soon,0.5,pervasive,1,essential,1
+usually,0.9,straightforward,0.5,prevalent,1,valuable,1
+regularly,0.9,after,0.4,intense(ly),1,imperative,1
+generally,0.8,afterwards,0.4,exceptional,1,unavoidable,1
+normally,0.8,late,0.2,extensive(ly),1,inevitable,1
+steadily,0.8,later,0.2,tremendous,1,inexorable,1
+often,0.7,slow/slowly,0.2,extraordinary,1,obligatory,1
+frequently,0.7,long,0.2,remarkably,1,should,0.5
+progressively,0.6,finally,0.1,intensive,1,let's,0.5
+gradually,0.5,eventually,0.05,immense,1,let us,0.5
+sometimes,0.5,at some stage,0.05,unmatched,1,want to,0.5
+occasionally,0.3,at some point,0.05,momentous,1,might,0.5
+sporadically,0.3,,,maximum,1,shall,0.5
+irregularly,0.3,,,vast,1,would,0.5
+seldom,0.2,,,ultimate,1,could,0.5
+infrequently,0.1,,,certain,1,can,0.5
+rarely,0.05,,,ambitiously,0.5,may,0.5
+unusual,0.05,,,realistically,0.5,optional,0.5
+hardly ever,0.02,,,more,0.5,marginal,0.5
+scarcely,0.02,,,insufficient,0.5,tenable,0.5
+hardly,0.02,,,moderately,0.5,doable,0.5
+barely,0.02,,,large,0.5,cautious,0.5
+,,,,substantial,0.5,plausibly/plausible,0.5
+,,,,above,0.5,possibly/possible,0.5
+,,,,lots,0.5,preferable,0.5
+,,,,very,0.5,useful/useable,0.5
+,,,,much,0.5,willing,0.5
+,,,,most,0.5,able,0.5
+,,,,completely,0.5,ideal(ly),1
+,,,,totally,0.5,optimal,1
+,,,,entirely,0.5,good,1
+,,,,fully,0.5,better,1
+,,,,far,0.5,best,1
+,,,,clearly,0.5,obvious,1
+,,,,somewhat,0.2,serious,1
+,,,,almost,0.2,significant,1
+,,,,least,0.2,major,1
+,,,,less,0.2,severe,1
+,,,,quite,0.2,great,1
+,,,,rather,0.2,sure/surely,0.5
+,,,,little,0.2,opportune,0.5
+,,,,minimal,0.2,timely,0.5
+,,,,minimum,0.2,insignificant,0.2
+,,,,merely,0.2,trivial,0.2
+,,,,weakly,0.2,ambivalent,0.2
+,,,,sufficient,0.2,ambiguous,0.2
+,,,,enough,0.2,vague,0.2
 ,,,,modest,0.2,,
 ,,,,reasonably,0.2,,
 ,,,,adequate,0.2,,
 ,,,,near(ly),0.2,,
 ,,,,average,0.2,,
 ,,,,low,0.2,,
-,,,,valid,0.2,,
-,,,,insignificant,0.2,,
-,,,,trivial,0.2,,
-,,,,ambivalent,0.2,,
-,,,,ambiguous,0.2,,
-,,,,vague,0.2,,
 ,,,,limited,0.2,,
