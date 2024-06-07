@@ -35,6 +35,7 @@ extract_speaker <- function(v) {
   #   s
   # }
   # to do: setup plotting method (as a network)
+  # to do: match duplicated names
   spacyr::spacy_finalize()
   out
 }
