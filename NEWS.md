@@ -1,5 +1,7 @@
 # poldis 0.1.0
 
+2024-06-07
+
 ## Package
 
 - Closed #3 by adding code coverage and code factor (and badges) to package
