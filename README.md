@@ -1,6 +1,7 @@
 
 # poldis <img src="man/figures/poldishexlogo.png" align="right" width="220"/>
 
+
 <!-- badges: start -->
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
@@ -244,9 +245,7 @@ propose [changes](https://github.com/henriquesposito/poldis/pulls).
 
 Lastly, if you are using ´{poldis}´, please do not forget to cite us ;)
 
-``` r
-citation("poldis")
-```
+    citation("poldis")
 
     ## To cite poldis in publications use:
     ## 
