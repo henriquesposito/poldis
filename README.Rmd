@@ -4,14 +4,15 @@ output: github_document
 # poldis <img src="man/figures/poldishexlogo.png" align="right" width="220"/>
 
 <!-- badges: start -->
+[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/henriquesposito/poldis)
 ![GitHub issues](https://img.shields.io/github/issues-raw/henriquesposito/poldis)
-<!--[![Codecov test coverage](https://codecov.io/gh/henriquesposito/poldis/branch/main/graph/badge.svg)](https://app.codecov.io/gh/henriquesposito/poldis?branch=main)-->
-<!--[![CodeFactor](https://www.codefactor.io/repository/github/henriquesposito/poldis/badge)](https://www.codefactor.io/repository/github/henriquesposito/poldis)-->
-<!--[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4562/badge)](https://bestpractices.coreinfrastructure.org/projects/4562)-->
+![GitHub Release Date](https://img.shields.io/github/release-date/henriquesposito/poldis)
+[![Codecov test coverage](https://codecov.io/gh/henriquesposito/poldis/branch/master/graph/badge.svg)](https://app.codecov.io/gh/henriquesposito/poldis?branch=master)
+[![CodeFactor](https://www.codefactor.io/repository/github/henriquesposito/poldis/badge)](https://www.codefactor.io/repository/github/henriquesposito/poldis)
 <!-- badges: end -->
 
-`{poldis}` provides text data and tools for analysing on political discourses in time with R. 
+Political discourses are fundamentally different from other types of discourses as they are usually unstructured and cover multiple topic, `{poldis}` provides tools for analyzing on political discourses in time in R!
 
 Political discourse data comes in many types.
 While it is easier to analyse data from official speeches,
@@ -25,17 +26,72 @@ working with large amounts of text programmatically becomes very tricky.
 For example, large amounts of text might need to be separated by speakers,
 or have questions removed for analysis,
 or only the context of a string matches is wanted.
-It is exactly these tasks `{poldis}` makes it easier for you!
+`{poldis}` makes these, and other tasks, related to working with political discourses easier to work through!
 
-A lot more is yet to come, keep your eyes open for it,
-but I hope the first few functions available are helpful to you!
+# Installing the package
 
 To download the latest version of ´{poldis}´ from GitHub and use it locally:
 
 ``` {r download, eval= FALSE}
 # install.packages("remotes")
 remotes::install_github("henriquesposito/poldis")
+library(poldis)
 ```
+
+```{r, include=FALSE}
+library(poldis)
+```
+
+# Gettting started
+
+`{poldis}` contains several text tools for wrangling texts. Users can, for example, extract the contexts surrounding a specific string in text.
+
+```{r context}
+set.seed(1234)
+text <- sample(US_News_Conferences_1960_1980$text, 10, replace = TRUE)
+extract_context(" war ", text, level = "sentences", n = 1)
+```
+
+# Annotating text
+
+We “stand on the shoulders of giants” by relying on the [spacy(r)]() NLP algorithm to annotate texts. Text annotations are offered at the word (token) and sentence levels. The syntax metadata later helps to code words or sentences when it makes sense rather than to match all instances (e.g. code adverbs or adjectives where/when present).
+
+```{r, eval=FALSE}
+annotate_text(text, level = "words")
+annotate_text(text, level = "sentences")
+```
+
+# Selecting political promises
+
+Once annotated, political promises (i.e. statements in which actors express their intent or commitment to take political action to address various issues in the future over the short or long term) can be extracted. Promises are captured by looking at sentences containing modal verbs and adverbs (e.g. must) or other indications of future looking sentences based on dictionaries (e.g. going to). At the same time, sentences which include present actions (e.g. are doing) or negative sentences (e.g. should not do) are excluded. This is done to avoid capturing actions that are taking place and are, therefore, not promises (i.e. politicians taking stock) or sentences that appear urgent but refer to actions that will not be taken (i.e. talk about things they will never do/negative promises).
+
+```{r promises, eval= FALSE}
+select_promises(text)
+```
+
+# Gathering topics
+
+We automates topic generation for promises by constructing a custom built dictionary for 20 major political topics based on the [Comparative Agendas Projects](https://www.comparativeagendas.net/). Topics are only assigned when words related to subjects appear in promise. This means if promises do not match any of the subjects and related terms topics are not assigned. Users could also declare a custom dictionary for topics.
+
+```{r topics}
+gather_topics(text)
+```
+
+# Getting urgency
+
+Urgency is the degree in which future political action is necessary and immediate. We code four dimensions of urgency using purpose-built dictionaries of terms developed explicitly for each of these dimensions. In relation to the immediacy of a political action, we code the frequency and the timing of a promise. The frequency refers to reiteration of the topic, solution, or context in a political action. The timing refers to the time orientation of a political action. In relation to the necessity of a political action, we code the degree of intensity and commitment. Degree of intensity refers to the level at which a political action is urgent. The commitment level of a promise refers to the intensity of the political action commitment. By default, scores are normalized by the number of words in the dictionary for the dimensions and the number of words in the text promise they appear in but users can choose different ways to (or not) normalize scores.
+
+```{r urgency}
+get_urgency(text)
+```
+
+Although the functions are developed considering the theoretical implications of working with political texts, they prioritize flexibility and accessibility. This means users can select promises, and/or gather topics, and/or get urgency for a variety of texts if they choose to do so.
+
+# Contributing
+
+If you are interested in `{poldis}`, please do not hesitate to contribute to the package by opening [issues](https://github.com/henriquesposito/poldis/issues), asking [questions](https://github.com/henriquesposito/poldis/discussions), or propose [changes](https://github.com/henriquesposito/poldis/pulls). 
+
+# Citing
 
 Lastly, if you are using ´{poldis}´, please do not forget to cite us ;)
 
