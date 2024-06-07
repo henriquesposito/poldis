@@ -91,7 +91,7 @@ extract_location <- function(v) {
   v <- stringr::str_extract(v, "\\.\\.\\.[^()]+\\.\\.\\.")
   v <- paste0(v, "...", NA_character_)
   v <- strsplit(v, "\\.\\.\\.")
-  v <- purrr::map_chr(v, c(2))
+  v <- purrr::map_chr(v, 2)
   v
   # todo: find a better list of countries/cities/locations in the world
   # todo: use NLP to identify location entity

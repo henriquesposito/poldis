@@ -29,7 +29,7 @@ text <- c("This function was created on the 2021 September 9. I am Henrique",
 # })
 
 test_that("Titles are extracted properly", {
-  expect_equal(extract_title(text)[3], c("This is the first sentence."))
+  expect_equal(extract_title(text)[3], "This is the first sentence.")
 })
 
 test_that("Locations are extracted properly", {
