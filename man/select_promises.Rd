@@ -16,7 +16,5 @@ at the sentence level.}
 Select future promises from political discourses
 }
 \examples{
-\donttest{
-select_promises(US_News_Conferences_1960_1980[1:2,3])
-}
+#select_promises(US_News_Conferences_1960_1980[1:2,3])
 }

@@ -20,7 +20,5 @@ The function relies on NLP models and, therefore, results
 might not be accurate or consistent.
 }
 \examples{
-\dontrun{
-extract_speaker(US_News_Conferences_1960_1980[20, 3])
-}
+#extract_speaker(US_News_Conferences_1960_1980[20, 3])
 }

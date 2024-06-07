@@ -7,9 +7,7 @@
 #' @importFrom stringr str_detect str_remove_all
 #' @importFrom dplyr mutate distinct %>%
 #' @examples
-#' \donttest{
 #' #select_promises(US_News_Conferences_1960_1980[1:2,3])
-#' }
 #' @export
 select_promises <- function(.data) {
   tags <- sentence <- lemmas <- sentence_id <- doc_id <- promises <- NULL

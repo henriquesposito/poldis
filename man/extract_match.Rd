@@ -26,8 +26,7 @@ Get texts in which only certain "matches" occur.
 }
 \examples{
 \donttest{
-text <- c("This function was created on the 29 September 2021",
-"Today is October 12, 2021")
-extract_match(text, "October")
+extract_match(c("This function was created on the 29 September 2021",
+"Today is October 12, 2021"), "October")
 }
 }

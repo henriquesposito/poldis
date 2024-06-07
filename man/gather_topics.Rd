@@ -31,5 +31,4 @@ gather_topics(.data = US_News_Conferences_1960_1980[1:5, 3],
                dictionary = list("military" = c("military", "gun", "war"),
                                  "development" = c("development", "interest rate", "banks")))
 }
-
 }

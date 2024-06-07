@@ -8,9 +8,7 @@
 #' @details The function relies on NLP models and, therefore, results
 #' might not be accurate or consistent.
 #' @examples
-#' \dontrun{
-#' extract_speaker(US_News_Conferences_1960_1980[20, 3])
-#' }
+#' #extract_speaker(US_News_Conferences_1960_1980[20, 3])
 #' @export
 extract_speaker <- function(v) {
   ent_type <- text <- NULL
@@ -114,9 +112,8 @@ extract_location <- function(v) {
 #' @return A list of matches of the same length as text variable
 #' @examples
 #' \donttest{
-#' text <- c("This function was created on the 29 September 2021",
-#' "Today is October 12, 2021")
-#' extract_match(text, "October")
+#' extract_match(c("This function was created on the 29 September 2021",
+#' "Today is October 12, 2021"), "October")
 #' }
 #' @export
 extract_match <- function(v, match, invert = FALSE,
@@ -221,9 +218,7 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' @importFrom quanteda.textstats textstat_simil textstat_dist
 #' @importFrom dplyr group_by summarise select %>%
 #' @examples
-#' \donttest{
 #' #extract_similarities(US_News_Conferences_1960_1980[1:2,3])
-#' }
 #' @export
 extract_similarities <- function(v, comparison = "similarities", method) {
   doc_id <- token <- text <- NULL
@@ -318,9 +313,7 @@ load_pdf <- function(path) {
 #' @importFrom dplyr group_by summarise ungroup %>%
 #' @importFrom stringr str_squish
 #' @examples
-#' \donttest{
 #' #annotate_text(US_News_Conferences_1960_1980[1:2, 3])
-#' }
 #' @export
 annotate_text <- function(v, level = "words") {
   doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- entity <- NULL

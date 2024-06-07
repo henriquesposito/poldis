@@ -20,7 +20,6 @@
 #'                dictionary = list("military" = c("military", "gun", "war"),
 #'                                  "development" = c("development", "interest rate", "banks")))
 #' }
-#'
 #' @export
 gather_topics <- function(.data, dictionary = "CAP") {
   Words <- NULL
