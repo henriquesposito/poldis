@@ -22,7 +22,6 @@ Split texts into structured lists of lists according to a split sign.
 }
 \examples{
 \donttest{
-text <- "This is the first sentence. This is the second sentence."
-split_text(text)
+split_text("This is the first sentence. This is the second sentence.")
 }
 }

@@ -26,7 +26,7 @@ gather_topics <- function(.data, dictionary = "CAP") {
   Words <- NULL
   # get text variable
   if (inherits(.data, "promises")) {
-    text <- .clean_token(getElement(.data, "promises"))
+    text <- stats::na.omit(.clean_token(getElement(.data, "promises")))
   } else if (inherits(.data, "data.frame")) {
     text <- .clean_token(getElement(.data, "text"))
   } else text <- .clean_token(.data)
@@ -94,10 +94,10 @@ gather_topics <- function(.data, dictionary = "CAP") {
 gather_related_terms <- function(.data, dictionary) {
   Words <- NULL
   # get text variable
-  if (inherits(.data, "data.frame")) {
-    text <- .clean_token(.data["text"])
-  } else if (inherits(.data, "promises")) {
-    text <- .clean_token(.data["promises"])
+  if (inherits(.data, "promises")) {
+    text <- stats::na.omit(.clean_token(getElement(.data, "promises")))
+  } else if (inherits(.data, "data.frame")) {
+    text <- .clean_token(getElement(.data, "text"))
   } else text <- .clean_token(.data)
   # check dictionary
   if (any(dictionary ==  "CAP")) {

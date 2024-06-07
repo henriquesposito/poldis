@@ -14,7 +14,7 @@
 #' @export
 extract_speaker <- function(v) {
   ent_type <- text <- NULL
-  spacyr::spacy_extract_entity(v, type = "named") %>%
+  out <- spacyr::spacy_extract_entity(v, type = "named") %>%
     dplyr::filter(ent_type == "PERSON") %>%
     dplyr::group_by(text) %>%
     dplyr::summarise(length = sum(length))
@@ -36,6 +36,7 @@ extract_speaker <- function(v) {
   # }
   # to do: setup plotting method (as a network)
   spacyr::spacy_finalize()
+  out
 }
 
 #' Extract first sentence from text
@@ -77,9 +78,8 @@ extract_date <- function(v) {
 #' @details If more than one location is found,
 #' returns only the first match.
 #' @examples
-#' text <- c("This is the United States", "This is Sao Paulo",
-#' "I was in Rio de Janeiro and Sao Paulo, then back to the United States")
-#' extract_location(text)
+#' extract_location(c("This is the United States", "This is Sao Paulo",
+#' "I was in Rio de Janeiro and Sao Paulo, then back to the United States"))
 #' @export
 extract_location <- function(v) {
   v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
@@ -220,8 +220,8 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' @importFrom quanteda.textstats textstat_simil textstat_dist
 #' @importFrom dplyr group_by summarise select %>%
 #' @examples
-#' \dontrun{
-#' extract_similarities(US_News_Conferences_1960_1980[1:2,3])
+#' \donttest{
+#' #extract_similarities(US_News_Conferences_1960_1980[1:2,3])
 #' }
 #' @export
 extract_similarities <- function(v, comparison = "similarities", method) {
@@ -261,8 +261,7 @@ extract_similarities <- function(v, comparison = "similarities", method) {
 #' @importFrom dplyr group_by summarise select %>%
 #' @examples
 #' \donttest{
-#' text <- "This is the first sentence. This is the second sentence."
-#' split_text(text)
+#' split_text("This is the first sentence. This is the second sentence.")
 #' }
 #' @export
 split_text <- function(v, splitsign = "\\.") {
@@ -319,7 +318,7 @@ load_pdf <- function(path) {
 #' @importFrom stringr str_squish
 #' @examples
 #' \donttest{
-#' annotate_text(US_News_Conferences_1960_1980[1:2, 3])
+#' #annotate_text(US_News_Conferences_1960_1980[1:2, 3])
 #' }
 #' @export
 annotate_text <- function(v, level = "words") {

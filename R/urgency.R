@@ -15,30 +15,30 @@
 #' }
 #' @export
 get_urgency <- function(.data, normalize = "tokens") {
-  promises <- frequency <- timing <- commitment <- intensity <- urgency <- NULL
+  promises <- frequency <- timing <- commitment <- intensity <- urgency <- text_clean <- NULL
   # get text variable
-  if (inherits(.data, "data.frame")) {
-    text <- .clean_token(.data["text"])
-  } else if (inherits(.data, "promises")) {
-    text <- .clean_token(.data["promises"])
-  } else text <- .clean_token(.data)
+  if (inherits(.data, "promises")) {
+    text <- stats::na.omit(getElement(.data, "promises"))
+  } else if (inherits(.data, "data.frame")) {
+    text <- getElement(.data, "text")
+  } else text <- .data
   # assign urgency dimensions
-  out <- data.frame("text" = text)
-  out$frequency <- .assign_frequencies(out[["text"]])/41
-  out$timing <- .assign_timing(out[["text"]])/31
-  out$intensity <- .assign_intensity(out[["text"]])/102
-  out$commitment <- .assign_commitment(out[["text"]])/66
+  out <- data.frame("text" = text, "text_clean" = .clean_token(text)) %>%
+    dplyr::mutate(frequency = .assign_frequencies(text_clean)/41,
+                  timing = .assign_timing(text_clean)/31,
+                  intensity = .assign_intensity(text_clean)/102,
+                  commitment = .assign_commitment(text_clean)/66)
   if (normalize == "tokens") {
     out <- out %>%
-      dplyr::mutate(urgency = (frequency + timing + intensity + commitment)/nchar(text)) %>%
+      dplyr::mutate(urgency = (frequency + timing + intensity + commitment)/nchar(text_clean)) %>%
       dplyr::arrange(-urgency)
-  } else if (normalize == "tokens") {
+  } else if (normalize == "none") {
     out <- out %>%
       dplyr::mutate(urgency = (frequency + timing + intensity + commitment)) %>%
       dplyr::arrange(-urgency)
   }
   class(out) <- c("urgency", class(out))
-  out
+  dplyr::select(out, -text_clean)
   # todo: fix how the function works for small numbers of text
   # todo: what about nouns, should we code them using SO-CAL dictionaries?
   # todo: fix normalization scores, how to best do it?

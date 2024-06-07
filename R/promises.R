@@ -8,7 +8,7 @@
 #' @importFrom dplyr mutate distinct %>%
 #' @examples
 #' \donttest{
-#' select_promises(US_News_Conferences_1960_1980[1:2,3])
+#' #select_promises(US_News_Conferences_1960_1980[1:2,3])
 #' }
 #' @export
 select_promises <- function(.data) {
