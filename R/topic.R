@@ -2,10 +2,10 @@
 #'
 #' @param .data A data frame, "promises" data frame, or text vector.
 #' For data frames, function will search for "text" variable.
-#' For promises data frames coded using `gather_promises()`,
+#' For promises data frames coded using `select_promises()`,
 #' function will search for "promises" variable.
 #' @param dictionary The dictionary of 20 major political topics from the
-#' Comparative Agendas Project is used by default.
+#' Comparative Agendas Project (Jones et al., 2023) is used by default.
 #' Users can also declare a custom dictionary as a vector or a list.
 #' If users declare a vector, each element is treated as a independent topic.
 #' If users declare a list of subjects and related terms, function understands
@@ -71,7 +71,7 @@ gather_topics <- function(.data, dictionary = "CAP") {
 #' For data frames, function will search for "text" variable.
 #' For promises data, function will search for "promises" variable.
 #' @param dictionary The dictionary of 20 major political topics from the
-#' Comparative Agendas Project is used by default.
+#' Comparative Agendas Project (Jones et al., 2023) is used by default.
 #' Users can also declare a custom dictionary as a vector or a list.
 #' If users declare a vector, each element is treated as a independent topic.
 #' If users declare a list of subjects and related terms, function understands
