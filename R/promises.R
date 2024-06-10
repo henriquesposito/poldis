@@ -21,19 +21,20 @@ select_promises <- function(.data) {
                                       stringr::str_detect(lemmas,
                                                           "going to|need to|ready to|
                                      |is time to|commit to|promise to|have to|
-                                     |plan to|intend to|let 's|require|want to"),
+                                     |plan to|intend to|let 's|let us|urge|
+                                     |require|want to"),
                                     paste(sentence), NA), # detect promises
                   promises = ifelse(stringr::str_detect(promises, " not |
                                                         |yesterday|last week|
                                                         |last month|last year|
-                                                        |prime minister|president|
                                                         |thank|honor|honour|
                                                         |applause|greet|laugh|
                                                         |privilege to|great to|
-                                                        |good to") |
+                                                        |good to be|good to see") |
                                       stringr::str_detect(tags, "MD VB( RB)? VBN|
                                                          |VBD( RB)? VBN|VBZ( RB)? VBN|
-                                                         |VBD( RB)? JJ|PRP( RB)? VBD TO"),
+                                                         |VBD( RB)? JJ|PRP( RB)? VBD TO|
+                                                         |VBN( RB)? VBN"),
                                     NA, promises)) %>%
     dplyr::distinct()
   class(out) <- c("promises", class(out))
