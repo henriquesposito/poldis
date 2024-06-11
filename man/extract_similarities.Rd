@@ -10,7 +10,8 @@ extract_similarities(v, comparison = "similarities", method)
 \item{v}{Text vector or annotated data frame.}
 
 \item{comparison}{Would you like to extract similarities or differences
-between treaties? Options are "similarities" or "differences".
+between treaties?
+Options are "similarities" or "differences".
 Defaults to "similarities".}
 
 \item{method}{A method for checking similarities or differences.
@@ -18,7 +19,7 @@ For similarities, defaults to "correlation" method.
 Other methods from `quanteda.textstats::textstat_simil()`
 include "cosine", "jaccard", "ejaccard", "dice", "edice",
 "simple matching", and "hamann".
-For differences, fedaukts to "euclidean".
+For differences, defaults to "euclidean".
 Other methods from `quanteda.textstats::textstat_dist()` include
 "manhattan", "maximum", "canberra", and "minkowski".}
 }
@@ -26,5 +27,7 @@ Other methods from `quanteda.textstats::textstat_dist()` include
 Extract similarities and differences in texts/segments
 }
 \examples{
-#extract_similarities(US_News_Conferences_1960_1980[1:2,3])
+\donttest{
+extract_similarities(US_News_Conferences_1960_1980[1:2,3])
+}
 }

@@ -1,5 +1,7 @@
 #' Select future promises from political discourses
 #'
+#' Political promises are statements in which actors express their
+#' intent or commitment to take political action in the future.
 #' @param .data A (annotated) data frame or text vector.
 #' For data frames, function will search for "text" variable.
 #' For annotated data frames, please declare an annotated data frame
@@ -10,7 +12,7 @@
 #' #select_promises(US_News_Conferences_1960_1980[1:2,3])
 #' @export
 select_promises <- function(.data) {
-  tags <- sentence <- lemmas <- sentence_id <- doc_id <- promises <- NULL
+  tags <- sentence <- lemmas <- promises <- NULL
   if (inherits(.data, "data.frame")) {
     if ("token_id" %in% names(.data))
       stop("Please declare a text vector or an annotated data frame at the sentence level.")

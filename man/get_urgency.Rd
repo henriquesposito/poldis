@@ -7,9 +7,10 @@
 get_urgency(.data, normalize = "tokens")
 }
 \arguments{
-\item{.data}{A data frame, promises, or text vector.
+\item{.data}{A data frame, "promises" data frame, or text vector.
 For data frames, function will search for "text" variable.
-For promises data, function will search for "promises" variable.}
+For promises data frames coded using `select_promises()`,
+function will search for "promises" variable.}
 
 \item{normalize}{Would you like urgency scores to be normalized?
 By default, urgency scores are normalized by "tokens",

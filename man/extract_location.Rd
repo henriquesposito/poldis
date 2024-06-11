@@ -10,7 +10,7 @@ extract_location(v)
 \item{v}{Text variable/object}
 }
 \value{
-A list of the first locations
+A list of the first location mentioned in texts.
 }
 \description{
 Extract location from strings

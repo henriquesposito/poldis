@@ -13,7 +13,8 @@ For annotated data frames, please declare an annotated data frame
 at the sentence level.}
 }
 \description{
-Select future promises from political discourses
+Political promises are statements in which actors express their
+intent or commitment to take political action in the future.
 }
 \examples{
 #select_promises(US_News_Conferences_1960_1980[1:2,3])

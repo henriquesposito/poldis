@@ -52,11 +52,8 @@ gather_topics <- function(.data, dictionary = "CAP") {
   class(out) <- c("topics", class(out))
   out
   # todo: fix issue for when list is declared as dictionary
-  # todo: check for US and UK spellings in dictionary?
   # todo: get proportion of topics for texts with multiple topics?
   # todo: normalize scores by the number of words in dictionary for a topic?
-  # todo: what to do with small words currently excluded for similar terms?
-  # todo: what to do with plural words in similar terms?
   out
 }
 
@@ -131,6 +128,7 @@ gather_related_terms <- function(.data, dictionary) {
   out
   # todo: get only words above certain threshold for topics?
   # todo: what to do with overlapping words/topics?
+  # todo: what to do with small words currently excluded for similar terms?
   # todo: fix issue with multiple word subjects
 }
 

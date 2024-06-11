@@ -2,7 +2,7 @@
 % Please edit documentation in R/text_tools.R
 \name{annotate_text}
 \alias{annotate_text}
-\title{Parse text with NLP}
+\title{Annotate text with NLP}
 \usage{
 annotate_text(v, level = "words")
 }
@@ -12,7 +12,7 @@ annotate_text(v, level = "words")
 \item{level}{Do you want to parse words or sentences? Words by default.}
 }
 \description{
-Wrapper for `spacyr::spacy_parse` function.
+This function builds upon `spacyr::spacy_parse` function to annotate texts.
 }
 \examples{
 #annotate_text(US_News_Conferences_1960_1980[1:2, 3])
