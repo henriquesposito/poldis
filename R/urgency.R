@@ -1,8 +1,9 @@
 #' Urgency Analysis
 #'
-#' @param .data A data frame, promises, or text vector.
+#' @param .data A data frame, "promises" data frame, or text vector.
 #' For data frames, function will search for "text" variable.
-#' For promises data, function will search for "promises" variable.
+#' For promises data frames coded using `select_promises()`,
+#' function will search for "promises" variable.
 #' @param normalize Would you like urgency scores to be normalized?
 #' By default, urgency scores are normalized by "tokens",
 #' the number of words in text observation.
@@ -24,10 +25,10 @@ get_urgency <- function(.data, normalize = "tokens") {
   } else text <- .data
   # assign urgency dimensions
   out <- data.frame("text" = text, "text_clean" = .clean_token(text)) %>%
-    dplyr::mutate(frequency = .assign_frequencies(text_clean)/41,
-                  timing = .assign_timing(text_clean)/31,
-                  intensity = .assign_intensity(text_clean)/102,
-                  commitment = .assign_commitment(text_clean)/66)
+    dplyr::mutate(frequency = .assign_frequencies(text_clean)/59,
+                  timing = .assign_timing(text_clean)/39,
+                  intensity = .assign_intensity(text_clean)/94,
+                  commitment = .assign_commitment(text_clean)/80)
   if (normalize == "tokens") {
     out <- out %>%
       dplyr::mutate(urgency = (frequency + timing + intensity + commitment)/nchar(text_clean)) %>%
@@ -39,9 +40,6 @@ get_urgency <- function(.data, normalize = "tokens") {
   }
   class(out) <- c("urgency", class(out))
   dplyr::select(out, -text_clean)
-  # todo: fix how the function works for small numbers of text
-  # todo: what about nouns, should we code them using SO-CAL dictionaries?
-  # todo: fix normalization scores, how to best do it?
 }
 
 .assign_frequencies <- function(v) {
