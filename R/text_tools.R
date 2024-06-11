@@ -1,8 +1,9 @@
-#' Extract a list of the speakers in texts
+#' Extract a list of possible speakers in texts
 #'
 #' @param v A text vector.
 #' @importFrom dplyr distinct filter %>% summarize group_by
 #' @importFrom stringdist stringsimmatrix
+#' @importFrom stringr str_squish
 #' @import spacyr
 #' @return A list of speakers.
 #' @details The function relies on NLP models and, therefore, results
@@ -11,29 +12,18 @@
 #' #extract_speaker(US_News_Conferences_1960_1980[20, 3])
 #' @export
 extract_speaker <- function(v) {
-  ent_type <- text <- NULL
+  ent_type <- text <- s <- NULL
   out <- spacyr::spacy_extract_entity(v, type = "named") %>%
     dplyr::filter(ent_type == "PERSON") %>%
-    dplyr::group_by(text) %>%
-    dplyr::summarise(length = sum(length))
-  # if (is.null(allSpeakers)) {
-  #   message("No speakers were found in text...")
-  # } else {
-  #   # check if similar names are the same person
-  #   s <- stringdist::stringsimmatrix(parse$text, parse$text)
-  #   s <- ifelse(s == 1, 0, s)
-  #   rownames(s) <- parse$text
-  #   colnames(s) <- parse$text
-  #   s <- ifelse(s > 0.8, rownames(s), 0)
-  #   s <- data.frame(match1 = colnames(s)[row(s)],
-  #                   match2 = as.character(c(t(s))),
-  #                   stringsAsFactors = FALSE)
-  #   s <- dplyr::distinct(s)
-  #   s <- ifelse(s$match2 == 0, s$match1, paste(s$match1, " - ", s$match2))
-  #   s
-  # }
+    dplyr::mutate(names = .clean_token(text)) %>%
+    dplyr::group_by(names) %>%
+    dplyr::summarise(count = sum(length))
+  # check if similar names are the same person
+  s <- stringdist::stringsimmatrix(out$names, out$names, method = "cosine", q = 2)
+  diag(s[, 1:ncol(s)]) <- 0
+  s <- ifelse(s > 0.5, out$names, "")
+  out$similar_names <- stringr::str_squish(apply(s, 2, paste, collapse = " "))
   # to do: setup plotting method (as a network)
-  # to do: match duplicated names
   spacyr::spacy_finalize()
   out
 }
@@ -73,7 +63,7 @@ extract_date <- function(v) {
 #' @importFrom purrr map_chr
 #' @details Works well for Brazilian states and other countries.
 #' Texts must be in English or Portuguese.
-#' @return A list of the first locations
+#' @return A list of the first location mentioned in texts.
 #' @details If more than one location is found,
 #' returns only the first match.
 #' @examples
@@ -93,13 +83,13 @@ extract_location <- function(v) {
   v <- strsplit(v, "\\.\\.\\.")
   v <- purrr::map_chr(v, 2)
   v
-  # todo: find a better list of countries/cities/locations in the world
+  # todo: find a better list of countries/cities/locations in the world to use
   # todo: use NLP to identify location entity
 }
 
 #' Extract text matches
 #'
-#' Get texts in which only certain "matches" occur.
+#' Get texts in which certain "matches" occur.
 #' @param v Text vector or annotated data frame.
 #' @param match A regex match for a word(s) or expression.
 #' For multiple words, please use "|" to divide them.
@@ -109,7 +99,7 @@ extract_location <- function(v) {
 #' By default, TRUE.
 #' @importFrom purrr map_chr
 #' @importFrom dplyr group_by summarise select %>%
-#' @return A list of matches of the same length as text variable
+#' @return A list the same length as text variable
 #' @examples
 #' \donttest{
 #' extract_match(c("This function was created on the 29 September 2021",
@@ -205,20 +195,23 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #'
 #' @param v Text vector or annotated data frame.
 #' @param comparison Would you like to extract similarities or differences
-#' between treaties? Options are "similarities" or "differences".
+#' between treaties?
+#' Options are "similarities" or "differences".
 #' Defaults to "similarities".
 #' @param method A method for checking similarities or differences.
 #' For similarities, defaults to "correlation" method.
 #' Other methods from `quanteda.textstats::textstat_simil()`
 #' include "cosine", "jaccard", "ejaccard", "dice", "edice",
 #' "simple matching", and "hamann".
-#' For differences, fedaukts to "euclidean".
+#' For differences, defaults to "euclidean".
 #' Other methods from `quanteda.textstats::textstat_dist()` include
 #' "manhattan", "maximum", "canberra", and "minkowski".
 #' @importFrom quanteda.textstats textstat_simil textstat_dist
 #' @importFrom dplyr group_by summarise select %>%
 #' @examples
-#' #extract_similarities(US_News_Conferences_1960_1980[1:2,3])
+#' \donttest{
+#' extract_similarities(US_News_Conferences_1960_1980[1:2,3])
+#' }
 #' @export
 extract_similarities <- function(v, comparison = "similarities", method) {
   doc_id <- token <- text <- NULL
@@ -237,10 +230,10 @@ extract_similarities <- function(v, comparison = "similarities", method) {
   v <- quanteda::corpus(v)
   if (comparison == "similarities") {
     if(missing(method)) method = "correlation"
-    quanteda.textstats::textstat_simil(quanteda::dfm(v), method = method)
+    quanteda.textstats::textstat_simil(quanteda::dfm(quanteda::tokens(v)), method = method)
   } else {
     if(missing(method)) method = "euclidean"
-    quanteda.textstats::textstat_dist(quanteda::dfm(v), method = method)
+    quanteda.textstats::textstat_dist(quanteda::dfm(quanteda::tokens(v)), method = method)
   }
   # todo: add plotting method that plots texts similarities as a dendogram
 }
@@ -253,7 +246,7 @@ extract_similarities <- function(v, comparison = "similarities", method) {
 #' By default sentences (".").
 #' This can also be words, signals or other markers you want.
 #' For special characters, please use escape sign before (i.e. "\\").
-#' @return A splitted list for each row
+#' @return A list of lists the same leghth as vector.
 #' @importFrom dplyr group_by summarise select %>%
 #' @examples
 #' \donttest{
@@ -304,9 +297,9 @@ load_pdf <- function(path) {
   out
 }
 
-#' Parse text with NLP
+#' Annotate text with NLP
 #'
-#' Wrapper for `spacyr::spacy_parse` function.
+#' This function builds upon `spacyr::spacy_parse` function to annotate texts.
 #' @param v Text vector
 #' @param level Do you want to parse words or sentences? Words by default.
 #' @import spacyr
