@@ -12,7 +12,7 @@ output: github_document
 [![CodeFactor](https://www.codefactor.io/repository/github/henriquesposito/poldis/badge)](https://www.codefactor.io/repository/github/henriquesposito/poldis)
 <!-- badges: end -->
 
-Political discourses are fundamentally different from other types of discourses as they are usually unstructured and cover multiple topic, `{poldis}` provides tools for analyzing on political discourses in time in R!
+Political discourses are fundamentally different from other types of discourses as they are usually unstructured and cover multiple topic. `{poldis}` provides tools for analyzing on political discourses over time in R!
 
 # Why {`poldis`}?
 
@@ -20,17 +20,17 @@ Political discourse data comes in many types.
 While it is easier to analyse data from official speeches,
 where there is one speaker
 with other available R packages,
-this only tells a portion of the story of what, how, and where politics gets done.
+this only tells a portion of the story of what, how, and where politics "gets done".
 For most other settings in which political discourse appears as debates,
 interviews, news conferences, or campaign rallies,
 where there may be multiple speakers, questions, languages, and other types of "noise" in text data,
-working with text programmatically becomes very tricky.
+working with text programmatically becomes tricky.
 For example, text might need to be separated by speakers,
 or have questions removed for analysis,
-or only the context of a string matches is wanted.
+or only the context around string matches is wanted.
 `{poldis}` makes these, and other tasks, related to working with political discourses easier to work through.
 
-Additionally, `{poldis}` introduces a new method for the analysis of political texts, namely urgency analysis. Urgency analysis (UA) rests upon a multidimensional, weighted, and survey-validated conception of how urgency can be expressed in political discourses. UA combines Natural Language Processes (NLP) and dictionary approaches to provide a contextualized, comparable, and scalable new method for the analysis of political texts.
+Additionally, `{poldis}` introduces a new method for the analysis of political texts, namely urgency analysis (UA). UA rests upon a multidimensional, weighted, and survey-validated conception of how urgency can be expressed in political discourses. UA combines Natural Language Processes (NLP) and dictionary approaches to provide a contextualized, comparable, and scalable new method for the analysis of political texts.
 
 # Installing the package
 
@@ -52,15 +52,15 @@ library(poldis)
 
 ```{r context}
 set.seed(1234)
-text <- sample(US_News_Conferences_1960_1980$text, 10, replace = TRUE)
+text <- sample(US_News_Conferences_1960_1980$text, 2, replace = TRUE)
 extract_context(" war ", text, level = "sentences", n = 1)
 ```
 
-Other text functions include `extract_spaker()` to extract speakers from text or `extract_similarities()` to compare similarities across texts, among others.
+Other text functions include `extract_spaker()`, to extract speakers from text, and `extract_similarities()`, to compare similarities across texts, among others.
 
 # Annotating text
 
-We rely on the [spacy(r)](https://spacy.io/universe/project/spacyr) NLP algorithm to annotate texts. Text annotations are offered at the word (token) and sentence levels. The syntax metadata helps to code words or sentences when it makes sense later on (e.g. code adverbs or adjectives where/when present).
+We rely on the [spacy(r)](https://spacy.io/universe/project/spacyr) NLP algorithm to annotate texts. Text annotations are offered at the word (token) and sentence levels. The annotated syntax metadata helps to code words or sentences when it makes sense later on (e.g. code adverbs or adjectives where/when present) and avoid false positive matches.
 
 ```{r, eval=FALSE}
 annotate_text(text, level = "words")
@@ -69,7 +69,7 @@ annotate_text(text, level = "sentences")
 
 # Selecting political promises
 
-Political promises (i.e. statements in which actors express their intent or commitment to take political action to address various issues in the future over the short or long term) can be extracted, for example, once texts have been annotated. Promises are captured by looking at sentences containing modal verbs and adverbs (e.g. must) or other indications of future looking sentences based on our custom dictionaries (e.g. going to).
+Political promises (i.e. statements in which actors express their intent or commitment to take political action in the future) can be extracted, for example, once texts have been annotated. Promises are captured by looking at sentences containing modal verbs and adverbs (e.g. must) or other indications of future looking sentences based our custom built dictionaries (e.g. going to).
 
 ```{r promises, eval= FALSE}
 select_promises(text)
@@ -77,7 +77,7 @@ select_promises(text)
 
 # Gathering topics
 
-We automates topic generation for promises by constructing a custom built dictionary for 20 major political topics based on the [Comparative Agendas Projects](https://www.comparativeagendas.net/). Topics are assigned when words related to subjects appear in text Users could also declare a custom dictionary for topics.
+We automates topic generation for promises by constructing a custom built dictionary of terms for capturing 20 major political topics based on the [Comparative Agendas Projects](https://www.comparativeagendas.net/). Topics are assigned when words related to subjects appear in texts. Alternatively, users can also declare their own dictionary for topics.
 
 ```{r topics}
 gather_topics(text)
@@ -85,7 +85,7 @@ gather_topics(text)
 
 # Getting urgency
 
-Urgency is the degree in which future political action is necessary and immediate. We code four dimensions of urgency using purpose-built dictionaries of terms. In relation to the immediacy of a political action, we code the frequency and the timing in text. Frequency refers to reiteration of the topic, solution, or context in text (e.g. we must act constantly too vs. sometimes we must act). The timing refers to the time orientation in text (e.g. we must act now vs. we must act in the future). In relation to the necessity of a political action, we code the degree of intensity and commitment. Degree of intensity refers to the level at which a political action is urgent (e.g. extremely important vs. rather important). The commitment level refers to the intensity of the political action commitment (e.g. we should act vs. we must act). By default, scores are normalized by the number of words in the dictionary for the dimensions and the number of words in the text promise they appear in; but users can choose different ways to (or not) normalize scores.
+Urgency express how necessary or how soon a political action should be undertaken. We code four dimensions of urgency in political discourses using purpose-built dictionaries of terms: frequency, timing, intensity, and commitment. Frequency refers to reiteration of the topic, solution, or context in text (e.g. we must act constantly too vs. sometimes we must act). The timing refers to the time orientation in text (e.g. we must act now vs. we must act in the future). Degree of intensity refers to the level at which a political action is urgent (e.g. extremely important vs. rather important). The commitment level refers to the intensity of the political action commitment (e.g. we should act vs. we must act). Scores are normalized by the number of words in the dictionary for the dimensions and the number of words in the text promise they appear in by default, but users can also choose different ways to (or not) normalize scores.
 
 ```{r urgency}
 get_urgency(text)
