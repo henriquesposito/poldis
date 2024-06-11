@@ -2,7 +2,7 @@
 % Please edit documentation in R/text_tools.R
 \name{extract_speaker}
 \alias{extract_speaker}
-\title{Extract a list of the speakers in texts}
+\title{Extract a list of possible speakers in texts}
 \usage{
 extract_speaker(v)
 }
@@ -13,7 +13,7 @@ extract_speaker(v)
 A list of speakers.
 }
 \description{
-Extract a list of the speakers in texts
+Extract a list of possible speakers in texts
 }
 \details{
 The function relies on NLP models and, therefore, results
