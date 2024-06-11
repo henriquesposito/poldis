@@ -16,7 +16,7 @@
 #' }
 #' @export
 get_urgency <- function(.data, normalize = "tokens") {
-  promises <- frequency <- timing <- commitment <- intensity <- urgency <- text_clean <- NULL
+  frequency <- timing <- commitment <- intensity <- urgency <- text_clean <- NULL
   # get text variable
   if (inherits(.data, "promises")) {
     text <- stats::na.omit(getElement(.data, "promises"))

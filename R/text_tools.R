@@ -20,7 +20,7 @@ extract_speaker <- function(v) {
     dplyr::summarise(count = sum(length))
   # check if similar names are the same person
   s <- stringdist::stringsimmatrix(out$names, out$names, method = "cosine", q = 2)
-  diag(s[, 1:ncol(s)]) <- 0
+  diag(s[, seq_len(ncol(s))]) <- 0
   s <- ifelse(s > 0.5, out$names, "")
   out$similar_names <- stringr::str_squish(apply(s, 2, paste, collapse = " "))
   # to do: setup plotting method (as a network)
@@ -121,18 +121,16 @@ extract_match <- function(v, match, invert = FALSE,
         dplyr::select(text)
     }
   }
-  if (invert == TRUE & ignore.case == FALSE) {
+  if (invert == TRUE && ignore.case == FALSE) {
     t <- lapply(v, function(x) grep(match, x, value = TRUE,
                                        ignore.case = FALSE, invert = TRUE))
-  } else if (invert == TRUE & ignore.case == TRUE) {
+  } else if (invert == TRUE && ignore.case == TRUE) {
     t <- lapply(v, function(x) grep(match, x, value = TRUE,
                                        ignore.case = TRUE, invert = TRUE))
-  } else if (invert == FALSE & ignore.case == FALSE) {
-    t <- lapply(v, function(x) grep(match, x, value = TRUE,
-                                       ignore.case = FALSE))
+  } else if (invert == FALSE && ignore.case == FALSE) {
+    t <- lapply(v, function(x) grep(match, x, value = TRUE, ignore.case = FALSE))
   } else {
-    t <- lapply(v, function(x) grep(match, x, value = TRUE,
-                                       ignore.case = TRUE))
+    t <- lapply(v, function(x) grep(match, x, value = TRUE, ignore.case = TRUE))
   }
   t
 }
