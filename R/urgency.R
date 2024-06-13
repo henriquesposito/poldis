@@ -49,12 +49,8 @@ get_urgency <- function(.data, normalize = "tokens") {
     dplyr::mutate(frequency = textstem::lemmatize_words(frequency)) %>%
     dplyr::group_by(score_frequency) %>%
     summarise(terms = paste0(frequency, collapse = "|"))
-  out <- list()
-  for (i in seq_len(nrow(freq_words))) {
-    out[[i]] <- stringr::str_count(v, freq_words$terms[i])*
-      freq_words$score_frequency[i]
-  }
-  rowSums(do.call("cbind", out))
+  rowSums(do.call("cbind", lapply(seq_len(nrow(freq_words)), function(i)
+    stringr::str_count(as.character(v), freq_words$terms[i])* freq_words$score_frequency[i])))
 }
 
 .assign_timing <- function(v) {
@@ -64,12 +60,8 @@ get_urgency <- function(.data, normalize = "tokens") {
     dplyr::mutate(timing = textstem::lemmatize_words(timing)) %>%
     dplyr::group_by(score_timing) %>%
     summarise(terms = paste0(timing, collapse = "|"))
-  out <- list()
-  for (i in seq_len(nrow(timing_words))) {
-    out[[i]] <- stringr::str_count(v, timing_words$terms[i])*
-      timing_words$score_timing[i]
-  }
-  rowSums(do.call("cbind", out))
+  rowSums(do.call("cbind", lapply(seq_len(nrow(timing_words)), function(i)
+    stringr::str_count(as.character(v), timing_words$terms[i])*timing_words$score_timing[i])))
 }
 
 .assign_intensity <- function(v) {
@@ -79,12 +71,9 @@ get_urgency <- function(.data, normalize = "tokens") {
     dplyr::mutate(intensity = textstem::lemmatize_words(intensity)) %>%
     dplyr::group_by(score_intensity) %>%
     summarise(terms = paste0(intensity, collapse = "|"))
-  out <- list()
-  for (i in seq_len(nrow(intensity_words))) {
-    out[[i]] <- stringr::str_count(v, intensity_words$terms[i])*
-      intensity_words$score_intensity[i]
-  }
-  rowSums(do.call("cbind", out))
+  rowSums(do.call("cbind", lapply(seq_len(nrow(intensity_words)), function(i)
+    stringr::str_count(as.character(v), intensity_words$terms[i])*
+      intensity_words$score_intensity[i])))
 }
 
 .assign_commitment <- function(v) {
@@ -95,9 +84,7 @@ get_urgency <- function(.data, normalize = "tokens") {
     dplyr::group_by(score_commitment) %>%
     summarise(terms = paste0(commitment, collapse = "|"))
   out <- list()
-  for (i in seq_len(nrow(commitment_words))) {
-    out[[i]] <- stringr::str_count(v, commitment_words$terms[i])*
-      commitment_words$score_commitment[i]
-  }
-  rowSums(do.call("cbind", out))
+  rowSums(do.call("cbind", lapply(seq_len(nrow(commitment_words)), function(i)
+    stringr::str_count(as.character(v), commitment_words$terms[i])*
+      commitment_words$score_commitment[i])))
 }
