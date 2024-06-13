@@ -274,12 +274,12 @@ split_text <- function(v, splitsign = "\\.") {
   t
 }
 
-#' Load text from PDFs
+#' Read text from PDFs
 #'
 #' @param path The path to a PDF file or a folder containing multiple PDFs.
 #' @return A list of texts.
 #' @export
-load_pdf <- function(path) {
+read_pdf <- function(path) {
   thisRequires("pdftools")
   thisRequires("tesseract")
   if (grepl(".pdf", path)) {
