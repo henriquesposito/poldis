@@ -29,12 +29,12 @@ from single-speaker speeches easily, this only reveals a portion of the
 what, how, and where politics “gets done”. For most other settings where
 political discourse appears as debates, interviews, news conferences, or
 campaign rallies, working with text programmatically becomes tricky
-where there may be multiple speakers, questions, languages, and other
-types of “noise” in text data. Texts might need to be separated by
-speakers, have questions removed for analysis, or retain only the
-context around specific topics and keywords. `{poldis}` contains the
-tools required for wrangling and annotating these different types of
-political discourse texts within R.
+where there may be multiple speakers, questions, different languages,
+and other types of “noise” in text data. Texts might need to be
+separated by speakers, have questions removed for analysis, or retain
+only the context around specific topics and keywords. The package
+contains the tools required for wrangling and annotating these different
+types of political discourse texts within R.
 
 Beyond these basic tools for text analysis, `{poldis}` also introduces
 tools for Urgency Analysis (UA), a new method for the analysis of
