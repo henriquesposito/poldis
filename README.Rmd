@@ -16,9 +16,7 @@ output: github_document
 
 # Why {`poldis`}?
 
-Political discourses are fundamentally different from other types of discourses
-as they are usually unstructured and may cover multiple topics each time.
-Political discourse as data may also come in many different forms,
+Political discourse data come in many different forms,
 ranging from single-speaker speeches to debates.
 While other R packages allow us to analyse data from single-speaker speeches easily,
 this only reveals a portion of the what, how, and where politics "gets done".
