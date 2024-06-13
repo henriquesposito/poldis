@@ -76,8 +76,9 @@ extract_context(" war ", text, level = "sentences", n = 1)
     ## [1] " President, did you limit yourself to this global theme?,THE PRESIDENT. Well, because the issue of war and peace is involved, and the survival of perhaps the planet, possibly our system. And, therefore, this is a matter of primary concern to the people of the United States and the people of the world."
 
 Other text functions in the ‘extract’ family of functions include
-`extract_speaker()`, to extract speakers from the text, and
-`extract_similarities()`, to compare similarities across texts.
+`extract_names()`, that uses NLP to extract names of persons refereed to
+in the text, and `extract_text_similarities()`, that compares textual
+similarities for multiple texts.
 
 # Annotating text
 
