@@ -1,17 +1,17 @@
-#' Extract a list of possible speakers in texts
+#' Extract a list of possible names of individuals in texts
 #'
 #' @param v A text vector.
 #' @importFrom dplyr distinct filter %>% summarize group_by
-#' @importFrom stringdist stringsimmatrix
 #' @importFrom stringr str_squish
 #' @import spacyr
-#' @return A list of speakers.
+#' @return A list of individual names.
 #' @details The function relies on NLP models and, therefore, results
 #' might not be accurate or consistent.
 #' @examples
-#' #extract_speaker(US_News_Conferences_1960_1980[20, 3])
+#' #extract_names(US_News_Conferences_1960_1980[20, 3])
 #' @export
-extract_speaker <- function(v) {
+extract_names <- function(v) {
+  thisRequires("stringdist")
   ent_type <- text <- s <- NULL
   out <- spacyr::spacy_extract_entity(v, type = "named") %>%
     dplyr::filter(ent_type == "PERSON") %>%
@@ -207,11 +207,9 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' "manhattan", "maximum", "canberra", and "minkowski".
 #' @importFrom dplyr group_by summarise select %>%
 #' @examples
-#' \donttest{
-#' extract_similarities(US_News_Conferences_1960_1980[1:2,3])
-#' }
+#' #extract_text_similarities(US_News_Conferences_1960_1980[1:2,3])
 #' @export
-extract_similarities <- function(v, comparison = "similarities", method) {
+extract_text_similarities <- function(v, comparison = "similarities", method) {
   thisRequires("quanteda.textstats")
   doc_id <- token <- text <- NULL
   if (inherits(v, "data.frame")) {
