@@ -1,5 +1,5 @@
 
-# poldis <img src="man/figures/poldishexlogo.png" align="right" width="220"/>
+# poldis <img src="man/figures/poldishexlogo3.png" align="right" width="220"/>
 
 <!-- badges: start -->
 
