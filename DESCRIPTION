@@ -25,13 +25,9 @@ Imports:
     stringr,
     purrr,
     stringi,
-    messydates,
     stringdist,
-    pdftools,
     quanteda,
-    quanteda.textstats,
-    spacyr, 
-    keyATM,
+    spacyr,
     tm,
     textstem,
     tidyr
@@ -40,7 +36,11 @@ Suggests:
     testthat,
     covr,
     tesseract,
-    pkgdown
+    pkgdown,
+    quanteda.textstats,
+    keyATM,
+    messydates,
+    pdftools
 RoxygenNote: 7.3.1
 Encoding: UTF-8
 LazyData: True

@@ -49,9 +49,10 @@ extract_title <- function(v) {
 #' @param v Text vector
 #' @return A vector of the dates in text
 #' @examples
-#' extract_date("Today is the twenty six of February of two thousand and twenty four")
+#' #extract_date("Today is the twenty six of February of two thousand and twenty four")
 #' @export
 extract_date <- function(v) {
+  thisRequires("messydates")
   messydates::as_messydate(v)
 }
 
@@ -204,7 +205,6 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' For differences, defaults to "euclidean".
 #' Other methods from `quanteda.textstats::textstat_dist()` include
 #' "manhattan", "maximum", "canberra", and "minkowski".
-#' @importFrom quanteda.textstats textstat_simil textstat_dist
 #' @importFrom dplyr group_by summarise select %>%
 #' @examples
 #' \donttest{
@@ -212,6 +212,7 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' }
 #' @export
 extract_similarities <- function(v, comparison = "similarities", method) {
+  thisRequires("quanteda.textstats")
   doc_id <- token <- text <- NULL
   if (inherits(v, "data.frame")) {
     if (!"doc_id" %in% names(v)) {
@@ -279,9 +280,9 @@ split_text <- function(v, splitsign = "\\.") {
 #'
 #' @param path The path to a PDF file or a folder containing multiple PDFs.
 #' @return A list of texts.
-#' @importFrom pdftools pdf_ocr_text
 #' @export
 load_pdf <- function(path) {
+  thisRequires("pdftools")
   thisRequires("tesseract")
   if (grepl(".pdf", path)) {
     out <- paste(pdftools::pdf_ocr_text(x), collapse = " ")

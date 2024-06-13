@@ -22,12 +22,10 @@ names as topic and words as terms.}
 Gather terms related to subjects
 }
 \examples{
-\donttest{
-gather_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
-gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
-                      dictionary = c("military", "development"))
-gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
-                      dictionary = list("military" = c("military", "gun", "war"),
-                                        "development" = c("development", "interest rate", "banks")))
-}
+#gather_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
+#gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
+#                     dictionary = c("military", "development"))
+#gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
+#                     dictionary = list("military" = c("military", "gun", "war"),
+#                                       "development" = c("development", "interest rate", "banks")))
 }

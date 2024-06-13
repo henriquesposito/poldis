@@ -75,20 +75,18 @@ gather_topics <- function(.data, dictionary = "CAP") {
 #' names as topic and words as terms.
 #' @import quanteda
 #' @import dplyr
-#' @importFrom keyATM keyATM keyATM_read
 #' @importFrom stringr str_detect str_remove_all
 #' @examples
-#' \donttest{
-#' gather_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
-#' gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
-#'                       dictionary = c("military", "development"))
-#' gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
-#'                       dictionary = list("military" = c("military", "gun", "war"),
-#'                                         "development" = c("development", "interest rate", "banks")))
-#' }
+#' #gather_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
+#' #gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
+#' #                     dictionary = c("military", "development"))
+#' #gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
+#' #                     dictionary = list("military" = c("military", "gun", "war"),
+#' #                                       "development" = c("development", "interest rate", "banks")))
 #' @export
 gather_related_terms <- function(.data, dictionary) {
   Words <- NULL
+  thisRequires("keyATM")
   # get text variable
   if (inherits(.data, "promises")) {
     text <- stats::na.omit(.clean_token(getElement(.data, "promises")))
