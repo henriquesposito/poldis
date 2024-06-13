@@ -29,12 +29,12 @@ For example, text might need to be separated by speakers,
 have questions removed for analysis,
 or retain only the context around specific topics and keywords.
 `{poldis}` provides the tools necessary to work with these different types of texts,
-making it easier to work with political discourses.
+making it easier to analyse political discourses.
 
 Specifically, `{poldis}` introduces tools for Urgency Analysis (UA),
 a new method for the analysis of urgency in political texts.
 Urgency is an expression of how critical or immediate problems or solutions are in political discourse.
-UA rests upon a multidimensional, weighted, and survey-validated conception of how urgency can be expressed in political discourses. It combines Natural Language Processes (NLP) and dictionary approaches to provide a contextualized, comparable, and scaleable new method for the analysis of political texts.
+UA rests upon a multidimensional, weighted, and survey-validated conception of how urgency can be expressed in political discourses. It combines Natural Language Processes (NLP) and dictionary approaches to provide a contextualized, comparable, and scalable new method for the analysis of political texts.
 
 # Installing the package
 
