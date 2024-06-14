@@ -11,18 +11,19 @@
 #' If users declare a list of subjects and related terms, function understands
 #' names as topic and words as terms.
 #' @import dplyr
+#' @importfrom tidyr unite
 #' @examples
 #' \donttest{
 #' gather_topics(US_News_Conferences_1960_1980[1:5, 3])
 #' gather_topics(US_News_Conferences_1960_1980[1:5, 3],
-#'                dictionary = c("military", "development"))
-#' gather_topics(.data = US_News_Conferences_1960_1980[1:5, 3],
-#'                dictionary = list("military" = c("military", "gun", "war"),
-#'                                  "development" = c("development", "interest rate", "banks")))
+#'               dictionary = c("military", "development"))
+#' gather_topics(US_News_Conferences_1960_1980[1:5, 3],
+#'               dictionary = list("military" = c("military", "gun", "war"),
+#'                                 "development" = c("development", "interest rate", "banks")))
 #' }
 #' @export
 gather_topics <- function(.data, dictionary = "CAP") {
-  Words <- NULL
+  Words <- topics <- NULL
   # get text variable
   if (inherits(.data, "promises")) {
     text <- stats::na.omit(.clean_token(getElement(.data, "promises")))
@@ -37,24 +38,22 @@ gather_topics <- function(.data, dictionary = "CAP") {
     subjects <- dictionary$Words
     names(subjects) <- dictionary$Topic
     } else if (is.list(dictionary)) {
-      subjects <- lapply(dictionary, function(x) paste0(x, collapse = "|"))
+      subjects <- unlist(lapply(dictionary, function(x) paste0(x, collapse = "|")))
     } else {
       subjects <- dictionary
       names(subjects) <- subjects
     }
   # match terms
-  out <- list()
-  for (i in names(subjects)) {
-    out[[i]] <- stringr::str_count(text, subjects[[i]])
-    }
-  out <- apply(data.frame(out), 1, function(i) which(i > 0))
-  out <- lapply(out, function(x) paste0(names(x), collapse = ", "))
+  out <- lapply(names(subjects), function(i) stringr::str_count(text, subjects[[i]]))
+  names(out) <- names(subjects)
+  out <- data.frame(out) %>%
+    dplyr::mutate(dplyr::across(dplyr::everything(),
+                                ~ if_else(. > 0, dplyr::cur_column(), NA))) %>%
+    tidyr::unite(col = topics,  na.rm = TRUE, sep = ", ")
   class(out) <- c("topics", class(out))
   out
-  # todo: fix issue for when list is declared as dictionary
   # todo: get proportion of topics for texts with multiple topics?
   # todo: normalize scores by the number of words in dictionary for a topic?
-  out
 }
 
 .clean_token <- function(v) {
@@ -132,16 +131,14 @@ gather_related_terms <- function(.data, dictionary) {
 
 # helper function
 .as_dictionary <- function(dictionary, dfm) {
-  out <- list()
-  names <- ifelse(stringr::str_detect(dictionary, "\\|"), # split multiple elements
-                  stringr::str_split_i(dictionary, "\\|", i = 1), dictionary)
-  for (i in seq_len(length(dictionary))) {
-    out[[i]] <- ifelse(stringr::str_detect(dictionary[[i]], "\\|"),
-                       stringr::str_split(dictionary[[i]], "\\|"),
-                       dictionary[[i]])
-  }
-  out <- lapply(out, function(x) stringr::str_replace_all(unname(unlist(x)),
-                                                          " ", "_"))
+  if (length(dictionary) != sum(names(dictionary) != "",na.rm = TRUE)) {
+    names <- ifelse(stringr::str_detect(dictionary, "\\|"), # split multiple elements
+                    stringr::str_split_i(dictionary, "\\|", i = 1), dictionary)
+  } else names <- names(dictionary)
+  out <- lapply(seq_len(length(dictionary)), function(i)
+    ifelse(stringr::str_detect(dictionary[[i]], "\\|"),
+           stringr::str_split(dictionary[[i]], "\\|"), dictionary[[i]]))
+  out <- lapply(out, function(x) stringr::str_replace_all(unname(unlist(x)), " ", "_"))
   names(out) <- names # add names
   out[unlist(lapply(out, function(x) any(x %in% colnames(dfm))))]
   # todo: warn users that topics that do not match names in DFM are removed
