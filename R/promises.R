@@ -37,6 +37,7 @@ select_promises <- function(.data) {
                                                          |VBD( RB)? VBN|VBZ( RB)? VBN|
                                                          |VBD( RB)? JJ|PRP( RB)? VBD TO|
                                                          |VBN( RB)? VBN"),
+                                    # Combinations of NLP tags to select
                                     NA, promises)) %>%
     dplyr::distinct()
   class(out) <- c("promises", class(out))
