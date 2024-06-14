@@ -251,7 +251,7 @@ extract_text_similarities <- function(v, comparison = "similarities", method) {
 #' By default sentences (".").
 #' This can also be words, signals or other markers you want.
 #' For special characters, please use escape sign before (i.e. "\\").
-#' @return A list of lists the same leghth as vector.
+#' @return A list of lists the same length as vector.
 #' @importFrom dplyr group_by summarise select %>%
 #' @examples
 #' \donttest{

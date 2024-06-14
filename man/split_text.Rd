@@ -15,7 +15,7 @@ This can also be words, signals or other markers you want.
 For special characters, please use escape sign before (i.e. "\\").}
 }
 \value{
-A list of lists the same leghth as vector.
+A list of lists the same length as vector.
 }
 \description{
 Split texts into structured lists of lists according to a split sign.
