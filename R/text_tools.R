@@ -184,9 +184,13 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
     }
   }
   if (level == "sentences") {
-    s <- stringr::str_extract_all(v, paste0("([^.]+\\.){0,", n, "}[^.]+(", match, ").*?\\.([^.]+\\.){0,", n, "}"))
+    # gets a certain number "n" of sentences, from ".", before and after match
+    s <- stringr::str_extract_all(v, paste0("([^.]+\\.){0,", n, "}[^.]+(",
+                                            match, ").*?\\.([^.]+\\.){0,", n, "}"))
   } else if (level == "words") {
-    s <- stringr::str_extract_all(v, paste0("([^\\s]+\\s+){", n,"}", match, "(\\s+[^\\s]+){", n, "}"))
+    # gets a certain number "n" of words, based on spaces ("s+"), before and after match
+    s <- stringr::str_extract_all(v, paste0("([^\\s]+\\s+){", n,"}",
+                                            match, "(\\s+[^\\s]+){", n, "}"))
   } else if (level == "paragraph") {
     if (stringr::str_detect(v, "\\.\n", negate = TRUE))
     {
