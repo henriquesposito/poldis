@@ -5,9 +5,8 @@
 #' @importFrom stringr str_squish
 #' @importFrom stringdist stringsimmatrix
 #' @import spacyr
-#' @return A list of individual names.
-#' @details The function relies on NLP models and, therefore, results
-#' might not be accurate or consistent.
+#' @return A data frame of individual names and the number of times they appear.
+#' @details The function relies on named entity recognition from NLP models.
 #' @examples
 #' #extract_names(US_News_Conferences_1960_1980[20, 3])
 #' @export
@@ -33,8 +32,8 @@ extract_names <- function(v) {
 #' A lot of information is contained in the first sentence of a text.
 #' In political texts, for example, dates and locations are often contained
 #' in the first sentence of the text.
-#' @param v Text vector
-#' @return A list of the first sentences
+#' @param v Text vector.
+#' @return A list of the first sentences.
 #' @examples
 #' extract_title("This is the first sentence. This is the second sentence.")
 #' @export
@@ -46,8 +45,8 @@ extract_title <- function(v) {
 #' Extract dates from text
 #'
 #' Wrapper function for `messydates::as_messydates`.
-#' @param v Text vector
-#' @return A vector of the dates in text
+#' @param v Text vector.
+#' @return A vector of the dates in text.
 #' @examples
 #' #extract_date("Today is the twenty six of February of two thousand and twenty four")
 #' @export
@@ -56,23 +55,20 @@ extract_date <- function(v) {
   messydates::as_messydate(v)
 }
 
-#' Extract location from strings
+#' Extract locations from strings
 #'
-#' @param v Text variable/object
+#' @param v Text vector.
 #' @importFrom stringi stri_trans_general
 #' @importFrom stringr str_extract
 #' @importFrom purrr map_chr
 #' @importFrom stringdist stringsimmatrix
-#' @details Works well for Brazilian states and other countries.
-#' Texts must be in English or Portuguese.
-#' @return A list of the first location mentioned in texts.
-#' @details If more than one location is found,
-#' returns only the first match.
+#' @return A data frame of locations and the number of times they appear.
+#' @details The function relies on geographical entity detection from NLP models.
 #' @examples
-#' extract_location(c("This is the United States", "This is Sao Paulo",
+#' extract_locations(c("This is the United States", "This is Sao Paulo",
 #' "I was in Rio de Janeiro and Sao Paulo, then back to the United States"))
 #' @export
-extract_location <- function(v) {
+extract_locations <- function(v) {
   v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
   ent_type <- text <- s <- NULL
   out <- spacyr::spacy_extract_entity(v) %>%

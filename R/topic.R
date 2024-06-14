@@ -11,7 +11,7 @@
 #' If users declare a list of subjects and related terms, function understands
 #' names as topic and words as terms.
 #' @import dplyr
-#' @importfrom tidyr unite
+#' @importFrom tidyr unite
 #' @examples
 #' \donttest{
 #' gather_topics(US_News_Conferences_1960_1980[1:5, 3])
