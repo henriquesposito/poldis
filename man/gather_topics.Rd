@@ -19,6 +19,9 @@ If users declare a vector, each element is treated as a independent topic.
 If users declare a list of subjects and related terms, function understands
 names as topic and words as terms.}
 }
+\value{
+A list of topics present in each text separated by comma.
+}
 \description{
 Gather topic from political discourses
 }

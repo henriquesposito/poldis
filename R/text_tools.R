@@ -12,7 +12,7 @@
 #' @export
 extract_names <- function(v) {
   ent_type <- text <- s <- NULL
-  spacyr::spacy_initialize()
+  suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
   out <- suppressWarnings(spacyr::spacy_extract_entity(v, type = "named")) %>%
     dplyr::filter(ent_type == "PERSON") %>%
     dplyr::mutate(names = .clean_token(text)) %>%
@@ -48,7 +48,7 @@ extract_names <- function(v) {
 extract_locations <- function(v) {
   v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
   ent_type <- text <- s <- NULL
-  spacyr::spacy_initialize()
+  suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
   out <- suppressWarnings(spacyr::spacy_extract_entity(v)) %>%
     dplyr::filter(ent_type == "GPE") %>%
     dplyr::mutate(names = .clean_token(text)) %>%
@@ -74,7 +74,7 @@ extract_locations <- function(v) {
 #' In political texts, for example, dates and locations are often contained
 #' in the first sentence of the text.
 #' @param v Text vector.
-#' @return A list of the first sentences.
+#' @return A list of the first sentences in text.
 #' @examples
 #' extract_title("This is the first sentence. This is the second sentence.")
 #' @export
@@ -108,7 +108,7 @@ extract_date <- function(v) {
 #' By default, TRUE.
 #' @importFrom purrr map_chr
 #' @importFrom dplyr group_by summarise select %>%
-#' @return A list the same length as text variable
+#' @return A list the same length as text variable.
 #' @examples
 #' \donttest{
 #' extract_match(c("This function was created on the 29 September 2021",
@@ -165,7 +165,7 @@ extract_match <- function(v, match, invert = FALSE,
 #'                 v = US_News_Conferences_1960_1980$text[100],
 #'                 level = "sentences", n = 2)
 #' }
-#' @return A list of string matches an their context
+#' @return A list of string matches and their context.
 #' @export
 extract_context <- function(match, v, level = "sentences", n = 1) {
   doc_id <- sentence <- text <- token <- NULL
@@ -214,6 +214,7 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' Other methods from `quanteda.textstats::textstat_dist()` include
 #' "manhattan", "maximum", "canberra", and "minkowski".
 #' @importFrom dplyr group_by summarise select %>%
+#' @return A matrix of similarity scores between texts.
 #' @examples
 #' #extract_text_similarities(US_News_Conferences_1960_1980[1:2,3])
 #' @export
@@ -304,7 +305,7 @@ read_pdf <- function(path) {
 
 #' Annotate text with NLP
 #'
-#' This function builds upon `spacyr::spacy_parse` function to annotate texts.
+#' This function relies on `{spacyr}` NLP parsing to annotate texts.
 #' @param v Text vector
 #' @param level Do you want to parse words or sentences? Words by default.
 #' @import spacyr
@@ -312,6 +313,8 @@ read_pdf <- function(path) {
 #' @importFrom stringr str_squish
 #' @examples
 #' #annotate_text(US_News_Conferences_1960_1980[1:2, 3])
+#' #annotate_text(US_News_Conferences_1960_1980[1:2, 3], level = "sentence")
+#' @return A data frame with syntax information by words or sentences in text.
 #' @export
 annotate_text <- function(v, level = "words") {
   doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- entity <- NULL

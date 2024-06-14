@@ -11,9 +11,13 @@ annotate_text(v, level = "words")
 
 \item{level}{Do you want to parse words or sentences? Words by default.}
 }
+\value{
+A data frame with syntax information by words or sentences in text.
+}
 \description{
-This function builds upon `spacyr::spacy_parse` function to annotate texts.
+This function relies on `{spacyr}` NLP parsing to annotate texts.
 }
 \examples{
 #annotate_text(US_News_Conferences_1960_1980[1:2, 3])
+#annotate_text(US_News_Conferences_1960_1980[1:2, 3], level = "sentence")
 }

@@ -22,7 +22,7 @@ That is, one word or one sentence before, and after, string match.
 For paragraphs, n is always set to one.}
 }
 \value{
-A list of string matches an their context
+A list of string matches and their context.
 }
 \description{
 A function for getting string matches and the context in which they occur.

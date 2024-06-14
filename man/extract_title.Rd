@@ -10,7 +10,7 @@ extract_title(v)
 \item{v}{Text vector.}
 }
 \value{
-A list of the first sentences.
+A list of the first sentences in text.
 }
 \description{
 A lot of information is contained in the first sentence of a text.

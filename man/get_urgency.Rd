@@ -18,7 +18,7 @@ the number of words in text observation.
 Users can also declare "none", for no normalization.}
 }
 \value{
-A scored data frame.
+A scored data frame for each dimension of urgency.
 }
 \description{
 Urgency Analysis

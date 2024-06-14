@@ -19,7 +19,7 @@ By default FALSE.}
 By default, TRUE.}
 }
 \value{
-A list the same length as text variable
+A list the same length as text variable.
 }
 \description{
 Get texts in which certain "matches" occur.

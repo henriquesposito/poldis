@@ -23,6 +23,9 @@ For differences, defaults to "euclidean".
 Other methods from `quanteda.textstats::textstat_dist()` include
 "manhattan", "maximum", "canberra", and "minkowski".}
 }
+\value{
+A matrix of similarity scores between texts.
+}
 \description{
 Extract similarities and differences in texts/segments
 }

@@ -12,6 +12,10 @@ For data frames, function will search for "text" variable.
 For annotated data frames, please declare an annotated data frame
 at the sentence level.}
 }
+\value{
+A data frame with syntax information by sentences and
+a variable identifying which of these sentences are promises.
+}
 \description{
 Political promises are statements in which actors express their
 intent or commitment to take political action in the future.

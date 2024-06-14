@@ -10,6 +10,8 @@
 #' @importFrom dplyr mutate distinct %>%
 #' @examples
 #' #select_promises(US_News_Conferences_1960_1980[1:2,3])
+#' @return A data frame with syntax information by sentences and
+#' a variable identifying which of these sentences are promises.
 #' @export
 select_promises <- function(.data) {
   tags <- sentence <- lemmas <- promises <- NULL

@@ -8,7 +8,7 @@
 #' By default, urgency scores are normalized by "tokens",
 #' the number of words in text observation.
 #' Users can also declare "none", for no normalization.
-#' @return A scored data frame.
+#' @return A scored data frame for each dimension of urgency.
 #' @import dplyr
 #' @examples
 #' \donttest{

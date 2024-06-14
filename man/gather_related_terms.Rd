@@ -18,8 +18,16 @@ If users declare a vector, each element is treated as a independent topic.
 If users declare a list of subjects and related terms, function understands
 names as topic and words as terms.}
 }
+\value{
+A list of related terms to each of the topics declared in dictionary.
+}
 \description{
 Gather terms related to subjects
+}
+\details{
+This function relies on keyword assisted topic models (Eshima,
+Imai, and Sasaki 2024) implemented through the `{keyATM}` package to find
+related words based on the topics provided and texts in which they appear.
 }
 \examples{
 #gather_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
