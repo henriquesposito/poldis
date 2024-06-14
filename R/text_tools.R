@@ -3,6 +3,7 @@
 #' @param v A text vector.
 #' @importFrom dplyr distinct filter %>% summarize group_by
 #' @importFrom stringr str_squish
+#' @importFrom stringdist stringsimmatrix
 #' @import spacyr
 #' @return A list of individual names.
 #' @details The function relies on NLP models and, therefore, results
@@ -11,21 +12,20 @@
 #' #extract_names(US_News_Conferences_1960_1980[20, 3])
 #' @export
 extract_names <- function(v) {
-  thisRequires("stringdist")
   ent_type <- text <- s <- NULL
   out <- spacyr::spacy_extract_entity(v, type = "named") %>%
     dplyr::filter(ent_type == "PERSON") %>%
     dplyr::mutate(names = .clean_token(text)) %>%
     dplyr::group_by(names) %>%
-    dplyr::summarise(count = sum(length))
-  # check if similar names are the same person
+    dplyr::count(name = "count")
+  # check if similar names are the same
   s <- stringdist::stringsimmatrix(out$names, out$names, method = "cosine", q = 2)
   diag(s[, seq_len(ncol(s))]) <- 0
-  s <- ifelse(s > 0.5, out$names, "")
-  out$similar_names <- stringr::str_squish(apply(s, 2, paste, collapse = " "))
-  # to do: setup plotting method (as a network)
+  s <- ifelse(s > 0.5, out$names, NA)
+  if (!all(is.na(s))) out$similar_names <- stringr::str_squish(apply(s, 2, paste, collapse = " "))
   spacyr::spacy_finalize()
   out
+  # to do: setup plotting method (as a network)
 }
 
 #' Extract first sentence from text
@@ -62,6 +62,7 @@ extract_date <- function(v) {
 #' @importFrom stringi stri_trans_general
 #' @importFrom stringr str_extract
 #' @importFrom purrr map_chr
+#' @importFrom stringdist stringsimmatrix
 #' @details Works well for Brazilian states and other countries.
 #' Texts must be in English or Portuguese.
 #' @return A list of the first location mentioned in texts.
@@ -73,19 +74,19 @@ extract_date <- function(v) {
 #' @export
 extract_location <- function(v) {
   v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
-  for (k in seq_len(nrow(location))) {
-    v <- gsub(paste0(location$regex[k]),
-              paste0(location$location[k]),
-              v, ignore.case = TRUE,
-              perl = T)
-  }
-  v <- stringr::str_extract(v, "\\.\\.\\.[^()]+\\.\\.\\.")
-  v <- paste0(v, "...", NA_character_)
-  v <- strsplit(v, "\\.\\.\\.")
-  v <- purrr::map_chr(v, 2)
-  v
-  # todo: find a better list of countries/cities/locations in the world to use
-  # todo: use NLP to identify location entity
+  ent_type <- text <- s <- NULL
+  out <- spacyr::spacy_extract_entity(v) %>%
+    dplyr::filter(ent_type == "GPE") %>%
+    dplyr::mutate(names = .clean_token(text)) %>%
+    dplyr::group_by(names) %>%
+    dplyr::count(name = "count")
+  # check if similar locations are the same
+  s <- stringdist::stringsimmatrix(out$names, out$names, method = "cosine", q = 2)
+  diag(s[, seq_len(ncol(s))]) <- 0
+  s <- ifelse(s > 0.5, out$names, NA)
+  if (!all(is.na(s))) out$similar_names <- stringr::str_squish(apply(s, 2, paste, collapse = " "))
+  spacyr::spacy_finalize()
+  out
 }
 
 #' Extract text matches
