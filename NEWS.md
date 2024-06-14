@@ -1,6 +1,6 @@
 # poldis 0.1.0
 
-2024-06-07
+2024-06-14
 
 ## Package
 
@@ -16,7 +16,7 @@
   - Added `annotate_text()` function to classify words or sentences using NLP
   - Added `load_pdfs()` function to help users loading readable and non-readable text files from PDFs
 - Closed #14 by adding `select_promises()` function to extract future promises in text  
-- Closes #15 by adding `gather_topics()` and `gather_related_terms()` for assigning topics to texts
+- Closed #15 by adding `gather_topics()` and `gather_related_terms()` for assigning topics to texts
 - Added `get_urgency()` function for coding urgency from text
 
 # poldis 0.0.3
