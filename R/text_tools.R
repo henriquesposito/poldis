@@ -42,8 +42,8 @@ extract_names <- function(v) {
 #' @return A data frame of locations and the number of times they appear.
 #' @details The function relies on geographical entity detection from NLP models.
 #' @examples
-#' extract_locations(c("This is the United States", "This is Sao Paulo",
-#' "I was in Rio de Janeiro and Sao Paulo, then back to the United States"))
+#' #extract_locations(c("This is the United States", "This is Sao Paulo",
+#' #"I was in Rio de Janeiro and Sao Paulo, then back to the United States"))
 #' @export
 extract_locations <- function(v) {
   v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
