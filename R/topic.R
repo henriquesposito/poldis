@@ -37,11 +37,11 @@ gather_topics <- function(.data, dictionary = "CAP") {
         stringr::str_squish(tolower(Words))), ", ", "|"))
     subjects <- dictionary$Words
     names(subjects) <- dictionary$Topic
-    } else if (is.list(dictionary)) {
-      subjects <- unlist(lapply(dictionary, function(x) paste0(x, collapse = "|")))
-    } else {
+    } else if (is.vector(dictionary) && is.atomic(dictionary)) {
       subjects <- dictionary
       names(subjects) <- subjects
+    } else {
+      subjects <- unlist(lapply(dictionary, function(x) paste0(x, collapse = "|")))
     }
   # match terms
   out <- lapply(names(subjects), function(i) stringr::str_count(text, subjects[[i]]))
