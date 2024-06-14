@@ -9,3 +9,8 @@ thisRequires <- function(pkgname){
     }
   }
 }
+
+.clean_token <- function(v) {
+  textstem::lemmatize_words(stringr::str_squish(tm::removePunctuation(
+    tm::removeWords(tolower(v), quanteda::stopwords()))))
+}
