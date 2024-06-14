@@ -201,18 +201,19 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' Extract similarities and differences in texts/segments
 #'
 #' @param v Text vector or annotated data frame.
-#' @param comparison Would you like to extract similarities or differences
-#' between treaties?
-#' Options are "similarities" or "differences".
+#' @param comparison How would you like to compare texts?
+#' Options are "similarities", for comparing similarities, or "differences",
+#' for comparing differences.
 #' Defaults to "similarities".
-#' @param method A method for checking similarities or differences.
+#' @param method A method for checking similarities or differences between texts.
 #' For similarities, defaults to "correlation" method.
-#' Other methods from `quanteda.textstats::textstat_simil()`
-#' include "cosine", "jaccard", "ejaccard", "dice", "edice",
-#' "simple matching", and "hamann".
+#' Other methods for similarities include "cosine", "jaccard", "ejaccard",
+#' "dice", "edice", "simple matching", and "hamann".
 #' For differences, defaults to "euclidean".
-#' Other methods from `quanteda.textstats::textstat_dist()` include
-#' "manhattan", "maximum", "canberra", and "minkowski".
+#' Other methods for differences include "manhattan", "maximum",
+#' "canberra", and "minkowski".
+#' For more information on each of these methods and what are the implications
+#' in selecting a method, please see `?quanteda.textstats::textstat_simil()`.
 #' @importFrom dplyr group_by summarise select %>%
 #' @return A matrix of similarity scores between texts.
 #' @examples
@@ -241,7 +242,6 @@ extract_text_similarities <- function(v, comparison = "similarities", method) {
     if(missing(method)) method = "euclidean"
     quanteda.textstats::textstat_dist(quanteda::dfm(quanteda::tokens(v)), method = method)
   }
-  # todo: add plotting method that plots texts similarities as a dendogram
 }
 
 #' Split texts
@@ -307,7 +307,9 @@ read_pdf <- function(path) {
 #'
 #' This function relies on `{spacyr}` NLP parsing to annotate texts.
 #' @param v Text vector
-#' @param level Do you want to parse words or sentences? Words by default.
+#' @param level At which level would you like to parse the text?
+#' Options include "words" or "sentences".
+#' Defaults to "words".
 #' @import spacyr
 #' @importFrom dplyr group_by summarise ungroup %>%
 #' @importFrom stringr str_squish
@@ -342,6 +344,4 @@ annotate_text <- function(v, level = "words") {
       dplyr::ungroup()
   }
   parse
-  # todo: add more informative messages/warnings for users
-  # todo: add nouns, adverbs, adjectives and entities together
 }

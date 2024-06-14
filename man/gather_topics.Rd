@@ -7,10 +7,10 @@
 gather_topics(.data, dictionary = "CAP")
 }
 \arguments{
-\item{.data}{A data frame, "promises" data frame, or text vector.
+\item{.data}{A data frame, promises data frames coded using
+`select_promises()`, or text vector.
 For data frames, function will search for "text" variable.
-For promises data frames coded using `select_promises()`,
-function will search for "promises" variable.}
+For promises data frames function will search for "promises" variable.}
 
 \item{dictionary}{The dictionary of 20 major political topics from the
 Comparative Agendas Project (Jones et al., 2023) is used by default.

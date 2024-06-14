@@ -9,7 +9,9 @@ annotate_text(v, level = "words")
 \arguments{
 \item{v}{Text vector}
 
-\item{level}{Do you want to parse words or sentences? Words by default.}
+\item{level}{At which level would you like to parse the text?
+Options include "words" or "sentences".
+Defaults to "words".}
 }
 \value{
 A data frame with syntax information by words or sentences in text.

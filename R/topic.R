@@ -1,9 +1,9 @@
 #' Gather topic from political discourses
 #'
-#' @param .data A data frame, "promises" data frame, or text vector.
+#' @param .data A data frame, promises data frames coded using
+#' `select_promises()`, or text vector.
 #' For data frames, function will search for "text" variable.
-#' For promises data frames coded using `select_promises()`,
-#' function will search for "promises" variable.
+#' For promises data frames function will search for "promises" variable.
 #' @param dictionary The dictionary of 20 major political topics from the
 #' Comparative Agendas Project (Jones et al., 2023) is used by default.
 #' Users can also declare a custom dictionary as a vector or a list.
@@ -53,9 +53,6 @@ gather_topics <- function(.data, dictionary = "CAP") {
     tidyr::unite(col = topics,  na.rm = TRUE, sep = ", ")
   class(out) <- c("topics", class(out))
   out
-  # todo: get proportion of topics for texts with multiple topics?
-  # todo: normalize scores by the number of words in dictionary for a topic?
-  # todo: create a plot for topic co-occurrence in texts
 }
 
 #' Gather terms related to subjects
@@ -124,10 +121,6 @@ gather_related_terms <- function(.data, dictionary) {
   names(out) <- stringr::str_remove_all(names(out), "[0-9]|\\_")
   class(out) <- c("related_subjects", class(out))
   out
-  # todo: get only words above certain threshold for topics?
-  # todo: what to do with overlapping words/topics?
-  # todo: what to do with small words currently excluded for similar terms?
-  # todo: fix issue with multiple word subjects
 }
 
 # helper function
@@ -142,5 +135,4 @@ gather_related_terms <- function(.data, dictionary) {
   out <- lapply(out, function(x) stringr::str_replace_all(unname(unlist(x)), " ", "_"))
   names(out) <- names # add names
   out[unlist(lapply(out, function(x) any(x %in% colnames(dfm))))]
-  # todo: warn users that topics that do not match names in DFM are removed
 }
