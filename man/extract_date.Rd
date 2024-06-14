@@ -7,10 +7,10 @@
 extract_date(v)
 }
 \arguments{
-\item{v}{Text vector}
+\item{v}{Text vector.}
 }
 \value{
-A vector of the dates in text
+A vector of the dates in text.
 }
 \description{
 Wrapper function for `messydates::as_messydates`.

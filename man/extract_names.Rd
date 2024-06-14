@@ -10,14 +10,13 @@ extract_names(v)
 \item{v}{A text vector.}
 }
 \value{
-A list of individual names.
+A data frame of individual names and the number of times they appear.
 }
 \description{
 Extract a list of possible names of individuals in texts
 }
 \details{
-The function relies on NLP models and, therefore, results
-might not be accurate or consistent.
+The function relies on named entity recognition from NLP models.
 }
 \examples{
 #extract_names(US_News_Conferences_1960_1980[20, 3])
