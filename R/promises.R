@@ -21,7 +21,7 @@ select_promises <- function(.data) {
     dplyr::mutate(lemmas = tolower(lemmas),
                   promises = ifelse(stringr::str_detect(tags, "PRP MD ")|
                                       stringr::str_detect(lemmas,
-                                                          "going to|need to|ready to|
+                                                          "going to|go to |need to|ready to|
                                      |is time to|commit to|promise to|have to|
                                      |plan to|intend to|let 's|let us|urge|
                                      |require|want to"),
