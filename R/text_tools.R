@@ -12,19 +12,60 @@
 #' @export
 extract_names <- function(v) {
   ent_type <- text <- s <- NULL
-  out <- spacyr::spacy_extract_entity(v, type = "named") %>%
+  spacyr::spacy_initialize()
+  out <- suppressWarnings(spacyr::spacy_extract_entity(v, type = "named")) %>%
     dplyr::filter(ent_type == "PERSON") %>%
     dplyr::mutate(names = .clean_token(text)) %>%
     dplyr::group_by(names) %>%
     dplyr::count(name = "count")
-  # check if similar names are the same
-  s <- stringdist::stringsimmatrix(out$names, out$names, method = "cosine", q = 2)
-  diag(s[, seq_len(ncol(s))]) <- 0
-  s <- ifelse(s > 0.5, out$names, NA)
-  if (!all(is.na(s))) out$similar_names <- stringr::str_squish(apply(s, 2, paste, collapse = " "))
   spacyr::spacy_finalize()
+  if (nrow(out) == 0) {
+    message("No names found in text.")
+  } else if (nrow(out) > 2) {
+    # check if similar names are the same
+    s <- stringdist::stringsimmatrix(out$names, out$names, method = "cosine", q = 2)
+    diag(s[, seq_len(ncol(s))]) <- 0
+    s <- ifelse(s > 0.5, out$names, NA)
+    if (!all(is.na(s))) out$similar_names <- stringr::str_squish(apply(s, 2, paste, collapse = " "))
+  }
   out
-  # to do: setup plotting method (as a network)
+  # to do: setup plotting method for co-occurrence of names in text
+}
+
+#' Extract locations from strings
+#'
+#' @param v Text vector.
+#' @importFrom stringi stri_trans_general
+#' @importFrom stringr str_extract
+#' @importFrom purrr map_chr
+#' @importFrom stringdist stringsimmatrix
+#' @return A data frame of locations and the number of times they appear.
+#' @details The function relies on geographical entity detection from NLP models.
+#' @examples
+#' extract_locations(c("This is the United States", "This is Sao Paulo",
+#' "I was in Rio de Janeiro and Sao Paulo, then back to the United States"))
+#' @export
+extract_locations <- function(v) {
+  v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
+  ent_type <- text <- s <- NULL
+  spacyr::spacy_initialize()
+  out <- suppressWarnings(spacyr::spacy_extract_entity(v)) %>%
+    dplyr::filter(ent_type == "GPE") %>%
+    dplyr::mutate(names = .clean_token(text)) %>%
+    dplyr::group_by(names) %>%
+    dplyr::count(name = "count")
+  spacyr::spacy_finalize()
+  if (nrow(out) == 0) {
+    message("No names found in text.")
+  } else if (nrow(out) > 2) {
+    # check if similar names are the same
+    s <- stringdist::stringsimmatrix(out$names, out$names, method = "cosine", q = 2)
+    diag(s[, seq_len(ncol(s))]) <- 0
+    s <- ifelse(s > 0.5, out$names, NA)
+    if (!all(is.na(s))) out$similar_names <- stringr::str_squish(apply(s, 2, paste, collapse = " "))
+  }
+  out
+  # to do: setup plotting method for co-occurrence of locations in text
 }
 
 #' Extract first sentence from text
@@ -53,36 +94,6 @@ extract_title <- function(v) {
 extract_date <- function(v) {
   thisRequires("messydates")
   messydates::as_messydate(v)
-}
-
-#' Extract locations from strings
-#'
-#' @param v Text vector.
-#' @importFrom stringi stri_trans_general
-#' @importFrom stringr str_extract
-#' @importFrom purrr map_chr
-#' @importFrom stringdist stringsimmatrix
-#' @return A data frame of locations and the number of times they appear.
-#' @details The function relies on geographical entity detection from NLP models.
-#' @examples
-#' extract_locations(c("This is the United States", "This is Sao Paulo",
-#' "I was in Rio de Janeiro and Sao Paulo, then back to the United States"))
-#' @export
-extract_locations <- function(v) {
-  v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
-  ent_type <- text <- s <- NULL
-  out <- spacyr::spacy_extract_entity(v) %>%
-    dplyr::filter(ent_type == "GPE") %>%
-    dplyr::mutate(names = .clean_token(text)) %>%
-    dplyr::group_by(names) %>%
-    dplyr::count(name = "count")
-  # check if similar locations are the same
-  s <- stringdist::stringsimmatrix(out$names, out$names, method = "cosine", q = 2)
-  diag(s[, seq_len(ncol(s))]) <- 0
-  s <- ifelse(s > 0.5, out$names, NA)
-  if (!all(is.na(s))) out$similar_names <- stringr::str_squish(apply(s, 2, paste, collapse = " "))
-  spacyr::spacy_finalize()
-  out
 }
 
 #' Extract text matches

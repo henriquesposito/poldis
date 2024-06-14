@@ -54,11 +54,7 @@ gather_topics <- function(.data, dictionary = "CAP") {
   out
   # todo: get proportion of topics for texts with multiple topics?
   # todo: normalize scores by the number of words in dictionary for a topic?
-}
-
-.clean_token <- function(v) {
-  textstem::lemmatize_words(stringr::str_squish(tm::removePunctuation(
-    tm::removeWords(tolower(v), quanteda::stopwords()))))
+  # todo: create a plot for topic co-occurrence in texts
 }
 
 #' Gather terms related to subjects
