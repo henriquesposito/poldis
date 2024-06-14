@@ -43,13 +43,22 @@
     <loc>https://henriquesposito.github.io/poldis/reference/extract_location.html</loc>
   </url>
   <url>
+    <loc>https://henriquesposito.github.io/poldis/reference/extract_locations.html</loc>
+  </url>
+  <url>
     <loc>https://henriquesposito.github.io/poldis/reference/extract_match.html</loc>
+  </url>
+  <url>
+    <loc>https://henriquesposito.github.io/poldis/reference/extract_names.html</loc>
   </url>
   <url>
     <loc>https://henriquesposito.github.io/poldis/reference/extract_similarities.html</loc>
   </url>
   <url>
     <loc>https://henriquesposito.github.io/poldis/reference/extract_speaker.html</loc>
+  </url>
+  <url>
+    <loc>https://henriquesposito.github.io/poldis/reference/extract_text_similarities.html</loc>
   </url>
   <url>
     <loc>https://henriquesposito.github.io/poldis/reference/extract_title.html</loc>
@@ -68,6 +77,9 @@
   </url>
   <url>
     <loc>https://henriquesposito.github.io/poldis/reference/load_pdf.html</loc>
+  </url>
+  <url>
+    <loc>https://henriquesposito.github.io/poldis/reference/read_pdf.html</loc>
   </url>
   <url>
     <loc>https://henriquesposito.github.io/poldis/reference/select_promises.html</loc>
