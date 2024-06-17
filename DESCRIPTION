@@ -1,24 +1,29 @@
 Package: poldis
 Type: Package
-Title: Tools for Analyzing Political Discourse
+Title: Tools for Analyzing Political Texts
 Version: 0.1.0
 Date: 2024-06-17
-Authors: c(person(given = "Henrique",
-                 family = "Sposito", 
-                 role = c("cre", "aut", "ctb"),
-                 email = "henrique.sposito@graduateinstitute.ch",
-                 ORDCID = c("IHEID", "0000-0003-3420-6085")),
-          person(given = "James",
-                 family = "Hollway",
-                 role = c("ctb"),
-                 email = "james.hollway@graduateinstitute.ch",
-                 comment = c("IHEID", ORCID = "0000-0002-8361-9647")),
-          person(given = "Jael",
-                 family = "Tan",
-                 role = "ctb",
-                 comment = c("IHEID", ORCID = "0000-0002-6234-9764")))
+Authors@R: 
+    c(person(given = "Henrique",
+             family = "Sposito", 
+             role = c("cre", "aut", "ctb"),
+             email = "henrique.sposito@graduateinstitute.ch",
+             comment = c("IHEID", ORCID = "0000-0003-3420-6085")),
+      person(given = "James",
+             family = "Hollway",
+             role = c("ctb"),
+             email = "james.hollway@graduateinstitute.ch",
+             comment = c("IHEID", ORCID = "0000-0002-8361-9647")),
+      person(given = "Jael",
+             family = "Tan",
+             role = "ctb",
+             comment = c("IHEID", ORCID = "0000-0002-6234-9764"))
+      )
 Maintainer: Henrique Sposito <henrique.sposito@graduateinstitute.ch>
-Description: Tools for analyzing political texts
+Description: poldis contains the tools required for wrangling and annotating
+    these different types of political discourse texts within R.
+    As well, the package introduces tools for Urgency Analysis,
+    a new method for the analysis of urgency in political texts.
 License: MIT + file LICENSE
 Imports:
     dplyr,
