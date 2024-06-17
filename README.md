@@ -119,14 +119,9 @@ Alternatively, users can also declare their own dictionary for topics.
 gather_topics(text)
 ```
 
-    ## [[1]]
-    ## [1] "Macroeconomics, Civil.Rights..Minority.Issues..and.Civil.Liberties, Health, Labor.and.Employment, Education, Energy, Immigration, Transportation, Law..Crime..and.Family.Issues, Community.Development.and.Housing.Issues, Defense, Space..Science..Technology..and.Communications, Foreign.Trade, International.Affairs.and.Foreign.Aid, Government.Operations, Public.Lands.and.Water.Management"
-    ## 
-    ## [[2]]
-    ## [1] "Macroeconomics, Health, Agriculture, Labor.and.Employment, Education, Immigration, Transportation, Law..Crime..and.Family.Issues, Social.Welfare, Community.Development.and.Housing.Issues, Defense, Space..Science..Technology..and.Communications, Foreign.Trade, International.Affairs.and.Foreign.Aid, Government.Operations"
-    ## 
-    ## attr(,"class")
-    ## [1] "topics" "list"
+    ##                                                                                                                                                                                                                                                                                                                                                                                               topics
+    ## 1 Macroeconomics, Civil.Rights..Minority.Issues..and.Civil.Liberties, Health, Labor.and.Employment, Education, Energy, Immigration, Transportation, Law..Crime..and.Family.Issues, Community.Development.and.Housing.Issues, Defense, Space..Science..Technology..and.Communications, Foreign.Trade, International.Affairs.and.Foreign.Aid, Government.Operations, Public.Lands.and.Water.Management
+    ## 2                                                                   Macroeconomics, Health, Agriculture, Labor.and.Employment, Education, Immigration, Transportation, Law..Crime..and.Family.Issues, Social.Welfare, Community.Development.and.Housing.Issues, Defense, Space..Science..Technology..and.Communications, Foreign.Trade, International.Affairs.and.Foreign.Aid, Government.Operations
 
 # Measuring urgency
 

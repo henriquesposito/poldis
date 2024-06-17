@@ -1,9 +1,9 @@
 #' Urgency Analysis
 #'
-#' @param .data A data frame, promises data frames coded using
+#' @param .data A data frame, promises data frame coded using
 #' `select_promises()`, or text vector.
 #' For data frames, function will search for "text" variable.
-#' For promises data frames function will search for "promises" variable.
+#' For promises data frame function will search for "promises" variable.
 #' @param normalize Would you like urgency scores to be normalized?
 #' By default, urgency scores are normalized by "tokens",
 #' the number of words in text observation.
