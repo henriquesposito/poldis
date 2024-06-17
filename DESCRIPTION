@@ -22,7 +22,7 @@ Authors@R:
 Maintainer: Henrique Sposito <henrique.sposito@graduateinstitute.ch>
 Description: A set of tools for wrangling and annotating
     different types of political texts within R.
-    The package also introduces Urgency Analysis,
+    It also introduces Urgency Analysis,
     a new method for the analysis of urgency in political texts.
 License: MIT + file LICENSE
 Imports:
