@@ -1,6 +1,6 @@
 Package: poldis
 Type: Package
-Title: Tools for Analyzing Political Texts
+Title: Tools for Analysing Political Texts
 Version: 0.1.0
 Date: 2024-06-17
 Authors@R: 
@@ -23,7 +23,7 @@ Maintainer: Henrique Sposito <henrique.sposito@graduateinstitute.ch>
 Description: The package contains a set of tools for wrangling and annotating
     different types of political texts within R.
     As well, it introduces Urgency Analysis,
-    a new method for the analyzis of urgency in political texts.
+    a new method for the analysis of urgency in political texts.
 License: MIT + file LICENSE
 Imports:
     dplyr,
