@@ -1,6 +1,6 @@
 # poldis 0.1.0
 
-2024-06-14
+2024-06-17
 
 ## Package
 
@@ -11,10 +11,10 @@
 ## Functions
 
 - Updated text tools
-  - Renamed old text functions to start with "extract_" (`extract_speaker()`, `extract_title()`, `extract_context()`, `extract_date()`, `extract_location()`, `extract_match()`)
-  - Closed #11 by adding `extract_similarities()` to fuzzy match texts
-  - Added `annotate_text()` function to classify words or sentences using NLP
-  - Added `load_pdfs()` function to help users loading readable and non-readable text files from PDFs
+  - Renamed text tools functions to start with "extract_" (`extract_names()`, `extract_title()`, `extract_context()`, `extract_date()`, `extract_locations()`, `extract_match()`)
+  - Closed #11 by adding `extract_similarities()` function to fuzzy match texts
+  - Added `annotate_text()` function to parse words or sentences using NLP
+  - Added `read_pdf()` function to load readable and non-readable text files from PDFs
 - Closed #14 by adding `select_promises()` function to extract future promises in text  
 - Closed #15 by adding `gather_topics()` and `gather_related_terms()` for assigning topics to texts
 - Added `get_urgency()` function for coding urgency from text

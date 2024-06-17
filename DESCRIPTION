@@ -2,7 +2,7 @@ Package: poldis
 Type: Package
 Title: Tools for Analyzing Political Discourse
 Version: 0.1.0
-Date: 2024-06-14
+Date: 2024-06-17
 Author: c(person(given = "Henrique",
                  family = "Sposito", 
                  role = c("cre", "aut", "ctb"),
