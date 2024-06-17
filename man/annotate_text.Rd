@@ -17,7 +17,7 @@ Defaults to "words".}
 A data frame with syntax information by words or sentences in text.
 }
 \description{
-This function relies on `{spacyr}` NLP parsing to annotate texts.
+This function relies on `\{spacyr\}` NLP parsing to annotate texts.
 }
 \examples{
 #annotate_text(US_News_Conferences_1960_1980[1:2, 3])

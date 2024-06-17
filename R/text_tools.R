@@ -309,7 +309,7 @@ read_pdf <- function(path) {
 
 #' Annotate text with NLP
 #'
-#' This function relies on `{spacyr}` NLP parsing to annotate texts.
+#' This function relies on `\{spacyr\}` NLP parsing to annotate texts.
 #' @param v Text vector
 #' @param level At which level would you like to parse the text?
 #' Options include "words" or "sentences".

@@ -27,7 +27,7 @@ Gather terms related to subjects
 }
 \details{
 This function relies on keyword assisted topic models (Eshima,
-Imai, and Sasaki 2024) implemented through the `{keyATM}` package to find
+Imai, and Sasaki 2024) implemented through the `\{keyATM\}` package to find
 related words based on the topics provided and texts in which they appear.
 }
 \examples{
