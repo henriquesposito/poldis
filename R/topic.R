@@ -51,6 +51,7 @@ gather_topics <- function(.data, dictionary = "CAP") {
     dplyr::mutate(dplyr::across(dplyr::everything(),
                                 ~ if_else(. > 0, dplyr::cur_column(), NA))) %>%
     tidyr::unite(col = topics,  na.rm = TRUE, sep = ", ")
+  out <- out$topics
   class(out) <- c("topics", class(out))
   out
 }
