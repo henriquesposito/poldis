@@ -21,6 +21,9 @@
 #' gather_topics(US_News_Conferences_1960_1980[1:5, 3],
 #'               dictionary = list("military" = c("military", "gun", "war"),
 #'                                 "development" = c("development", "interest rate", "banks")))
+#' #summary(gather_topics(US_News_Conferences_1960_1980[1:5, 3]))
+#' #plot(gather_topics(US_News_Conferences_1960_1980[1:5, 3],
+#' #                   dictionary = c("military", "development")))
 #' }
 #' @export
 gather_topics <- function(.data, dictionary = "CAP") {
@@ -51,7 +54,7 @@ gather_topics <- function(.data, dictionary = "CAP") {
     dplyr::mutate(dplyr::across(dplyr::everything(),
                                 ~ if_else(. > 0, dplyr::cur_column(), NA))) %>%
     tidyr::unite(col = topics,  na.rm = TRUE, sep = ", ")
-  out <- out$topics
+  out <- gsub("\\.", " ", out$topics)
   class(out) <- c("topics", class(out))
   out
 }
