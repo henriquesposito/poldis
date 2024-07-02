@@ -4,13 +4,17 @@
 \alias{select_promises}
 \title{Select future promises from political discourses}
 \usage{
-select_promises(.data)
+select_promises(.data, na.rm = TRUE)
 }
 \arguments{
 \item{.data}{A (annotated) data frame or text vector.
 For data frames, function will search for "text" variable.
 For annotated data frames, please declare an annotated data frame
 at the sentence level.}
+
+\item{na.rm}{Would you like political statements that do not contain a
+political action to be removed?
+By default, TRUE.}
 }
 \value{
 A data frame with syntax information by sentences and

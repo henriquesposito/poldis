@@ -6,6 +6,9 @@
 #' For data frames, function will search for "text" variable.
 #' For annotated data frames, please declare an annotated data frame
 #' at the sentence level.
+#' @param na.rm Would you like political statements that do not contain a
+#' political action to be removed?
+#' By default, TRUE.
 #' @importFrom stringr str_detect str_remove_all
 #' @importFrom dplyr mutate distinct %>%
 #' @examples
@@ -13,7 +16,7 @@
 #' @return A data frame with syntax information by sentences and
 #' a variable identifying which of these sentences are promises.
 #' @export
-select_promises <- function(.data) {
+select_promises <- function(.data, na.rm = TRUE) {
   tags <- sentence <- lemmas <- promises <- NULL
   if (inherits(.data, "data.frame")) {
     if ("token_id" %in% names(.data))
@@ -42,6 +45,7 @@ select_promises <- function(.data) {
                                     # Combinations of NLP tags to select
                                     NA, promises)) %>%
     dplyr::distinct()
+  if (isTRUE(na.rm)) out <- filter(out, !is.na(promises))
   class(out) <- c("promises", class(out))
   out
 }
