@@ -2,7 +2,7 @@ Package: poldis
 Type: Package
 Title: Tools for Analysing Political Texts
 Version: 0.1.0
-Date: 2024-06-17
+Date: 2024-07-02
 Authors@R: 
     c(person(given = "Henrique",
              family = "Sposito", 
@@ -45,7 +45,9 @@ Suggests:
     quanteda.textstats,
     keyATM,
     messydates,
-    pdftools
+    pdftools,
+    fmsb,
+    ggplot2
 RoxygenNote: 7.3.1
 Encoding: UTF-8
 LazyData: True
