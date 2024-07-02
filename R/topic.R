@@ -55,7 +55,7 @@ gather_topics <- function(.data, dictionary = "CAP") {
                                 ~ if_else(. > 0, dplyr::cur_column(), NA))) %>%
     tidyr::unite(col = topics,  na.rm = TRUE, sep = ", ")
   out <- gsub("\\.", " ", out$topics)
-  class(out) <- c("topics", class(out))
+  class(out) <- "topics"
   out
 }
 
