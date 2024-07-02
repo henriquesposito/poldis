@@ -1,6 +1,6 @@
 # poldis 0.1.0
 
-2024-06-17
+2024-07-02
 
 ## Package
 
@@ -18,6 +18,7 @@
 - Closed #14 by adding `select_promises()` function to extract future promises in text  
 - Closed #15 by adding `gather_topics()` and `gather_related_terms()` for assigning topics to texts
 - Added `get_urgency()` function for coding urgency from text
+- Added summary and plotting methods for "urgency" and "topics" classes
 
 # poldis 0.0.3
 
