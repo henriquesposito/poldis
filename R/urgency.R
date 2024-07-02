@@ -12,34 +12,39 @@
 #' @import dplyr
 #' @examples
 #' \donttest{
-#' get_urgency(US_News_Conferences_1960_1980[1:10,3])
+#' get_urgency(US_News_Conferences_1960_1980[1:10, 3])
+#' get_urgency(US_News_Conferences_1960_1980[1:10,])
+#' #get_urgency(select_promises(US_News_Conferences_1960_1980[1:2, 3]))
+#' #summary(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
+#' #plot(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
 #' }
 #' @export
 get_urgency <- function(.data, normalize = "tokens") {
-  frequency <- timing <- commitment <- intensity <- urgency <- text_clean <- NULL
+  Frequency <- Timing <- Commitment <- Intensity <- Urgency <- text_clean <- NULL
   # get text variable
   if (inherits(.data, "promises")) {
-    text <- stats::na.omit(getElement(.data, "promises"))
+    text_clean <- getElement(.data, "promises")
   } else if (inherits(.data, "data.frame")) {
-    text <- getElement(.data, "text")
-  } else text <- .data
+    text_clean <- getElement(.data, "text")
+  } else text_clean <- .data
   # assign urgency dimensions
-  out <- data.frame("text" = text, "text_clean" = .clean_token(text)) %>%
-    dplyr::mutate(frequency = .assign_frequencies(text_clean)/60,
-                  timing = .assign_timing(text_clean)/41,
-                  intensity = .assign_intensity(text_clean)/104,
-                  commitment = .assign_commitment(text_clean)/83)
+  out <- data.frame("text_clean" = .clean_token(text_clean)) %>%
+    dplyr::mutate(Frequency = .assign_frequencies(text_clean)/60,
+                  Timing = .assign_timing(text_clean)/41,
+                  Intensity = .assign_intensity(text_clean)/104,
+                  Commitment = .assign_commitment(text_clean)/83)
   if (normalize == "tokens") {
     out <- out %>%
-      dplyr::mutate(urgency = (frequency + timing + intensity + commitment)/nchar(text_clean)) %>%
-      dplyr::arrange(-urgency)
+      dplyr::mutate(Urgency = (Frequency + Timing + Intensity + Commitment)/nchar(text_clean)) %>%
+      dplyr::arrange(-Urgency)
   } else if (normalize == "none") {
     out <- out %>%
-      dplyr::mutate(urgency = (frequency + timing + intensity + commitment)) %>%
-      dplyr::arrange(-urgency)
+      dplyr::mutate(Urgency = (Frequency + Timing + Intensity + Commitment)) %>%
+      dplyr::arrange(-Urgency)
   }
+  out <- cbind(.data, out) %>% dplyr::select(-c(text_clean))
   class(out) <- c("urgency", class(out))
-  dplyr::select(out, -text_clean)
+  out
 }
 
 .assign_frequencies <- function(v) {
