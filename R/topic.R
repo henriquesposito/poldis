@@ -37,8 +37,8 @@ gather_topics <- function(.data, dictionary = "CAP") {
   # get dictionary
   if (any(dictionary ==  "CAP")) {
     dictionary <- CAP_topics %>%
-      dplyr::mutate(Words = stringr::str_replace_all(textstem::lemmatize_words(
-        stringr::str_squish(tolower(Words))), ", ", "\\\\b|\\\\b"))
+      dplyr::mutate(Words = stringr::str_replace_all(.clean_token(Words),
+                                                     ", ", "\\\\b|\\\\b"))
     subjects <- dictionary$Words
     names(subjects) <- dictionary$Topic
     } else if (is.vector(dictionary) && is.atomic(dictionary)) {
