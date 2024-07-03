@@ -29,13 +29,14 @@ get_urgency <- function(.data, normalize = "tokens") {
   } else text_clean <- .data
   # assign urgency dimensions
   out <- data.frame("text_clean" = .clean_token(text_clean)) %>%
-    dplyr::mutate(Frequency = .assign_frequencies(text_clean)/60,
-                  Timing = .assign_timing(text_clean)/41,
-                  Intensity = .assign_intensity(text_clean)/104,
-                  Commitment = .assign_commitment(text_clean)/83)
+    dplyr::mutate(Frequency = .assign_frequencies(text_clean),
+                  Timing = .assign_timing(text_clean),
+                  Intensity = .assign_intensity(text_clean),
+                  Commitment = .assign_commitment(text_clean))
   if (normalize == "tokens") {
     out <- out %>%
-      dplyr::mutate(Urgency = (Frequency + Timing + Intensity + Commitment)/nchar(text_clean)) %>%
+      dplyr::mutate(Urgency = (Frequency + Timing + Intensity + Commitment)/
+                      nchar(text_clean)) %>%
       dplyr::arrange(-Urgency)
   } else if (normalize == "none") {
     out <- out %>%
@@ -52,11 +53,12 @@ get_urgency <- function(.data, normalize = "tokens") {
   freq_words <- urgency_word_scores[,1:2] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(frequency = textstem::lemmatize_words(frequency)) %>%
-    dplyr::distinct() %>%
+    dplyr::distinct() %>% # 61 terms
     dplyr::group_by(score_frequency) %>%
     summarise(terms = paste0(frequency, collapse = "|"))
   rowSums(do.call("cbind", lapply(seq_len(nrow(freq_words)), function(i)
-    stringr::str_count(as.character(v), freq_words$terms[i])* freq_words$score_frequency[i])))
+    stringr::str_count(as.character(v), paste0("\\b", freq_words$terms[i], "\\b"))*
+      freq_words$score_frequency[i])))
 }
 
 .assign_timing <- function(v) {
@@ -64,11 +66,12 @@ get_urgency <- function(.data, normalize = "tokens") {
   timing_words <- urgency_word_scores[,3:4] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(timing = textstem::lemmatize_words(timing)) %>%
-    dplyr::distinct() %>%
+    dplyr::distinct() %>% # 41 terms
     dplyr::group_by(score_timing) %>%
     summarise(terms = paste0(timing, collapse = "|"))
   rowSums(do.call("cbind", lapply(seq_len(nrow(timing_words)), function(i)
-    stringr::str_count(as.character(v), timing_words$terms[i])*timing_words$score_timing[i])))
+    stringr::str_count(as.character(v), paste0("\\b", timing_words$terms[i], "\\b"))*
+      timing_words$score_timing[i])))
 }
 
 .assign_intensity <- function(v) {
@@ -76,11 +79,11 @@ get_urgency <- function(.data, normalize = "tokens") {
   intensity_words <- urgency_word_scores[,5:6] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(intensity = textstem::lemmatize_words(intensity)) %>%
-    dplyr::distinct() %>%
+    dplyr::distinct() %>% # 103 terms
     dplyr::group_by(score_intensity) %>%
     summarise(terms = paste0(intensity, collapse = "|"))
   rowSums(do.call("cbind", lapply(seq_len(nrow(intensity_words)), function(i)
-    stringr::str_count(as.character(v), intensity_words$terms[i])*
+    stringr::str_count(as.character(v), paste0("\\b", intensity_words$terms[i], "\\b"))*
       intensity_words$score_intensity[i])))
 }
 
@@ -89,11 +92,11 @@ get_urgency <- function(.data, normalize = "tokens") {
   commitment_words <- urgency_word_scores[,7:8] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(commitment = textstem::lemmatize_words(commitment)) %>%
-    dplyr::distinct() %>%
+    dplyr::distinct() %>% # 78 terms
     dplyr::group_by(score_commitment) %>%
     summarise(terms = paste0(commitment, collapse = "|"))
   out <- list()
   rowSums(do.call("cbind", lapply(seq_len(nrow(commitment_words)), function(i)
-    stringr::str_count(as.character(v), commitment_words$terms[i])*
+    stringr::str_count(as.character(v), paste0("\\b", commitment_words$terms[i], "\\b"))*
       commitment_words$score_commitment[i])))
 }
