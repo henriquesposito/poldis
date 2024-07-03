@@ -38,14 +38,15 @@ gather_topics <- function(.data, dictionary = "CAP") {
   if (any(dictionary ==  "CAP")) {
     dictionary <- CAP_topics %>%
       dplyr::mutate(Words = stringr::str_replace_all(textstem::lemmatize_words(
-        stringr::str_squish(tolower(Words))), ", ", "|"))
+        stringr::str_squish(tolower(Words))), ", ", "\\\\b|\\\\b"))
     subjects <- dictionary$Words
     names(subjects) <- dictionary$Topic
     } else if (is.vector(dictionary) && is.atomic(dictionary)) {
       subjects <- dictionary
       names(subjects) <- subjects
     } else {
-      subjects <- unlist(lapply(dictionary, function(x) paste0(x, collapse = "|")))
+      subjects <- unlist(lapply(dictionary, function(x)
+        paste0(x, collapse = "\\b|\\b")))
     }
   # match terms
   out <- lapply(names(subjects), function(i) stringr::str_count(text, subjects[[i]]))
