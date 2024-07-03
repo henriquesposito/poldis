@@ -36,12 +36,10 @@ get_urgency <- function(.data, normalize = "tokens") {
   if (normalize == "tokens") {
     out <- out %>%
       dplyr::mutate(Urgency = (Frequency + Timing + Intensity + Commitment)/
-                      nchar(text_clean)) %>%
-      dplyr::arrange(-Urgency)
+                      nchar(text_clean))
   } else if (normalize == "none") {
     out <- out %>%
-      dplyr::mutate(Urgency = (Frequency + Timing + Intensity + Commitment)) %>%
-      dplyr::arrange(-Urgency)
+      dplyr::mutate(Urgency = (Frequency + Timing + Intensity + Commitment))
   }
   out <- cbind(.data, out) %>% dplyr::select(-c(text_clean))
   class(out) <- c("urgency", class(out))
