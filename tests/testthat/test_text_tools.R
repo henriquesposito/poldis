@@ -39,7 +39,7 @@ test_that("Titles are extracted properly", {
 test_that("Locations are extracted properly", {
   skip_on_ci()
   skip_on_cran()
-  expect_equal(extract_locations(text)[["names"]], c("sao paulo", "united states"))
+  expect_equal(extract_locations(text)[["names"]], c("sao paulo", "the united states"))
 })
 
 test_that("Text is properly split", {
