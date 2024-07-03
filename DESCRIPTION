@@ -39,9 +39,7 @@ Imports:
 Suggests:
     rmarkdown,
     testthat,
-    covr,
     tesseract,
-    pkgdown,
     quanteda.textstats,
     keyATM,
     messydates,
