@@ -32,7 +32,6 @@ Imports:
     stringi,
     quanteda,
     spacyr,
-    tm,
     textstem,
     tidyr,
     stringdist
@@ -45,7 +44,8 @@ Suggests:
     messydates,
     pdftools,
     fmsb,
-    ggplot2
+    ggplot2,
+    tm
 RoxygenNote: 7.3.1
 Encoding: UTF-8
 LazyData: True
