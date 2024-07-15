@@ -1,3 +1,11 @@
+# poldis 0.1.1
+
+2024-07-15
+
+## Package
+
+- Fixed issues with GitHub workflows
+
 # poldis 0.1.0
 
 2024-07-15
