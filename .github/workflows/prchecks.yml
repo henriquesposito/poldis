@@ -2,7 +2,6 @@ on:
   pull_request:
     branches:
       - master
-      - main
 
 name: Binary checks
 
@@ -41,6 +40,7 @@ jobs:
             any::rcmdcheck
             any::lintr
             any::spelling
+            any::covr
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
@@ -62,6 +62,9 @@ jobs:
         with:
           name: ${{ matrix.config.asset_name }}
           path: build/
+
+      - name: Calculate code coverage
+        run: Rscript -e "covr::codecov()"
 
       - name: Lint
         run: lintr::lint_package()

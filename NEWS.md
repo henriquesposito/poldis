@@ -1,3 +1,25 @@
+# poldis 0.1.0
+
+2024-07-15
+
+## Package
+
+- Closed #3 by adding code coverage and code factor (and badges) to package
+- Closed #7 by adding a getting started section in README
+- Closed #8 by adding a `{pkgdown}` website
+
+## Functions
+
+- Updated text tools
+  - Renamed text tools functions to start with "extract_" (`extract_names()`, `extract_title()`, `extract_context()`, `extract_date()`, `extract_locations()`, `extract_match()`)
+  - Closed #11 by adding `extract_similarities()` function to fuzzy match texts
+  - Added `annotate_text()` function to parse words or sentences using NLP
+  - Added `read_pdf()` function to load readable and non-readable text files from PDFs
+- Closed #14 by adding `select_promises()` function to extract future promises in text  
+- Closed #15 by adding `gather_topics()` and `gather_related_terms()` for assigning topics to texts
+- Added `get_urgency()` function for coding urgency from text
+- Added summary and plotting methods for "urgency" and "topics" classes
+
 # poldis 0.0.3
 
 2022-09-25

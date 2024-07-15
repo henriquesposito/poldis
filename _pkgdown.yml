@@ -1,0 +1,44 @@
+url: https://henriquesposito.github.io/poldis
+template:
+  bootstrap: 5
+navbar:
+  structure:
+    left: [home, reference, articles, news]
+    right: [packages, search, github]
+  components:
+    home:
+      icon: fa-home fa-lg
+      href: index.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    news:
+      text: News
+      href: news/index.html
+    github:
+      icon: "fab fa-github fa-lg"
+      href: https://github.com/globalgov/manyenviron
+reference:
+  - title: "Text Tools"
+    desc: "These general text functions help you working with texts."
+    contents:
+    - starts_with("extract")
+    - split_text
+    - read_pdf
+    - annotate_text
+  - title: "Promises"
+    desc: "Select political promises in political discourses."
+    contents:
+    - select_promises
+  - title: "Topic"
+    desc: "Gather political topics in political discourses."
+    contents:
+    - starts_with("gather")
+  - title: "Urgency"
+    desc: "Conduct urgency analysis in political discourses."
+    contents:
+    - get_urgency
+  - title: "Data"
+    desc: "Text data for news coferences of US presidents from 1960 to 1980."
+    contents:
+    - US_News_Conferences_1960_1980

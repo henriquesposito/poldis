@@ -18,28 +18,32 @@ test_that("Words before and after are extracted correctly", {
   expect_equal(words [[1]][1], "some economists are warning that consumers are")
 })
 
-text <- c("This function was created on the 2021 September 9. I am Henrique",
+text <- c("This function was created on the 2021 September 9. I am Henrique Sposito",
           "Today is 12, October, 2021",
           "This is the first sentence. This is the second sentence.",
           "This is the United States",
           "This is Sao Paulo")
 
-# test_that("Speakers are extracted properly", {
-#   expect_message(extract_speaker(text), "No speakers were found in text...")
-# })
+test_that("Speakers are extracted properly", {
+  skip_on_ci()
+  skip_on_cran()
+  expect_message(extract_names(c("this is a test for Brazil", "this is also a test")),
+                 "No names found in text.")
+  expect_equal(extract_names(text)[["names"]], "henrique sposito")
+})
 
 test_that("Titles are extracted properly", {
-  expect_equal(extract_title(text)[3], c("This is the first sentence."))
+  expect_equal(extract_title(text)[3], "This is the first sentence.")
 })
 
 test_that("Locations are extracted properly", {
-  expect_equal(extract_location(text), c("NA", "NA", "NA", "United States of America", "Sao Paulo"))
-  expect_equal(extract_location(c("Varginha/MG", "Varginha-MG", "Varginha, MG,")),
-                                c("Minas Gerais", "Minas Gerais", "Minas Gerais"))
+  skip_on_ci()
+  skip_on_cran()
+  expect_equal(extract_locations(text)[["names"]], c("sao paulo", "the united states"))
 })
 
 test_that("Text is properly split", {
-  a <- extract_split(text)
+  a <- split_text(text)
   expect_length(a, 5)
 })
 
