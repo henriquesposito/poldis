@@ -1,11 +1,3 @@
-# poldis 0.1.1
-
-2024-07-15
-
-## Package
-
-- Fixed issues with GitHub workflows
-
 # poldis 0.1.0
 
 2024-07-15
@@ -15,6 +7,7 @@
 - Closed #3 by adding code coverage and code factor (and badges) to package
 - Closed #7 by adding a getting started section in README
 - Closed #8 by adding a `{pkgdown}` website
+- Added GitHub workflow actions
 
 ## Functions
 
