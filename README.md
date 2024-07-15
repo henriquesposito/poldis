@@ -48,8 +48,15 @@ political texts.
 
 # Installing the package
 
-To download the latest version of ´{poldis}´ from GitHub and use it
-locally:
+The easiest way to install `{poldis}` is directly from CRAN:
+
+``` r
+install.packages("poldis")
+library(poldis)
+```
+
+However, you may also install the development version from
+[GitHub](https://github.com/).
 
 ``` r
 # install.packages("remotes")
