@@ -2,7 +2,7 @@ Package: poldis
 Type: Package
 Title: Tools for Analysing Political Texts
 Version: 0.1.0
-Date: 2024-07-02
+Date: 2024-07-15
 Authors@R: 
     c(person(given = "Henrique",
              family = "Sposito", 
