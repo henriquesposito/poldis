@@ -95,6 +95,7 @@ jobs:
           release_name: Release ${{ steps.newtag.outputs.tag }}
           draft: false
           prerelease: false
+          allowUpdates: true
 
       - name: Download binaries
         uses: actions/download-artifact@v2
