@@ -7,6 +7,7 @@
 - Closed #3 by adding code coverage and code factor (and badges) to package
 - Closed #7 by adding a getting started section in README
 - Closed #8 by adding a `{pkgdown}` website
+- Added GitHub workflow actions
 
 ## Functions
 

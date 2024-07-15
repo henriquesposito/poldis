@@ -50,7 +50,7 @@ remotes::install_github("henriquesposito/poldis")
 library(poldis)
 ```
 
-```{r, include=FALSE}
+```{r package, include=FALSE}
 library(poldis)
 ```
 
