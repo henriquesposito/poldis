@@ -1,9 +1,9 @@
 #' Gather topic from political discourses
 #'
-#' @param .data A data frame, promises data frame coded using
-#' `select_promises()`, or text vector.
+#' @param .data A data frame, priorities data frame coded using
+#' `select_priorities()`, or text vector.
 #' For data frames, function will search for "text" variable.
-#' For promises data frame function will search for "promises" variable.
+#' For priorities data frame function will search for "priorities" variable.
 #' @param dictionary The dictionary of 20 major political topics from the
 #' Comparative Agendas Project (Jones et al., 2023) is used by default.
 #' Users can also declare a custom dictionary as a vector or a list.
@@ -29,8 +29,8 @@
 gather_topics <- function(.data, dictionary = "CAP") {
   Words <- topics <- NULL
   # get text variable
-  if (inherits(.data, "promises")) {
-    text <- stats::na.omit(.clean_token(getElement(.data, "promises")))
+  if (inherits(.data, "priorities")) {
+    text <- stats::na.omit(.clean_token(getElement(.data, "priorities")))
   } else if (inherits(.data, "data.frame")) {
     text <- .clean_token(getElement(.data, "text"))
   } else text <- .clean_token(.data)
@@ -62,10 +62,10 @@ gather_topics <- function(.data, dictionary = "CAP") {
 
 #' Gather terms related to subjects
 #'
-#' @param .data A data frame, promises data frame coded using
-#' `select_promises()`, or text vector.
+#' @param .data A data frame, priorities data frame coded using
+#' `select_priorities()`, or text vector.
 #' For data frames, function will search for "text" variable.
-#' For promises data frame function will search for "promises" variable.
+#' For priorities data frame function will search for "priorities" variable.
 #' @param dictionary The dictionary of 20 major political topics from the
 #' Comparative Agendas Project (Jones et al., 2023) is used by default.
 #' Users can also declare a custom dictionary as a vector or a list.
@@ -91,8 +91,8 @@ gather_related_terms <- function(.data, dictionary) {
   Words <- NULL
   thisRequires("keyATM")
   # get text variable
-  if (inherits(.data, "promises")) {
-    text <- stats::na.omit(.clean_token(getElement(.data, "promises")))
+  if (inherits(.data, "priorities")) {
+    text <- stats::na.omit(.clean_token(getElement(.data, "priorities")))
   } else if (inherits(.data, "data.frame")) {
     text <- .clean_token(getElement(.data, "text"))
   } else text <- .clean_token(.data)
