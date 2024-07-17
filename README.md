@@ -48,8 +48,15 @@ political texts.
 
 # Installing the package
 
-To download the latest version of ´{poldis}´ from GitHub and use it
-locally:
+The easiest way to install `{poldis}` is directly from CRAN:
+
+``` r
+install.packages("poldis")
+library(poldis)
+```
+
+However, you may also install the development version from
+[GitHub](https://github.com/).
 
 ``` r
 # install.packages("remotes")
@@ -93,17 +100,17 @@ annotate_text(text, level = "words")
 annotate_text(text, level = "sentences")
 ```
 
-# Selecting political promises
+# Selecting political priorities
 
-`select_promises()` allows political promises (i.e. statements in which
-actors express their intent or commitment to take political action in
-the future) to be extracted once texts have been annotated. Promises are
-captured by identifying sentences containing modal verbs (e.g. must) and
-other indications of future-oriented sentences with our custom-built
-dictionaries (e.g. need to, going to).
+`select_priorities()` allows political priorities (i.e. statements in
+which actors express their intent or commitment to take political action
+in the future) to be extracted once texts have been annotated.
+priorities are captured by identifying sentences containing modal verbs
+(e.g. must) and other indications of future-oriented sentences with our
+custom-built dictionaries (e.g. need to, going to).
 
 ``` r
-select_promises(text)
+select_priorities(text)
 ```
 
 # Gathering topics
@@ -148,7 +155,7 @@ get_urgency(text)
 
 Although the functions developed in the package consider the theoretical
 implications of working with political texts, they prioritize
-flexibility and accessibility. This means users can select promises,
+flexibility and accessibility. This means users can select priorities,
 gather topics, and/or measure urgency for various other types of texts.
 
 # Contributing

@@ -7,10 +7,10 @@
 get_urgency(.data, normalize = "tokens")
 }
 \arguments{
-\item{.data}{A data frame, promises data frame coded using
-`select_promises()`, or text vector.
+\item{.data}{A data frame, priorities data frame coded using
+`select_priorities()`, or text vector.
 For data frames, function will search for "text" variable.
-For promises data frame function will search for "promises" variable.}
+For priorities data frame function will search for "priorities" variable.}
 
 \item{normalize}{Would you like urgency scores to be normalized?
 By default, urgency scores are normalized by "tokens",
@@ -27,8 +27,5 @@ Urgency Analysis
 \donttest{
 get_urgency(US_News_Conferences_1960_1980[1:10, 3])
 get_urgency(US_News_Conferences_1960_1980[1:10,])
-#get_urgency(select_promises(US_News_Conferences_1960_1980[1:2, 3]))
-#summary(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
-#plot(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
 }
 }

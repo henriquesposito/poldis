@@ -63,10 +63,10 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>.data</dt>
-<dd><p>A data frame, promises data frame coded using
-`select_promises()`, or text vector.
+<dd><p>A data frame, priorities data frame coded using
+`select_priorities()`, or text vector.
 For data frames, function will search for "text" variable.
-For promises data frame function will search for "promises" variable.</p></dd>
+For priorities data frame function will search for "priorities" variable.</p></dd>
 
 
 <dt>normalize</dt>
@@ -143,7 +143,7 @@ Users can also declare "none", for no normalization.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8       6.00  45.50      53.6      115.1 0.007389014</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9       3.00  55.40      41.7      137.0 0.008828896</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10      2.55  44.75      58.8      131.5 0.008644401</span>
-<span class="r-in"><span><span class="co">#get_urgency(select_promises(US_News_Conferences_1960_1980[1:2, 3]))</span></span></span>
+<span class="r-in"><span><span class="co">#get_urgency(select_priorities(US_News_Conferences_1960_1980[1:2, 3]))</span></span></span>
 <span class="r-in"><span><span class="co">#summary(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))</span></span></span>
 <span class="r-in"><span><span class="co">#plot(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

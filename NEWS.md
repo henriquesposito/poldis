@@ -1,3 +1,12 @@
+# poldis 0.1.1
+
+2024-07-17
+
+## Package
+
+- Removed redundant terms from description for CRAN submission
+- Removed commented out code lines and examples in documentation for CRAN submission
+
 # poldis 0.1.0
 
 2024-07-15

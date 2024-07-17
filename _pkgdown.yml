@@ -26,10 +26,10 @@ reference:
     - split_text
     - read_pdf
     - annotate_text
-  - title: "Promises"
-    desc: "Select political promises in political discourses."
+  - title: "Priorities"
+    desc: "Select political priorities in political discourses."
     contents:
-    - select_promises
+    - select_priorities
   - title: "Topic"
     desc: "Gather political topics in political discourses."
     contents:

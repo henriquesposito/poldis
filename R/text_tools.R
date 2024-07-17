@@ -7,8 +7,6 @@
 #' @import spacyr
 #' @return A data frame of individual names and the number of times they appear.
 #' @details The function relies on named entity recognition from NLP models.
-#' @examples
-#' #extract_names(US_News_Conferences_1960_1980[20, 3])
 #' @export
 extract_names <- function(v) {
   ent_type <- text <- s <- NULL
@@ -41,9 +39,6 @@ extract_names <- function(v) {
 #' @importFrom stringdist stringsimmatrix
 #' @return A data frame of locations and the number of times they appear.
 #' @details The function relies on geographical entity detection from NLP models.
-#' @examples
-#' #extract_locations(c("This is the United States", "This is Sao Paulo",
-#' #"I was in Rio de Janeiro and Sao Paulo, then back to the United States"))
 #' @export
 extract_locations <- function(v) {
   v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
@@ -88,8 +83,6 @@ extract_title <- function(v) {
 #' Wrapper function for `messydates::as_messydates`.
 #' @param v Text vector.
 #' @return A vector of the dates in text.
-#' @examples
-#' #extract_date("Today is the twenty six of February of two thousand and twenty four")
 #' @export
 extract_date <- function(v) {
   thisRequires("messydates")
@@ -220,8 +213,6 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' in selecting a method, please see `?quanteda.textstats::textstat_simil()`.
 #' @importFrom dplyr group_by summarise select %>%
 #' @return A matrix of similarity scores between texts.
-#' @examples
-#' #extract_text_similarities(US_News_Conferences_1960_1980[1:2,3])
 #' @export
 extract_text_similarities <- function(v, comparison = "similarities", method) {
   thisRequires("quanteda.textstats")
@@ -317,9 +308,6 @@ read_pdf <- function(path) {
 #' @import spacyr
 #' @importFrom dplyr group_by summarise ungroup %>%
 #' @importFrom stringr str_squish
-#' @examples
-#' #annotate_text(US_News_Conferences_1960_1980[1:2, 3])
-#' #annotate_text(US_News_Conferences_1960_1980[1:2, 3], level = "sentence")
 #' @return A data frame with syntax information by words or sentences in text.
 #' @export
 annotate_text <- function(v, level = "words") {
