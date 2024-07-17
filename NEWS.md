@@ -1,3 +1,12 @@
+# poldis 0.1.1
+
+2024-07-17
+
+## Package
+
+- Removed redundant terms from description
+- Removed commented out code lines and examples in documentation
+
 # poldis 0.1.0
 
 2024-07-15
