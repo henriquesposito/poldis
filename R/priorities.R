@@ -11,8 +11,6 @@
 #' By default, TRUE.
 #' @importFrom stringr str_detect str_remove_all
 #' @importFrom dplyr mutate distinct %>%
-#' @examples
-#' #select_priorities(US_News_Conferences_1960_1980[1:2,3])
 #' @return A data frame with syntax information by sentences and
 #' a variable identifying which of these sentences are priorities.
 #' @export

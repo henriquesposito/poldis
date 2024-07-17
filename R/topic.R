@@ -21,9 +21,6 @@
 #' gather_topics(US_News_Conferences_1960_1980[1:5, 3],
 #'               dictionary = list("military" = c("military", "gun", "war"),
 #'                                 "development" = c("development", "interest rate", "banks")))
-#' #summary(gather_topics(US_News_Conferences_1960_1980[1:5, 3]))
-#' #plot(gather_topics(US_News_Conferences_1960_1980[1:5, 3],
-#' #                   dictionary = c("military", "development")))
 #' }
 #' @export
 gather_topics <- function(.data, dictionary = "CAP") {
@@ -76,16 +73,14 @@ gather_topics <- function(.data, dictionary = "CAP") {
 #' @import dplyr
 #' @importFrom stringr str_detect str_remove_all
 #' @return A list of related terms to each of the topics declared in dictionary.
-#' @details This function relies on keyword assisted topic models (Eshima,
-#' Imai, and Sasaki 2024) implemented through the `\{keyATM\}` package to find
-#' related words based on the topics provided and texts in which they appear.
-#' @examples
-#' #gather_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
-#' #gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
-#' #                     dictionary = c("military", "development"))
-#' #gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
-#' #                     dictionary = list("military" = c("military", "gun", "war"),
-#' #                                       "development" = c("development", "interest rate", "banks")))
+#' @details This function relies on keyword assisted topic models implemented
+#' in the `\{keyATM\}` package to find related words based on the topics
+#' provided and texts in which they appear.
+#' @references
+#' Eshima S, Imai K, and Sasaki T. 2024.
+#' “Keyword-Assisted Topic Models.”
+#' _American Journal of Political Science_, 68(2): 730-750.
+#' \doi{10.1111/ajps.12779}
 #' @export
 gather_related_terms <- function(.data, dictionary) {
   Words <- NULL
@@ -104,7 +99,7 @@ gather_related_terms <- function(.data, dictionary) {
     dictionary <- subjects$Words
     names(dictionary) <- subjects$Topic
   }
-  # Get tokens and document feature matrix
+  # get tokens and document feature matrix
   tok <- quanteda::corpus_reshape(quanteda::corpus(text), "sentences") %>%
     quanteda::tokens(remove_numbers = TRUE, remove_punct = TRUE,
                      remove_symbols = TRUE, remove_separators = TRUE,
