@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">poldis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,7 +30,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Gather topic from political discourses</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/henriquesposito/poldis/blob/master/R/topic.R" class="external-link"><code>R/topic.R</code></a></small>
       <div class="d-none name"><code>gather_topics.Rd</code></div>
     </div>
 
@@ -48,10 +48,10 @@
 
 
 <dl><dt id="arg--data">.data<a class="anchor" aria-label="anchor" href="#arg--data"></a></dt>
-<dd><p>A data frame, promises data frame coded using
-`select_promises()`, or text vector.
+<dd><p>A data frame, priorities data frame coded using
+`select_priorities()`, or text vector.
 For data frames, function will search for "text" variable.
-For promises data frame function will search for "promises" variable.</p></dd>
+For priorities data frame function will search for "priorities" variable.</p></dd>
 
 
 <dt id="arg-dictionary">dictionary<a class="anchor" aria-label="anchor" href="#arg-dictionary"></a></dt>
@@ -72,7 +72,7 @@ names as topic and words as terms.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu">gather_topics</span><span class="op">(</span><span class="va">US_News_Conferences_1960_1980</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">3</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Macroeconomics, Civil Rights  Minority Issues  and Civil Liberties, Agriculture, Labor and Employment, Environment, Energy, Immigration, Transportation, Community Development and Housing Issues, Banking  Finance  and Domestic Commerce, Defense, Foreign Trade, International Affairs and Foreign Aid, Government Operations"                                                         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Macroeconomics, Civil Rights  Minority Issues  and Civil Liberties, Agriculture, Labor and Employment, Environment and Climate Change, Energy, Immigration, Transportation, Community Development and Housing Issues, Banking  Finance  and Domestic Commerce, Defense, Foreign Trade, International Affairs and Foreign Aid, Government Operations"                                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] "Macroeconomics, Civil Rights  Minority Issues  and Civil Liberties, Health, Labor and Employment, Education, Energy, Immigration, Law  Crime  and Family Issues, Community Development and Housing Issues, Banking  Finance  and Domestic Commerce, Defense, Space  Science  Technology  and Communications, Foreign Trade, International Affairs and Foreign Aid, Government Operations" </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3] "Macroeconomics, Civil Rights  Minority Issues  and Civil Liberties, Labor and Employment, Immigration, Law  Crime  and Family Issues, Banking  Finance  and Domestic Commerce, Defense, International Affairs and Foreign Aid, Government Operations"                                                                                                                                     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4] "Macroeconomics, Health, Agriculture, Labor and Employment, Energy, Immigration, Transportation, Law  Crime  and Family Issues, Community Development and Housing Issues, Banking  Finance  and Domestic Commerce, Defense, Space  Science  Technology  and Communications, Foreign Trade, International Affairs and Foreign Aid, Government Operations, Public Lands and Water Management"</span>
@@ -92,9 +92,6 @@ names as topic and words as terms.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4] "military"              "development"          </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "topics"</span>
-<span class="r-in"><span><span class="co">#summary(gather_topics(US_News_Conferences_1960_1980[1:5, 3]))</span></span></span>
-<span class="r-in"><span><span class="co">#plot(gather_topics(US_News_Conferences_1960_1980[1:5, 3],</span></span></span>
-<span class="r-in"><span><span class="co">#                   dictionary = c("military", "development")))</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
