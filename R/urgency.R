@@ -9,8 +9,8 @@
 #' the number of words in text observation.
 #' Users can also declare "none", for no normalization.
 #' Since dictionaries for each dimension of urgency have a slightly different
-#' number of words, scores for in each dimension are normalized
-#' by the number of words in dictionary by default.
+#' number of words, scores for in each dimension are adjusted
+#' by the number of words in each dictionary by default.
 #' @details
 #' Urgency words and scores were generated and validated with an
 #' online survey with 206 participants.
@@ -42,10 +42,10 @@ get_urgency <- function(.data, normalize = "tokens") {
   } else text_clean <- .data
   # assign urgency dimensions
   out <- data.frame("text_clean" = .clean_token(text_clean)) %>%
-    dplyr::mutate(Frequency = .assign_frequencies(text_clean)/61, #61 terms
-                  Timing = .assign_timing(text_clean)/41, #41 terms
-                  Intensity = .assign_intensity(text_clean)/98, #98 terms
-                  Commitment = .assign_commitment(text_clean)/85) #85 terms
+    dplyr::mutate(Frequency = .assign_frequencies(text_clean)*1.2, #61 terms
+                  Timing = .assign_timing(text_clean)*1.3, #41 terms
+                  Intensity = .assign_intensity(text_clean), #98 terms
+                  Commitment = .assign_commitment(text_clean)*1.1) #85 terms
   if (normalize == "tokens") {
     out <- out %>%
       dplyr::mutate(Urgency = (Frequency + Timing + Intensity + Commitment)/

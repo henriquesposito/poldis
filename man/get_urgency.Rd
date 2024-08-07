@@ -17,8 +17,8 @@ By default, urgency scores are normalized by "tokens",
 the number of words in text observation.
 Users can also declare "none", for no normalization.
 Since dictionaries for each dimension of urgency have a slightly different
-number of words, scores for in each dimension are normalized
-by the number of words in dictionary by default.}
+number of words, scores for in each dimension are adjusted
+by the number of words in each dictionary by default.}
 }
 \value{
 A scored data frame for each dimension of urgency.
@@ -27,7 +27,7 @@ A scored data frame for each dimension of urgency.
 Urgency Analysis
 }
 \details{
-Urgency words and scores were generated and validated with the help of an
+Urgency words and scores were generated and validated with an
 online survey with 206 participants.
 The survey collected responses anonymously but included basic demographic
 information about participants, as English proficiency and education levels.
