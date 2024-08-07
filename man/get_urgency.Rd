@@ -15,13 +15,30 @@ For priorities data frame function will search for "priorities" variable.}
 \item{normalize}{Would you like urgency scores to be normalized?
 By default, urgency scores are normalized by "tokens",
 the number of words in text observation.
-Users can also declare "none", for no normalization.}
+Users can also declare "none", for no normalization.
+Since dictionaries for each dimension of urgency have a slightly different
+number of words, scores for in each dimension are normalized
+by the number of words in dictionary by default.}
 }
 \value{
 A scored data frame for each dimension of urgency.
 }
 \description{
 Urgency Analysis
+}
+\details{
+Urgency words and scores were generated and validated with the help of an
+online survey with 206 participants.
+The survey collected responses anonymously but included basic demographic
+information about participants, as English proficiency and education levels.
+The survey results were recorded as counts of the number of participants
+who said a certain randomly selected urgency related word was more urgent
+than another randomly selected urgency related word.
+To analyze the survey results, we employed Bradley-Terry models for
+paired comparisons using the BradleyTerry2 R package (Turner and Firth, 2012).
+This allowed to obtain a rank of the words for each dimension of urgency.
+The rankings were then used to adjust and validate urgency word scores
+in the dictionaries.
 }
 \examples{
 \donttest{
