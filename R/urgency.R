@@ -4,6 +4,7 @@
 #' `select_priorities()`, or text vector.
 #' For data frames, function will search for "text" variable.
 #' For priorities data frame function will search for "priorities" variable.
+#' If missing, opens the webpage containing the urgency codebook.
 #' @param normalize Would you like urgency scores to be normalized?
 #' By default, urgency scores are normalized by "tokens",
 #' the number of words in text observation.
@@ -12,8 +13,23 @@
 #' number of words, scores for in each dimension are adjusted
 #' by the number of words in each dictionary by default.
 #' @details
-#' Urgency words and scores were generated and validated with an
-#' online survey with 206 participants.
+#' Urgency in political discourses is an expression of how necessary and/or
+#' how soon an action should be undertaken or completed.
+#' This is measured along four dimensions,
+#' two related to necessity and two related to timing.
+#' The first two dimensions, degree of intensity and degree of commitment,
+#' relate to the necessity of taking the action, while the next two dimensions,
+#' frequency of action and timing of action,
+#' relate to the timing in which action is taken.
+#' Our dictionary includes terms in each of these dimensions.
+#' The terms included in each of these dimensions of urgency were first adapted
+#' from established lexicon dictionaries and later complemented by other terms
+#' inductively found in texts during pre-testing.
+#' The words in the dictionaries for each dimension are scored on a scale
+#' between 0 and 1, with 1 being the maximum value obtainable and contributing
+#' the most to the urgency score of the sentence.
+#' Urgency terms were validated and adjusted with online survey
+#' with 206 participants that took place between July and August of 2024.
 #' The survey collected responses anonymously but included basic demographic
 #' information about participants, as English proficiency and education levels.
 #' The survey results were recorded as counts of the number of participants
@@ -24,6 +40,8 @@
 #' This allowed to obtain a rank of the words for each dimension of urgency.
 #' The rankings were then used to adjust and validate urgency word scores
 #' in the dictionaries.
+#' For more information on the dimensions, scores, or the survey on urgency,
+#' please run `get_urgency()` to access the urgency codebook.
 #' @return A scored data frame for each dimension of urgency.
 #' @import dplyr
 #' @examples
@@ -33,10 +51,13 @@
 #' #get_urgency(select_priorities(US_News_Conferences_1960_1980[1:2, 3]))
 #' #summary(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
 #' #plot(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
+#' #get_urgency()
 #' }
 #' @export
 get_urgency <- function(.data, normalize = "tokens") {
   Frequency <- Timing <- Commitment <- Intensity <- Urgency <- text_clean <- NULL
+  # tries to open urgency codebook if no argument is declared
+  if (missing(.data)) open_codebook(codebook = "urgency")
   # get text variable
   if (inherits(.data, "priorities")) {
     text_clean <- getElement(.data, "priorities")
