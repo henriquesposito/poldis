@@ -1,8 +1,8 @@
 Package: poldis
 Type: Package
 Title: Analyse Political Texts
-Version: 0.1.1
-Date: 2024-07-17
+Version: 0.1.2
+Date: 2024-08-08
 Authors@R: 
     c(person(given = "Henrique",
              family = "Sposito", 
@@ -46,7 +46,8 @@ Suggests:
     pdftools,
     fmsb,
     ggplot2,
-    tm
+    tm,
+    cli
 RoxygenNote: 7.3.2
 Encoding: UTF-8
 LazyData: True
