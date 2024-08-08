@@ -24,3 +24,6 @@ a variable identifying which of these sentences are priorities.
 Political priorities are statements in which actors express their
 intent or commitment to take political action in the future.
 }
+\examples{
+#select_priorities(US_News_Conferences_1960_1980[1:2,3])
+}

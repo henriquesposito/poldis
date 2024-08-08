@@ -13,6 +13,8 @@
 #' @importFrom dplyr mutate distinct %>%
 #' @return A data frame with syntax information by sentences and
 #' a variable identifying which of these sentences are priorities.
+#' @examples
+#' #select_priorities(US_News_Conferences_1960_1980[1:2,3])
 #' @export
 select_priorities <- function(.data, na.rm = TRUE) {
   tags <- sentence <- lemmas <- priorities <- NULL

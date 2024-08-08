@@ -30,6 +30,14 @@ This function relies on keyword assisted topic models implemented
 in the `\{keyATM\}` package to find related words based on the topics
 provided and texts in which they appear.
 }
+\examples{
+#gather_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
+#gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
+#                     dictionary = c("military", "development"))
+#gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
+#                     dictionary = list("military" = c("military", "gun", "war"),
+#                                       "development" = c("development", "interest rate", "banks")))
+}
 \references{
 Eshima S, Imai K, and Sasaki T. 2024.
 “Keyword-Assisted Topic Models.”

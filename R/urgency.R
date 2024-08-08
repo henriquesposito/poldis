@@ -4,20 +4,60 @@
 #' `select_priorities()`, or text vector.
 #' For data frames, function will search for "text" variable.
 #' For priorities data frame function will search for "priorities" variable.
+#' If missing, opens the webpage containing the urgency codebook.
 #' @param normalize Would you like urgency scores to be normalized?
 #' By default, urgency scores are normalized by "tokens",
 #' the number of words in text observation.
 #' Users can also declare "none", for no normalization.
+#' Since dictionaries for each dimension of urgency have a slightly different
+#' number of words, scores for in each dimension are adjusted
+#' by the number of words in each dictionary by default.
+#' @details
+#' Urgency in political discourses is an expression of how necessary and/or
+#' how soon an action should be undertaken or completed.
+#' This is measured along four dimensions,
+#' two related to necessity and two related to timing.
+#' The first two dimensions, degree of intensity and degree of commitment,
+#' relate to the necessity of taking the action, while the next two dimensions,
+#' frequency of action and timing of action,
+#' relate to the timing in which action is taken.
+#' Our dictionary includes terms in each of these dimensions.
+#' The terms included in each of these dimensions of urgency were first adapted
+#' from established lexicon dictionaries and later complemented by other terms
+#' inductively found in texts during pre-testing.
+#' The words in the dictionaries for each dimension are scored on a scale
+#' between 0 and 1, with 1 being the maximum value obtainable and contributing
+#' the most to the urgency score of the sentence.
+#' Urgency terms were validated and adjusted with online survey
+#' with 206 participants that took place between July and August of 2024.
+#' The survey collected responses anonymously but included basic demographic
+#' information about participants, as English proficiency and education levels.
+#' The survey results were recorded as counts of the number of participants
+#' who said a certain randomly selected urgency related word was more urgent
+#' than another randomly selected urgency related word.
+#' To analyze the survey results, we employed Bradley-Terry models for
+#' paired comparisons using the BradleyTerry2 R package (Turner and Firth, 2012).
+#' This allowed to obtain a rank of the words for each dimension of urgency.
+#' The rankings were then used to adjust and validate urgency word scores
+#' in the dictionaries.
+#' For more information on the dimensions, scores, or the survey on urgency,
+#' please run `get_urgency()` to access the urgency codebook.
 #' @return A scored data frame for each dimension of urgency.
 #' @import dplyr
 #' @examples
 #' \donttest{
 #' get_urgency(US_News_Conferences_1960_1980[1:10, 3])
 #' get_urgency(US_News_Conferences_1960_1980[1:10,])
+#' #get_urgency(select_priorities(US_News_Conferences_1960_1980[1:2, 3]))
+#' #summary(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
+#' #plot(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
+#' #get_urgency()
 #' }
 #' @export
 get_urgency <- function(.data, normalize = "tokens") {
   Frequency <- Timing <- Commitment <- Intensity <- Urgency <- text_clean <- NULL
+  # tries to open urgency codebook if no argument is declared
+  if (missing(.data)) open_codebook(codebook = "urgency")
   # get text variable
   if (inherits(.data, "priorities")) {
     text_clean <- getElement(.data, "priorities")
@@ -26,10 +66,10 @@ get_urgency <- function(.data, normalize = "tokens") {
   } else text_clean <- .data
   # assign urgency dimensions
   out <- data.frame("text_clean" = .clean_token(text_clean)) %>%
-    dplyr::mutate(Frequency = .assign_frequencies(text_clean),
-                  Timing = .assign_timing(text_clean),
-                  Intensity = .assign_intensity(text_clean),
-                  Commitment = .assign_commitment(text_clean))
+    dplyr::mutate(Frequency = .assign_frequencies(text_clean)*1.2, #61 terms
+                  Timing = .assign_timing(text_clean)*1.3, #41 terms
+                  Intensity = .assign_intensity(text_clean), #98 terms
+                  Commitment = .assign_commitment(text_clean)*1.1) #85 terms
   if (normalize == "tokens") {
     out <- out %>%
       dplyr::mutate(Urgency = (Frequency + Timing + Intensity + Commitment)/
@@ -44,54 +84,54 @@ get_urgency <- function(.data, normalize = "tokens") {
 }
 
 .assign_frequencies <- function(v) {
-  frequency <- score_frequency <- NULL
-  freq_words <- urgency_word_scores[,1:2] %>%
+  frequency <- score_frequency_scaled <- NULL
+  freq_words <- urgency_word_scores[,c(5,8)] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(frequency = textstem::lemmatize_words(frequency)) %>%
-    dplyr::distinct() %>% # 61 terms
-    dplyr::group_by(score_frequency) %>%
+    dplyr::distinct() %>%
+    dplyr::group_by(score_frequency_scaled) %>%
     summarise(terms = paste0(frequency, collapse = "|"))
   rowSums(do.call("cbind", lapply(seq_len(nrow(freq_words)), function(i)
     stringr::str_count(as.character(v), paste0("\\b", freq_words$terms[i], "\\b"))*
-      freq_words$score_frequency[i])))
+      freq_words$score_frequency_scaled[i])))
 }
 
 .assign_timing <- function(v) {
-  timing <- score_timing <- NULL
-  timing_words <- urgency_word_scores[,3:4] %>%
+  timing <- score_timing_scaled <- NULL
+  timing_words <- urgency_word_scores[,c(1,4)] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(timing = textstem::lemmatize_words(timing)) %>%
     dplyr::distinct() %>% # 41 terms
-    dplyr::group_by(score_timing) %>%
+    dplyr::group_by(score_timing_scaled) %>%
     summarise(terms = paste0(timing, collapse = "|"))
   rowSums(do.call("cbind", lapply(seq_len(nrow(timing_words)), function(i)
     stringr::str_count(as.character(v), paste0("\\b", timing_words$terms[i], "\\b"))*
-      timing_words$score_timing[i])))
+      timing_words$score_timing_scaled[i])))
 }
 
 .assign_intensity <- function(v) {
-  intensity <- score_intensity <- NULL
-  intensity_words <- urgency_word_scores[,5:6] %>%
+  intensity <- score_intensity_scaled <- NULL
+  intensity_words <- urgency_word_scores[,c(13, 16)] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(intensity = textstem::lemmatize_words(intensity)) %>%
-    dplyr::distinct() %>% # 103 terms
-    dplyr::group_by(score_intensity) %>%
+    dplyr::distinct() %>%
+    dplyr::group_by(score_intensity_scaled) %>%
     summarise(terms = paste0(intensity, collapse = "|"))
   rowSums(do.call("cbind", lapply(seq_len(nrow(intensity_words)), function(i)
     stringr::str_count(as.character(v), paste0("\\b", intensity_words$terms[i], "\\b"))*
-      intensity_words$score_intensity[i])))
+      intensity_words$score_intensity_scaled[i])))
 }
 
 .assign_commitment <- function(v) {
-  commitment <- score_commitment <- NULL
-  commitment_words <- urgency_word_scores[,7:8] %>%
+  commitment <- score_commitment_scaled <- NULL
+  commitment_words <- urgency_word_scores[,c(9,12)] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(commitment = textstem::lemmatize_words(commitment)) %>%
-    dplyr::distinct() %>% # 78 terms
-    dplyr::group_by(score_commitment) %>%
+    dplyr::distinct() %>%
+    dplyr::group_by(score_commitment_scaled) %>%
     summarise(terms = paste0(commitment, collapse = "|"))
   out <- list()
   rowSums(do.call("cbind", lapply(seq_len(nrow(commitment_words)), function(i)
     stringr::str_count(as.character(v), paste0("\\b", commitment_words$terms[i], "\\b"))*
-      commitment_words$score_commitment[i])))
+      commitment_words$score_commitment_scaled[i])))
 }
