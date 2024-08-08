@@ -4,12 +4,12 @@
 
 ## Package
 
-- Updated documentation to include more details about urgency scores
+- Updated documentation for `get_urgency()` to include more details about urgency scores
 
 ## Functions
 
 - Updated `get_urgency()` and `gather_topics()` to open codebooks for urgency or topic when no arguments are declared
-- Updated urgency scores in `get_urgency()` according to to survey results. 
+- Updated urgency scores in `get_urgency()` according to survey results. 
 
 # poldis 0.1.1
 
