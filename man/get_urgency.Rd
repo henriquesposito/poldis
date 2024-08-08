@@ -44,5 +44,8 @@ in the dictionaries.
 \donttest{
 get_urgency(US_News_Conferences_1960_1980[1:10, 3])
 get_urgency(US_News_Conferences_1960_1980[1:10,])
+#get_urgency(select_priorities(US_News_Conferences_1960_1980[1:2, 3]))
+#summary(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
+#plot(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
 }
 }

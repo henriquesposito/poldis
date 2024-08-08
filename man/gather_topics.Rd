@@ -33,5 +33,8 @@ gather_topics(US_News_Conferences_1960_1980[1:5, 3],
 gather_topics(US_News_Conferences_1960_1980[1:5, 3],
               dictionary = list("military" = c("military", "gun", "war"),
                                 "development" = c("development", "interest rate", "banks")))
+#summary(gather_topics(US_News_Conferences_1960_1980[1:5, 3]))
+#plot(gather_topics(US_News_Conferences_1960_1980[1:5, 3],
+#                   dictionary = c("military", "development")))
 }
 }

@@ -15,3 +15,6 @@ A vector of the dates in text.
 \description{
 Wrapper function for `messydates::as_messydates`.
 }
+\examples{
+#extract_date("Today is the twenty six of February of two thousand and twenty four")
+}
