@@ -20,12 +20,12 @@ open_codebook <- function(codebook = "urgency") {
   url <- "https://github.com/henriquesposito/poldis/inst"
   if (codebook == "urgency") {
     tryCatch({
-      utils::browseURL(paste0(url, "/urgency_codebok.pdf"),
+      utils::browseURL(paste0(url, "/urgency_codebook.pdf"),
                        browser = getOption("browser"), encodeIfNeeded = FALSE)
     }, error = function(e) {
       message(paste0("Unable to open codebook, please visit: ",
-                     cli::style_hyperlink(paste0(url, "/urgency_codebok.pdf"),
-                                          paste0(url, "/urgency_codebok.pdf"))))
+                     cli::style_hyperlink(paste0(url, "/urgency_codebook.pdf"),
+                                          paste0(url, "/urgency_codebook.pdf"))))
     })
   } else if (codebook == "topic") {
     tryCatch({
