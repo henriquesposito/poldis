@@ -9,9 +9,8 @@
 #' By default, urgency scores are normalized by "tokens",
 #' the number of words in text observation.
 #' Users can also declare "none", for no normalization.
-#' Since dictionaries for each dimension of urgency have a slightly different
-#' number of words, scores for in each dimension are adjusted
-#' by the number of words in each dictionary by default.
+#' Scores for each dimension are weighted to account for the
+#' different number of words in each dimension before normalization.
 #' @details
 #' Urgency in political discourses is an expression of how necessary and/or
 #' how soon an action should be undertaken or completed.
@@ -28,17 +27,16 @@
 #' The words in the dictionaries for each dimension are scored on a scale
 #' between 0 and 1, with 1 being the maximum value obtainable and contributing
 #' the most to the urgency score of the sentence.
-#' Urgency terms were validated and adjusted with online survey
+#' Urgency terms were validated and adjusted through an online survey
 #' with 206 participants that took place between July and August of 2024.
 #' The survey collected responses anonymously but included basic demographic
 #' information about participants, as English proficiency and education levels.
 #' The survey results were recorded as counts of the number of participants
-#' who said a certain randomly selected urgency related word was more urgent
-#' than another randomly selected urgency related word.
+#' who selected an urgency-related word as more urgent than its pair.
 #' To analyze the survey results, we employed Bradley-Terry models for
 #' paired comparisons using the BradleyTerry2 R package (Turner and Firth, 2012).
-#' This allowed to obtain a rank of the words for each dimension of urgency.
-#' The rankings were then used to adjust and validate urgency word scores
+#' A rank of the words for each dimension of urgency was obtained from the analysis,
+#' which were then used to adjust and validate the urgency word scores
 #' in the dictionaries.
 #' For more information on the dimensions, scores, or the survey on urgency,
 #' please run `get_urgency()` to access the urgency codebook.
