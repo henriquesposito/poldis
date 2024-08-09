@@ -10,12 +10,16 @@ get_urgency(.data, normalize = "tokens")
 \item{.data}{A data frame, priorities data frame coded using
 `select_priorities()`, or text vector.
 For data frames, function will search for "text" variable.
-For priorities data frame function will search for "priorities" variable.}
+For priorities data frame function will search for "priorities" variable.
+If missing, opens the webpage containing the urgency codebook.}
 
 \item{normalize}{Would you like urgency scores to be normalized?
 By default, urgency scores are normalized by "tokens",
 the number of words in text observation.
-Users can also declare "none", for no normalization.}
+Users can also declare "none", for no normalization.
+Since dictionaries for each dimension of urgency have a slightly different
+number of words, scores for in each dimension are adjusted
+by the number of words in each dictionary by default.}
 }
 \value{
 A scored data frame for each dimension of urgency.
@@ -23,9 +27,44 @@ A scored data frame for each dimension of urgency.
 \description{
 Urgency Analysis
 }
+\details{
+Urgency in political discourses is an expression of how necessary and/or
+how soon an action should be undertaken or completed.
+This is measured along four dimensions,
+two related to necessity and two related to timing.
+The first two dimensions, degree of intensity and degree of commitment,
+relate to the necessity of taking the action, while the next two dimensions,
+frequency of action and timing of action,
+relate to the timing in which action is taken.
+Our dictionary includes terms in each of these dimensions.
+The terms included in each of these dimensions of urgency were first adapted
+from established lexicon dictionaries and later complemented by other terms
+inductively found in texts during pre-testing.
+The words in the dictionaries for each dimension are scored on a scale
+between 0 and 1, with 1 being the maximum value obtainable and contributing
+the most to the urgency score of the sentence.
+Urgency terms were validated and adjusted with online survey
+with 206 participants that took place between July and August of 2024.
+The survey collected responses anonymously but included basic demographic
+information about participants, as English proficiency and education levels.
+The survey results were recorded as counts of the number of participants
+who said a certain randomly selected urgency related word was more urgent
+than another randomly selected urgency related word.
+To analyze the survey results, we employed Bradley-Terry models for
+paired comparisons using the BradleyTerry2 R package (Turner and Firth, 2012).
+This allowed to obtain a rank of the words for each dimension of urgency.
+The rankings were then used to adjust and validate urgency word scores
+in the dictionaries.
+For more information on the dimensions, scores, or the survey on urgency,
+please run `get_urgency()` to access the urgency codebook.
+}
 \examples{
 \donttest{
 get_urgency(US_News_Conferences_1960_1980[1:10, 3])
 get_urgency(US_News_Conferences_1960_1980[1:10,])
+#get_urgency(select_priorities(US_News_Conferences_1960_1980[1:2, 3]))
+#summary(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
+#plot(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
+#get_urgency()
 }
 }

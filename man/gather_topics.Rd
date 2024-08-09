@@ -10,14 +10,17 @@ gather_topics(.data, dictionary = "CAP")
 \item{.data}{A data frame, priorities data frame coded using
 `select_priorities()`, or text vector.
 For data frames, function will search for "text" variable.
-For priorities data frame function will search for "priorities" variable.}
+For priorities data frame function will search for "priorities" variable.
+If missing, opens the webpage containing the political topics codebook.}
 
 \item{dictionary}{The dictionary of 20 major political topics from the
 Comparative Agendas Project (Jones et al., 2023) is used by default.
 Users can also declare a custom dictionary as a vector or a list.
 If users declare a vector, each element is treated as a independent topic.
 If users declare a list of subjects and related terms, function understands
-names as topic and words as terms.}
+names as topic and words as terms.
+For more information on how the CAP topics were adapted, please run
+`gather_topics()` to access the political topics codebook.}
 }
 \value{
 A list of topics present in each text separated by comma.
@@ -33,5 +36,8 @@ gather_topics(US_News_Conferences_1960_1980[1:5, 3],
 gather_topics(US_News_Conferences_1960_1980[1:5, 3],
               dictionary = list("military" = c("military", "gun", "war"),
                                 "development" = c("development", "interest rate", "banks")))
+#summary(gather_topics(US_News_Conferences_1960_1980[1:5, 3]))
+#plot(gather_topics(US_News_Conferences_1960_1980[1:5, 3],
+#                   dictionary = c("military", "development")))
 }
 }
