@@ -66,7 +66,7 @@ get_urgency <- function(.data, normalize = "tokens") {
   } else text_clean <- .data
   # assign urgency dimensions
   out <- data.frame("text_clean" = .clean_token(text_clean)) %>%
-    dplyr::mutate(Frequency = .assign_frequencies(text_clean)*1.2, #61 terms
+    dplyr::mutate(Frequency = .assign_frequencies(text_clean)*1.2, #62 terms
                   Timing = .assign_timing(text_clean)*1.3, #41 terms
                   Intensity = .assign_intensity(text_clean), #98 terms
                   Commitment = .assign_commitment(text_clean)*1.1) #85 terms
