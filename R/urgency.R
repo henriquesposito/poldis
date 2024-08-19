@@ -66,7 +66,7 @@ get_urgency <- function(.data, normalize = "tokens") {
   out <- data.frame("text_clean" = .clean_token(text_clean)) %>%
     dplyr::mutate(Frequency = .assign_frequencies(text_clean)*1.2, #62 terms
                   Timing = .assign_timing(text_clean)*1.3, #41 terms
-                  Intensity = .assign_intensity(text_clean), #98 terms
+                  Intensity = .assign_intensity(text_clean), #103 terms
                   Commitment = .assign_commitment(text_clean)*1.1) #85 terms
   if (normalize == "tokens") {
     out <- out %>%
@@ -82,8 +82,8 @@ get_urgency <- function(.data, normalize = "tokens") {
 }
 
 .assign_frequencies <- function(v) {
-  frequency <- score_frequency_scaled <- NULL
-  freq_words <- urgency_word_scores[,c(5,8)] %>%
+  score_frequency_scaled <- NULL
+  freq_words <- frequency[,c(1,4)] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(frequency = textstem::lemmatize_words(frequency)) %>%
     dplyr::distinct() %>%
@@ -95,8 +95,8 @@ get_urgency <- function(.data, normalize = "tokens") {
 }
 
 .assign_timing <- function(v) {
-  timing <- score_timing_scaled <- NULL
-  timing_words <- urgency_word_scores[,c(1,4)] %>%
+  score_timing_scaled <- NULL
+  timing_words <- timing[,c(1,4)] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(timing = textstem::lemmatize_words(timing)) %>%
     dplyr::distinct() %>% # 41 terms
@@ -108,8 +108,8 @@ get_urgency <- function(.data, normalize = "tokens") {
 }
 
 .assign_intensity <- function(v) {
-  intensity <- score_intensity_scaled <- NULL
-  intensity_words <- urgency_word_scores[,c(13, 16)] %>%
+  score_intensity_scaled <- NULL
+  intensity_words <- intensity[,c(1, 4)] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(intensity = textstem::lemmatize_words(intensity)) %>%
     dplyr::distinct() %>%
@@ -121,8 +121,8 @@ get_urgency <- function(.data, normalize = "tokens") {
 }
 
 .assign_commitment <- function(v) {
-  commitment <- score_commitment_scaled <- NULL
-  commitment_words <- urgency_word_scores[,c(9,12)] %>%
+  score_commitment_scaled <- NULL
+  commitment_words <- commitment[,c(1,4)] %>%
     tidyr::drop_na() %>%
     dplyr::mutate(commitment = textstem::lemmatize_words(commitment)) %>%
     dplyr::distinct() %>%

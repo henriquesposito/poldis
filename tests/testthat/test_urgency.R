@@ -8,7 +8,7 @@ urgency <- get_urgency(text)
 test_that("Urgency is scored properly", {
   expect_true(urgency$Frequency[5] > 0.9)
   expect_true(urgency$Timing[1] > 1)
-  expect_true(urgency$Intensity[4] > 0.8)
+  expect_true(urgency$Intensity[4] > 0.7)
   expect_true(urgency$Commitment[2] < urgency$Commitment[3])
   expect_true(all(order(urgency$Urgency) == c(3, 4, 2, 5, 1)))
 })
