@@ -2,6 +2,12 @@
 #'
 #' @examples
 #' sim_urgency()
+#' sim_urgency(urgency = 0.5)
+#' sim_urgency(urgency = 2.5)
+#' sim_urgency(urgency = -2.5)
+#' sim_urgency(commitment = 0.6)
+#' sim_urgency(commitment = 0.6, intensity = 1.4)
+#' sim_urgency(commitment = 0.6, intensity = 1.4, timing = 1.4)
 #' @export
 sim_urgency <- function(urgency,
                         commitment, intensity, timing, frequency,
