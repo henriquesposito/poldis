@@ -142,7 +142,16 @@ get_urgency <- function(.data, normalize = "tokens") {
 sim_urgency <- function(urgency,
                         commitment, intensity, timing, frequency,
                         pronoun = "We"){
-  if(!missing(commitment)){
+  if(!missing(urgency)){
+    combins <- expand.grid(c("",int$word), comm$word, stringsAsFactors = FALSE)
+    combins <- merge(combins, int, by.x = "Var1", by.y = "word")
+    combins <- combins[,c("Var1","Var2","Rescaled")]
+    combins <- merge(combins, comm, by.x = "Var2", by.y = "word")
+    combins <- combins[,c("Var1","Var2","Rescaled.x","Rescaled.y")]
+    combins$combo <- combins$Rescaled.x * combins$Rescaled.y
+    intcom <- combins[which.min(abs(urgency - combins$combo)),c("Var1","Var2")]
+    out <- paste(pronoun, paste(intcom, collapse = " "), "do this.")
+  } else if(!missing(commitment)){
     commit <- comm$word[which.min(abs(abs(commitment) - comm$Rescaled))]
     if(commitment<0) commit <- paste(commit, sample(c("not","never"),1))
     if(!missing(intensity)){
