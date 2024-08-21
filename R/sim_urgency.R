@@ -29,6 +29,10 @@ sim_urgency <- function(urgency,
       timed <- time$word[which.min.diff(timing, time$Rescaled)]
       out <- paste(out, timed)
     }
+    cat("Urgency score:",
+        ifelse(missing(commitment),1,commitment) * ifelse(missing(intensity),1,intensity) *
+          ifelse(missing(timing),1,timing),
+        "\n")
   }
   out <- paste0(out, ".")
   out
