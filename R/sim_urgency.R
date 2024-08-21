@@ -17,7 +17,7 @@ sim_urgency <- function(urgency,
     combins <- merge(combins, time, by.x = "Var3", by.y = "word")
     combins <- combins[,c("Var1","Var2","Var3","Rescaled.x","Rescaled.y","Rescaled")]
     combins$combo <- as.numeric(combins$Rescaled.x) * combins$Rescaled.y * as.numeric(combins$Rescaled)
-    formul <- combins[which.min.diff(urgency, combins$combo),c("Var1","Var2","Var3")]
+    formul <- combins[which.min.diff(abs(urgency), combins$combo),c("Var1","Var2","Var3")]
     if(urgency < 0) intcom <- c(formul[1:2], sample(c("not","never"),1)) else
       intcom <- formul[1:2]
     out <- paste(pronoun, paste(intcom, collapse = " "), "do this", formul[3])
