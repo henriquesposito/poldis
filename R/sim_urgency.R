@@ -7,15 +7,19 @@ sim_urgency <- function(urgency,
                         commitment, intensity, timing, frequency,
                         pronoun = "We"){
   if(!missing(urgency)){
-    combins <- expand.grid(c("",int$word), comm$word, stringsAsFactors = FALSE)
+    combins <- expand.grid(int$word, comm$word, time$word, stringsAsFactors = FALSE)
+    # int <- rbind(int, c(word = "", NA, NA, NA, NA, NA, NA, NA, 1))
+    # time <- rbind(time, c(word = "", NA, NA, NA, NA, NA, NA, 1, NA))
     combins <- merge(combins, int, by.x = "Var1", by.y = "word")
-    combins <- combins[,c("Var1","Var2","Rescaled")]
+    combins <- combins[,c("Var1","Var2","Var3","Rescaled")]
     combins <- merge(combins, comm, by.x = "Var2", by.y = "word")
-    combins <- combins[,c("Var1","Var2","Rescaled.x","Rescaled.y")]
-    combins$combo <- combins$Rescaled.x * combins$Rescaled.y
-    intcom <- combins[which.min(abs(abs(urgency) - combins$combo)),c("Var1","Var2")]
-    if(urgency < 0) intcom <- c(intcom, sample(c("not","never"),1))
-    out <- paste(pronoun, paste(intcom, collapse = " "), "do this")
+    combins <- combins[,c("Var1","Var2","Var3","Rescaled.x","Rescaled.y")]
+    combins <- merge(combins, time, by.x = "Var3", by.y = "word")
+    combins <- combins[,c("Var1","Var2","Var3","Rescaled.x","Rescaled.y","Rescaled")]
+    combins$combo <- as.numeric(combins$Rescaled.x) * combins$Rescaled.y * as.numeric(combins$Rescaled)
+    formul <- combins[which.min.diff(urgency, combins$combo),c("Var1","Var2","Var3")]
+      intcom <- formul[1:2]
+    out <- paste(pronoun, paste(intcom, collapse = " "), "do this", formul[3])
   } else {
     if(!missing(commitment)){
       commit <- comm$word[which.min.diff(abs(commitment), comm$Rescaled)]
