@@ -25,6 +25,10 @@ sim_urgency <- function(urgency,
         out <- paste(pronoun, intensifier, commit, "do this")
       } else out <- paste(pronoun, commit, "do this")
     } else out <- paste(pronoun, "do this")
+    if(!missing(timing)){
+      timed <- time$word[which.min(abs(timing - time$Rescaled))]
+      out <- paste(out, timed)
+    }
   }
   out <- paste0(out, ".")
   out
