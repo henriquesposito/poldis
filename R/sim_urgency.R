@@ -18,18 +18,26 @@ sim_urgency <- function(urgency,
     out <- paste(pronoun, paste(intcom, collapse = " "), "do this")
   } else {
     if(!missing(commitment)){
-      commit <- comm$word[which.min(abs(abs(commitment) - comm$Rescaled))]
+      commit <- comm$word[which.min.diff(abs(commitment), comm$Rescaled)]
       if(commitment<0) commit <- paste(commit, sample(c("not","never"),1))
       if(!missing(intensity)){
-        intensifier <- int$word[which.min(abs(abs(intensity) - int$Rescaled))]
+        intensifier <- int$word[which.min.diff(intensity, int$Rescaled)]
         out <- paste(pronoun, intensifier, commit, "do this")
       } else out <- paste(pronoun, commit, "do this")
     } else out <- paste(pronoun, "do this")
     if(!missing(timing)){
-      timed <- time$word[which.min(abs(timing - time$Rescaled))]
+      timed <- time$word[which.min.diff(timing, time$Rescaled)]
       out <- paste(out, timed)
     }
   }
   out <- paste0(out, ".")
   out
+}
+
+which.min.diff <- function(x, y){
+  diffs <- abs(x - y)
+  y <- which(diffs == min(diffs, na.rm = TRUE))
+  if (length(y) > 1L)
+    sample(y, 1L)
+  else y
 }
