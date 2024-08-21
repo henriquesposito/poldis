@@ -149,7 +149,8 @@ sim_urgency <- function(urgency,
     combins <- merge(combins, comm, by.x = "Var2", by.y = "word")
     combins <- combins[,c("Var1","Var2","Rescaled.x","Rescaled.y")]
     combins$combo <- combins$Rescaled.x * combins$Rescaled.y
-    intcom <- combins[which.min(abs(urgency - combins$combo)),c("Var1","Var2")]
+    intcom <- combins[which.min(abs(abs(urgency) - combins$combo)),c("Var1","Var2")]
+    if(urgency < 0) intcom <- c(intcom, sample(c("not","never"),1))
     out <- paste(pronoun, paste(intcom, collapse = " "), "do this.")
   } else if(!missing(commitment)){
     commit <- comm$word[which.min(abs(abs(commitment) - comm$Rescaled))]
