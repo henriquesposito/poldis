@@ -133,3 +133,22 @@ get_urgency <- function(.data, normalize = "tokens") {
     stringr::str_count(as.character(v), paste0("\\b", commitment_words$terms[i], "\\b"))*
       commitment_words$score_commitment_scaled[i])))
 }
+
+#' Simulating urgency
+#'
+#' @examples
+#' sim_urgency()
+#' @export
+sim_urgency <- function(urgency,
+                        commitment, intensity, timing, frequency,
+                        pronoun = "We"){
+  if(!missing(commitment)){
+    commit <- comm$word[which.min(abs(abs(commitment) - comm$Rescaled))]
+    if(commitment<0) commit <- paste(commit, sample(c("not","never"),1))
+    if(!missing(intensity)){
+      intensifier <- int$word[which.min(abs(abs(intensity) - int$Rescaled))]
+      out <- paste(pronoun, intensifier, commit, "do this.")
+    } else out <- paste(pronoun, commit, "do this.")
+  } else out <- paste(pronoun, "do this.")
+  out
+}
