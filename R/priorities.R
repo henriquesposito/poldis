@@ -30,8 +30,8 @@ select_priorities <- function(.data, na.rm = TRUE) {
                                      |is time to|commit to|promise to|have to|
                                      |plan to|intend to|let 's|let us|urge|
                                      |require|want to"),
-                                    paste(sentence), NA), # detect priorities
-                  priorities = ifelse(stringr::str_detect(priorities, " not |
+                                      lemmas, NA), # detect priorities
+                  priorities = ifelse(stringr::str_detect(priorities, " not | never |
                                                         |yesterday|last week|
                                                         |last month|last year|
                                                         |thank|honor|honour|
@@ -41,9 +41,10 @@ select_priorities <- function(.data, na.rm = TRUE) {
                                       stringr::str_detect(tags, "MD VB( RB)? VBN|
                                                          |VBD( RB)? VBN|VBZ( RB)? VBN|
                                                          |VBD( RB)? JJ|PRP( RB)? VBD TO|
-                                                         |VBN( RB)? VBN"),
+                                                         |VBN( RB)? VBN|VBP VBN"),
                                     # Combinations of NLP tags to select
-                                    NA, priorities)) %>%
+                                    NA, priorities),
+                  priorities = ifelse(is.na(priorities), NA, sentence)) %>%
     dplyr::distinct()
   if (isTRUE(na.rm)) out <- filter(out, !is.na(priorities))
   class(out) <- c("priorities", class(out))
