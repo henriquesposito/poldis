@@ -4,7 +4,7 @@
 \alias{get_urgency}
 \title{Urgency Analysis}
 \usage{
-get_urgency(.data, normalize = "tokens")
+get_urgency(.data, summarise = "sum")
 }
 \arguments{
 \item{.data}{A data frame, priorities data frame coded using
@@ -13,12 +13,14 @@ For data frames, function will search for "text" variable.
 For priorities data frame function will search for "priorities" variable.
 If missing, opens the webpage containing the urgency codebook.}
 
-\item{normalize}{Would you like urgency scores to be normalized?
-By default, urgency scores are normalized by "tokens",
-the number of words in text observation.
-Users can also declare "none", for no normalization.
-Scores for each dimension are weighted to account for the
-different number of words in each dimension before normalization.}
+\item{summarise}{How to handle multiple matches for the same dimension
+in the same text observation?
+By default, multiple matches are added together and
+their "sum" per text observation is returned.
+Users can, instead, choose the "mean" which returns the average
+score per dimension per text observation when there are multiple matches.
+The "mean" can also be used as a form of normalization per
+dimension and text observation in certain cases.}
 }
 \value{
 A scored data frame for each dimension of urgency.
@@ -36,25 +38,27 @@ relate to the necessity of taking the action, while the next two dimensions,
 frequency of action and timing of action,
 relate to the timing in which action is taken.
 Our dictionary includes terms in each of these dimensions.
-The terms included in each of these dimensions of urgency were first adapted
-from established lexicon dictionaries and later complemented by other terms
-inductively found in texts during pre-testing.
-The words in the dictionaries for each dimension are scored on a scale
-between 0 and 1, with 1 being the maximum value obtainable and contributing
-the most to the urgency score of the sentence.
-Urgency terms were validated and adjusted through an online survey
-with 206 participants that took place between July and August of 2024.
-The survey collected responses anonymously but included basic demographic
-information about participants, as English proficiency and education levels.
+The terms included in each of these dimensions were validated and adjusted
+through an online survey that took place between July and August of 2024.
 The survey results were recorded as counts of the number of participants
 who selected an urgency-related word as more urgent than its pair.
 To analyze the survey results, we employed Bradley-Terry models for
-paired comparisons using the BradleyTerry2 R package (Turner and Firth, 2012).
+paired comparisons.
 A rank of the words for each dimension of urgency was obtained from the analysis,
-which were then used to adjust and validate the urgency word scores
-in the dictionaries.
+which were then used to create the urgency word scores in the dictionaries.
 For more information on the dimensions, scores, or the survey on urgency,
 please run `get_urgency()` to access the urgency codebook.
+For priorities (i.e. coded using the `select_priorities()`),
+urgency scores are calculated by multiplying the commitment scores by all
+other dimensions.
+This is done because commitment words are indicative of political priorities,
+For more information please refer to the `select_priorities()` function.
+For vectors or data frames urgency scores are calculated by
+adding commitment and intensity dimension scores (i.e. how necessary)
+and multiplying these by the sum of timing and frequency dimension
+scores (i.e. how soon).
+In both cases, zero urgency scores are indicative of no urgency but maximum
+scores can vary.
 }
 \examples{
 \donttest{

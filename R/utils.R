@@ -10,10 +10,6 @@ thisRequires <- function(pkgname){
   }
 }
 
-.clean_token <- function(v) {
-  textstem::lemmatize_words(stringr::str_squish(tolower(v)))
-}
-
 # Helper function to get urgency or topics codebook.
 open_codebook <- function(codebook = "urgency") {
   thisRequires("cli")
