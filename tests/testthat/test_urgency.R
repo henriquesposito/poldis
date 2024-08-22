@@ -14,6 +14,16 @@ test_that("Urgency is generally scored properly", {
   expect_true(all(order(urgency$Urgency) == c(3, 4, 5, 2, 1)))
 })
 
+test_that("summarise argument in urgency works properly", {
+  sum <- get_urgency(c("We really, really, really must do this.",
+                       "We should, could, and must do this."))
+  mean <- get_urgency(c("We really, really, really must do this.",
+                        "We should, could, and must do this."),
+                        summarise = "mean")
+  expect_true(sum$Intensity[1] > mean$Intensity[1])
+  expect_true(sum$Commitment[2] > mean$Commitment[2])
+})
+
 test_that("Urgency in priorities is scored properly", {
   skip_on_ci()
   skip_on_cran()
