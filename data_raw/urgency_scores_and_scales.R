@@ -46,7 +46,7 @@ timing[timing$word=="afterwards",3] # centering word score = 4.19
 timing <- timing %>%
   mutate(centered_coefficient = coefficient + 4.19,
          scaled = scales::rescale(1-(coefficient/min(timing$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
-         rescaled = 1+(centered_coefficient/max(timing$centered_coefficient, na.rm = TRUE)))
+         rescaled = scales::rescale(1+(centered_coefficient/max(timing$centered_coefficient, na.rm = TRUE))))
 
 # # Commitment dictionary
 
@@ -100,7 +100,9 @@ comm_adv <- filter(commitment, grammar_function == "adverb") # separate adverbs
 # Rescale coefficients
 commitment <- filter(commitment, grammar_function != "adverb") %>%
   mutate(scaled = scales::rescale(1-(coefficient/min(commitment$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
-         rescaled = scaled) # not done for commitment since only used in urgency of priorities
+         rescaled = scales::rescale(ifelse(grammar_function != "adjective",
+                                           1-(coefficient/min(commitment$coefficient, na.rm = TRUE)),
+                                           NA), to = c(0.05, 1)))
 
 # # Intensity dictionary
 
@@ -169,7 +171,8 @@ intensity[intensity$word=="simply",3] # centering word score = 0.75
 intensity <- full_join(intensity, comm_adv) %>%
   mutate(centered_coefficient = coefficient + 0.75,
          scaled = scales::rescale(1-(coefficient/min(intensity$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
-         rescaled = 1+(centered_coefficient/max(intensity$centered_coefficient, na.rm = TRUE)))
+         rescaled = ifelse(grammar_function != "adjective",
+                           1+(centered_coefficient/max(intensity$centered_coefficient, na.rm = TRUE)), NA))
 
 # # Frequency dictionary
 
@@ -221,7 +224,8 @@ frequency[which(frequency$word=="rare"),3] <- frequency[which(frequency$word=="r
 frequency <- frequency %>%
   mutate(centered_coefficient = coefficient + 4.51,
          scaled = scales::rescale(1-(coefficient/min(frequency$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
-         rescaled = 1+(centered_coefficient/max(frequency$centered_coefficient, na.rm = TRUE)))
+         rescaled = ifelse(grammar_function != "adjective",
+                           1+(centered_coefficient/max(frequency$centered_coefficient, na.rm = TRUE)), NA))
 
 # # Save the data as internal data
 # # Note that the CAP Topics is another type of internal data saved in package
