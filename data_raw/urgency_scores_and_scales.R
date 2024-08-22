@@ -46,7 +46,9 @@ timing[timing$word=="afterwards",3] # centering word score = 4.19
 timing <- timing %>%
   mutate(centered_coefficient = coefficient + 4.19,
          scaled = scales::rescale(1-(coefficient/min(timing$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
-         rescaled = scales::rescale(1+(centered_coefficient/max(timing$centered_coefficient, na.rm = TRUE))))
+         rescaled = ifelse(grammar_function != "adjective",
+                           1+(centered_coefficient/max(timing$centered_coefficient, na.rm = TRUE)), NA))
+
 
 # # Commitment dictionary
 
