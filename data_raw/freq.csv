@@ -1,0 +1,64 @@
+word,assigned_score,coefficient,se,grammar_function
+persistently,1,13.18,1873.64,adverb
+relentlessly,1,-0.33,1.91,adverb
+constantly,1,-0.99,1.21,adverb
+incessantly,1,-1.02,1.77,adverb
+always,1,0,NA,adverb
+daily,1,-0.38,0.8,adverb
+hourly,1,0,NA,adverb
+by the minute,1,NA,NA,adverb
+by the hour,1,NA,NA,adverb
+every hour,1,NA,NA,adverb
+every minute,1,NA,NA,adverb
+persistent,1,NA,NA,adverb
+relentless,1,NA,NA,adverb
+unrelentingly,1,NA,NA,adverb
+everyday,1,NA,NA,adverb
+nightly,1,NA,NA,adverb
+every night,1,NA,NA,adverb
+constant,1,NA,NA,adjective
+incessant,1,NA,NA,adjective
+interminable,1,NA,NA,adjective
+interminably,1,NA,NA,adverb
+weekly,0.9,-1.65,0.65,adverb
+every week,0.9,NA,NA,adverb
+steadily,0.8,-2.81,1.13,adverb
+generally,0.8,-3.99,1.21,adverb
+usually,0.8,-4.27,1.11,adverb
+fortnightly,0.8,NA,NA,adverb
+steady,0.8,NA,NA,adjective
+normally,0.8,NA,NA,adverb
+frequently,0.7,-2.56,1.09,adverb
+regularly,0.7,-2.92,1.18,adverb
+often,0.7,-3.37,1.06,adverb
+monthly,0.7,-3.21,0.76,adverb
+frequent,0.7,NA,NA,adjective
+regular,0.7,NA,NA,adjective
+every month,0.7,NA,NA,adverb
+incrementally,0.6,-2.6,1.8,adverb
+progressively,0.6,-2.74,1.2,adverb
+gradually,0.6,-4.75,1.09,adverb
+quarterly,0.6,-3.38,0.91,adverb
+progressive,0.6,NA,NA,adjective
+gradual,0.6,NA,NA,adjective
+sometimes,0.5,-6.28,1.19,adverb
+annually,0.5,-5.01,1.03,adverb
+yearly,0.5,NA,NA,adverb
+every year,0.5,NA,NA,adverb
+intermittently,0.3,-3.29,1.69,adverb
+sporadically,0.3,-5.36,1.31,adverb
+occasionally,0.3,-6.32,1.19,adverb
+irregularly,0.3,-7.33,1.25,adverb
+intermittent,0.3,NA,NA,adjective
+sporadic,0.3,NA,NA,adjective
+occasional,0.3,NA,NA,adjective
+irregular,0.3,NA,NA,adjective
+seldom,0.2,-7.13,1.14,adverb
+infrequently,0.1,-6.46,1.13,adverb
+infrequent,0.1,NA,NA,adjective
+unusual,0.05,-5.77,1.18,adjective
+rarely,0.05,-6.48,1.11,adverb
+rare,0.05,NA,NA,adjective
+scarcely,0.02,-5.88,1.2,adverb
+hardly,0.02,-6.3,1.14,adverb
+hardly ever,0.02,-6.46,1.49,adverb
