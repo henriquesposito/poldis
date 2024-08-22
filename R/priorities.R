@@ -43,8 +43,7 @@ select_priorities <- function(.data, na.rm = TRUE) {
                                                          |VBD( RB)? JJ|PRP( RB)? VBD TO|
                                                          |VBN( RB)? VBN|VBP VBN"),
                                     # Combinations of NLP tags to select
-                                    NA, priorities),
-                  priorities = ifelse(is.na(priorities), NA, sentence)) %>%
+                                    NA, sentence)) %>%
     dplyr::distinct()
   if (isTRUE(na.rm)) out <- filter(out, !is.na(priorities))
   class(out) <- c("priorities", class(out))

@@ -9,8 +9,15 @@
 # # The first task is to get close synonyms or versions of adjective/adverbs
 # # scored in the same ways.
 # # This is done since not all versions of the same word were surveyed.
-# # The second tasks refers to how the scores are rescaled to caluculate urgency
+# # The second tasks refers to how the scores are rescaled to calculate urgency
 # # and the urgency of priorities.
+# # Scaled variables refer to scaled coefficients.
+# # Scaling is done using 1-coefficient/min(coefficient) scaled from 0.05 to 1.
+# # Rescaled variables refer to centered coefficients (around a neutral term)
+# # and then scaled.
+# # Rescaling is done using 1+centered coefficient/min(centered coefficient).
+# # This is only done for timing, frequency, and intensity since rescaled scores
+# # are meant to be used to calculate the urgency of priorities only.
 
 library(readr)
 library(dplyr)
@@ -35,10 +42,11 @@ timing[which(timing$word=="late"),3] <- timing[which(timing$word=="later"),3]
 timing[which(timing$word=="slow"),3] <- timing[which(timing$word=="slowly"),3]
 
 # Rescale coefficients
-timing <- timing %>% mutate(Rescaled1 = scales::rescale((1-coefficient)/min(timing$coefficient,
-                                                                            na.rm = TRUE), to = c(0.05, 1)),
-                            Rescaled2 = scales::rescale((1-coefficient)/min(timing$coefficient,
-                                                                            na.rm = TRUE), to = c(0.05, 2)))
+timing[timing$word=="afterwards",3] # centering word score = 4.19
+timing <- timing %>%
+  mutate(centered_coefficient = coefficient + 4.19,
+         scaled = scales::rescale(1-(coefficient/min(timing$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
+         rescaled = 1+(centered_coefficient/max(timing$centered_coefficient, na.rm = TRUE)))
 
 # # Commitment dictionary
 
@@ -91,10 +99,8 @@ comm_adv <- filter(commitment, grammar_function == "adverb") # separate adverbs
 
 # Rescale coefficients
 commitment <- filter(commitment, grammar_function != "adverb") %>%
-  mutate(Rescaled1 = scales::rescale((1-coefficient)/min(commitment$coefficient,
-                                                         na.rm = TRUE), to = c(0.05, 1)),
-         Rescaled2 = scales::rescale((1-coefficient)/min(commitment$coefficient,
-                                                         na.rm = TRUE), to = c(0.05, 2)))
+  mutate(scaled = scales::rescale(1-(coefficient/min(commitment$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
+         rescaled = scaled) # not done for commitment since only used in urgency of priorities
 
 # # Intensity dictionary
 
@@ -159,16 +165,22 @@ intensity[which(intensity$word=="intensive"),3] <- intensity[which(intensity$wor
 intensity[which(intensity$word=="intensely"),3] <- intensity[which(intensity$word=="intense"),3]
 
 # Merge commitment adverbs and rescale coefficients
+intensity[intensity$word=="simply",3] # centering word score = 0.75
 intensity <- full_join(intensity, comm_adv) %>%
-  mutate(Rescaled1 = scales::rescale((1-coefficient)/min(intensity$coefficient,
-                                                         na.rm = TRUE), to = c(0.05, 1)),
-         Rescaled2 = scales::rescale((1-coefficient)/min(intensity$coefficient,
-                                                         na.rm = TRUE), to = c(0.05, 2)))
+  mutate(centered_coefficient = coefficient + 0.75,
+         scaled = scales::rescale(1-(coefficient/min(intensity$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
+         rescaled = 1+(centered_coefficient/max(intensity$centered_coefficient, na.rm = TRUE)))
 
 # # Frequency dictionary
 
 # Load original data
 frequency <- read_csv("data_raw/freq.csv")
+
+# Persistently is a big outlier, so we will remove it for now
+frequency[which(frequency$word=="persistently"),3] <- NA
+# # (another option would be to take the score from another term)
+# frequency_0_1[which(frequency$word=="persistently"),4] <-
+#   frequency_0_1[which(frequency$word=="relentlessly"),4]
 
 # Standardise scores for synonyms/equivalents
 frequency[which(frequency$word=="constant"),3] <- frequency[which(frequency$word=="constantly"),3]
@@ -177,7 +189,7 @@ frequency[which(frequency$word=="by the hour"),3] <- frequency[which(frequency$w
 frequency[which(frequency$word=="everyday"),3] <- frequency[which(frequency$word=="daily"),3]
 frequency[which(frequency$word=="nightly"),3] <- frequency[which(frequency$word=="daily"),3]
 frequency[which(frequency$word=="every night"),3] <- frequency[which(frequency$word=="daily"),3]
-frequency[which(frequency$word=="persistent"),3] <- frequency[which(frequency$word=="persistently"),3]
+#frequency[which(frequency$word=="persistent"),3] <- frequency[which(frequency$word=="persistently"),3]
 frequency[which(frequency$word=="relentless"),3] <- frequency[which(frequency$word=="relentlessly"),3]
 frequency[which(frequency$word=="incessant"),3] <- frequency[which(frequency$word=="incessantly"),3]
 frequency[which(frequency$word=="unrelentingly"),3] <- frequency[which(frequency$word=="relentlessly"),3]
@@ -204,15 +216,15 @@ frequency[which(frequency$word=="intermittent"),3] <- frequency[which(frequency$
 frequency[which(frequency$word=="rare"),3] <- frequency[which(frequency$word=="rarely"),3]
 
 # Rescale coefficients
+(unlist(frequency[frequency$word=="gradual",3]) + # between gradual and usually
+    unlist(frequency[frequency$word=="usually",3]))/2 # centering word score = 4.51
 frequency <- frequency %>%
-  mutate(Rescaled1 = scales::rescale((1-coefficient)/min(frequency$coefficient,
-                                                         na.rm = TRUE), to = c(0.05, 1)),
-         Rescaled2 = scales::rescale((1-coefficient)/min(frequency$coefficient,
-                                                         na.rm = TRUE), to = c(0.05, 2)))
+  mutate(centered_coefficient = coefficient + 4.51,
+         scaled = scales::rescale(1-(coefficient/min(frequency$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
+         rescaled = 1+(centered_coefficient/max(frequency$centered_coefficient, na.rm = TRUE)))
 
 # # Save the data as internal data
 # # Note that the CAP Topics is another type of internal data saved in package
 # # that should be (re)saved as well.
-
-usethis::use_data(CAP_topics, commitment, frequency, intensity, timing,
-                  internal = TRUE, overwrite = TRUE)
+# usethis::use_data(CAP_topics, commitment, frequency, intensity, timing,
+#                   internal = TRUE, overwrite = TRUE)
