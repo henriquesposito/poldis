@@ -1,13 +1,27 @@
-#' Simulating urgency
+#' Simulating urgency in priorities
 #'
+#' @param urgency Desired urgency score, optional.
+#' @param commitment Desired commitment score, optional.
+#' @param intensity Desired intensity score, optional.
+#' @param timing Desired timing score, optional.
+#' @param frequency Desired frequency score, optional.
+#' @param pronoun How would you like the simulated priorities to start?
+#' By default, priorities start with the pronoun "We".
+#' @details
+#' Users can declare a score for one or more of the
+#' urgency dimensions or an urgency score.
+#' This means, if users may not declare an urgency score and the
+#' score for one or more dimensions at once.
+#' In those cases, the urgency score is favored.
+#' @return A sentence that matches the urgency or urgency dimension scores.
 #' @examples
-#' sim_urgency()
-#' sim_urgency(urgency = 0.5)
-#' sim_urgency(urgency = 2.5)
-#' sim_urgency(urgency = -2.5)
-#' sim_urgency(commitment = 0.6)
-#' sim_urgency(commitment = 0.6, intensity = 1.4)
-#' sim_urgency(commitment = 0.6, intensity = 1.4, timing = 1.4)
+#' #sim_urgency()
+#' #sim_urgency(urgency = 0.5)
+#' #sim_urgency(urgency = 2.5)
+#' #sim_urgency(urgency = -2.5)
+#' #sim_urgency(commitment = 0.6)
+#' #sim_urgency(commitment = 0.6, intensity = 1.4)
+#' #sim_urgency(commitment = 0.6, intensity = 1.4, timing = 1.4)
 #' @export
 sim_urgency <- function(urgency,
                         commitment, intensity, timing, frequency,
