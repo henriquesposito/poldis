@@ -27,22 +27,15 @@ select_priorities <- function(.data, na.rm = TRUE) {
                   priorities = ifelse(stringr::str_detect(tags, "PRP MD ")|
                                       stringr::str_detect(lemmas,
                                                           "going to|go to |need to|ready to|
-                                     |is time to|commit to|promise to|have to|
-                                     |plan to|intend to|let 's|let us|urge|
-                                     |require|want to"),
+                                                          |is time to|commit to|promise to|have to|
+                                                          |plan to|intend to|let 's|let us|urge|
+                                                          |require|want to"),
                                       lemmas, NA), # detect priorities
-                  priorities = ifelse(stringr::str_detect(priorities, " not | never |
-                                                        |yesterday|last week|
-                                                        |last month|last year|
-                                                        |thank|honor|honour|
-                                                        |applause|greet|laugh|
-                                                        |privilege to|great to|
-                                                        |good to be|good to see") |
-                                      stringr::str_detect(tags, "MD VB( RB)? VBN|
-                                                         |VBD( RB)? VBN|VBZ( RB)? VBN|
-                                                         |VBD( RB)? JJ|PRP( RB)? VBD TO|
-                                                         |VBN( RB)? VBN|VBP VBN"),
-                                    # Combinations of NLP tags to select
+                  priorities = ifelse(stringr::str_detect(priorities, " not | never ") |
+                                        stringr::str_detect(tags, "MD VB( RB)? VBN|
+                                        |VBD( RB)? VBN|VBZ( RB)? VBN|
+                                        |VBD( RB)? JJ|PRP( RB)? VBD TO|VBN( RB)? VBN"),
+                                    # Combinations of NLP tags not to select
                                     NA, sentence)) %>%
     dplyr::distinct()
   if (isTRUE(na.rm)) out <- filter(out, !is.na(priorities))
