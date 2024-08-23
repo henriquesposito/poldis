@@ -328,7 +328,7 @@ read_pdf <- function(path) {
 annotate_text <- function(v, level = "words") {
   doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- entity <- NULL
   suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
-  v <- stringr::str_replace_all(v, "\\.\\,|\\. \\,|\\,\\.|\\, \\.", ".")
+  v <- stringr::str_replace_all(v, "\\.\\,|\\. \\,|\\,\\.|\\, \\.|\\.\\\n\\,", ".")
   parse <- spacyr::spacy_parse(v, tag = TRUE)
   suppressWarnings(spacyr::spacy_finalize())
   if (level == "sentences" | level == "sentence") {
