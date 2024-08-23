@@ -15,6 +15,7 @@
 #' `gather_topics()` to access the political topics codebook.
 #' @import dplyr
 #' @importFrom tidyr unite
+#' @importFrom textstem lemmatize_strings
 #' @return A list of topics present in each text separated by comma.
 #' @examples
 #' \donttest{
@@ -35,14 +36,14 @@ gather_topics <- function(.data, dictionary = "CAP") {
   if (missing(.data)) open_codebook(codebook = "topic")
   # get text variable
   if (inherits(.data, "priorities")) {
-    text <- stats::na.omit(.clean_token(getElement(.data, "priorities")))
+    text <- stats::na.omit(textstem::lemmatize_strings(getElement(.data, "priorities")))
   } else if (inherits(.data, "data.frame")) {
-    text <- .clean_token(getElement(.data, "text"))
-  } else text <- .clean_token(.data)
+    text <- textstem::lemmatize_strings(getElement(.data, "text"))
+  } else text <- textstem::lemmatize_strings(.data)
   # get dictionary
   if (any(dictionary ==  "CAP")) {
     dictionary <- CAP_topics %>%
-      dplyr::mutate(Words = stringr::str_replace_all(.clean_token(Words),
+      dplyr::mutate(Words = stringr::str_replace_all(textstem::lemmatize_strings(Words),
                                                      ", ", "\\\\b|\\\\b"))
     subjects <- dictionary$Words
     names(subjects) <- dictionary$Topic
@@ -80,6 +81,7 @@ gather_topics <- function(.data, dictionary = "CAP") {
 #' @import quanteda
 #' @import dplyr
 #' @importFrom stringr str_detect str_remove_all
+#' @importFrom textstem lemmatize_strings
 #' @return A list of related terms to each of the topics declared in dictionary.
 #' @details This function relies on keyword assisted topic models implemented
 #' in the `\{keyATM\}` package to find related words based on the topics
@@ -102,10 +104,10 @@ gather_related_terms <- function(.data, dictionary) {
   thisRequires("keyATM")
   # get text variable
   if (inherits(.data, "priorities")) {
-    text <- stats::na.omit(.clean_token(getElement(.data, "priorities")))
+    text <- stats::na.omit(textstem::lemmatize_strings(getElement(.data, "priorities")))
   } else if (inherits(.data, "data.frame")) {
-    text <- .clean_token(getElement(.data, "text"))
-  } else text <- .clean_token(.data)
+    text <- textstem::lemmatize_strings(getElement(.data, "text"))
+  } else text <- textstem::lemmatize_strings(.data)
   # check dictionary
   if (any(dictionary ==  "CAP")) {
     subjects <- CAP_topics %>%
