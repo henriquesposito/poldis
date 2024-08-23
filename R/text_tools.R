@@ -319,7 +319,7 @@ read_pdf <- function(path) {
 #' Defaults to "words".
 #' @import spacyr
 #' @importFrom dplyr group_by summarise ungroup %>%
-#' @importFrom stringr str_squish
+#' @importFrom stringr str_squish str_replace_all
 #' @return A data frame with syntax information by words or sentences in text.
 #' @examples
 #' #annotate_text(US_News_Conferences_1960_1980[1:2, 3])
@@ -328,6 +328,7 @@ read_pdf <- function(path) {
 annotate_text <- function(v, level = "words") {
   doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- entity <- NULL
   suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
+  v <- stringr::str_replace_all(v, "\\.\\,|\\. \\,|\\,\\.|\\, \\.", ".")
   parse <- spacyr::spacy_parse(v, tag = TRUE)
   suppressWarnings(spacyr::spacy_finalize())
   if (level == "sentences" | level == "sentence") {
