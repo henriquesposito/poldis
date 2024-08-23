@@ -59,7 +59,7 @@ sim_urgency <- function(urgency,
           ifelse(missing(timing),1,timing),
         "\n")
   }
-  out <- paste0(out, ".")
+  out <- paste0(trimws(out), ".")
   out
 }
 
