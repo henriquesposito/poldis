@@ -66,10 +66,10 @@ get_urgency <- function(.data, summarise = "sum") {
     priorities <- TRUE
   } else if (inherits(.data, "data.frame")) {
     if ("lemmas" %in% names(.data)) text_clean <- getElement(.data, "lemmas") else
-      text_clean <- .clean_token(getElement(.data, "text"))
+      text_clean <- textstem::lemmatize_strings(getElement(.data, "text"))
     priorities <- FALSE
   } else {
-    text_clean <- .clean_token(.data)
+    text_clean <- .textstem::lemmatize_strings(.data)
     priorities <- FALSE
   }
   # assign urgency dimensions
@@ -115,13 +115,13 @@ get_urgency <- function(.data, summarise = "sum") {
     out <- dplyr::rename(out, scale = rescaled) %>%
       dplyr::mutate(word = ifelse(grammar_function == "verb",
                                   stringr::str_remove_all(word, " to$"),
-                                  word)) %>% # to is not helpful because of how we select priorities
+                                  word)) %>% # to is not necessary because of how we select priorities
       dplyr::select(word, scale)
   } else out <- dplyr::rename(out, scale = scaled) %>% dplyr::select(word, scale)
   # remove missing and group words
   out <- out %>%
     tidyr::drop_na() %>%
-    dplyr::mutate(word = textstem::lemmatize_words(word)) %>%
+    dplyr::mutate(word = textstem::lemmatize_strings(word)) %>%
     dplyr::distinct() %>%
     dplyr::group_by(scale) %>%
     summarise(terms = paste0(word, collapse = "|"))
@@ -139,8 +139,4 @@ get_urgency <- function(.data, summarise = "sum") {
     out <- out/(replace(rowcount, rowcount == 0, 1)) # get average value
   }
   out
-}
-
-.clean_token <- function(v) {
-  textstem::lemmatize_words(stringr::str_squish(tolower(v)))
 }

@@ -1,4 +1,42 @@
 word,assigned_score,coefficient,se,grammar_function
+get to,0.7,,,verb
+oblige to,1,-1.01,0.49,verb
+need to,1,-1.04,0.43,verb
+must,1,0,NA,verb
+require to,1,NA,NA,verb
+time to,0.8,-0.85,0.47,verb
+have to,0.8,-0.92,0.41,verb
+going to,0.8,-1.64,0.58,verb
+ready to,0.8,-1.94,0.44,verb
+will,0.8,-2.65,0.54,verb
+urge to,0.8,NA,NA,verb
+promise to,0.7,-2.84,0.5,verb
+commit to,0.7,NA,NA,verb
+intend to,0.7,NA,NA,verb
+should,0.5,-2.49,0.52,verb
+want to,0.5,-2.58,0.47,verb
+would,0.5,-5.49,1.03,verb
+can,0.5,-5.64,0.94,verb
+might,0.5,-6.1,1.53,verb
+could,0.5,-7.04,1.05,verb
+may,0.5,-7.63,1.34,verb
+shall,0.5,NA,NA,verb
+plan to,0.5,NA,NA,verb
+option to,0.5,NA,NA,noun
+let's,0.5,-1.8,0.52,imperative
+let us,0.5,NA,NA,imperative
+necessarily,1,NA,NA,adverb
+importantly,1,NA,NA,adverb
+unavoidably,0.8,NA,NA,adverb
+inevitably,0.8,NA,NA,adverb
+inexorably,0.8,NA,NA,adverb
+prominently,0.8,NA,NA,adverb
+relevantly,0.7,NA,NA,adverb
+ideally,0.5,NA,NA,adverb
+preferably,0.5,NA,NA,adverb
+carefully,0.5,NA,NA,adverb
+plausibly,0.5,NA,NA,adverb
+possibly,0.5,NA,NA,adverb
 imperative,1,1.09,0.5,adjective
 serious,1,0.79,0.58,adjective
 essential,1,0.7,0.37,adjective
@@ -8,40 +46,20 @@ important,1,-0.39,0.35,adjective
 significant,1,-1.03,0.5,adjective
 major,1,-1.88,1.24,adjective
 necessary,1,0,NA,adjective
-oblige,1,-1.01,0.49,verb
-need to,1,-1.04,0.43,verb
-must,1,0,NA,verb
-necessarily,1,NA,NA,adverb
 obligatory,1,NA,NA,adjective
-require,1,NA,NA,verb
-importantly,1,NA,NA,adverb
 momentous,1,NA,NA,adjective
 unavoidable,0.8,0.44,0.47,adjective
 invaluable,0.8,-0.8,0.4,adjective
-is time to,0.8,-0.85,0.47,verb
-have to,0.8,-0.92,0.41,verb
-going to,0.8,-1.64,0.58,verb
-ready to,0.8,-1.94,0.44,verb
-will,0.8,-2.65,0.54,verb
-urge,0.8,NA,NA,verb
 quintessential,0.8,NA,NA,adjective
 worthy,0.8,NA,NA,adjective
 valuable,0.8,NA,NA,adjective
-unavoidably,0.8,NA,NA,adverb
 inevitable,0.8,NA,NA,adjective
-inevitably,0.8,NA,NA,adverb
 inexorable,0.8,NA,NA,adjective
-inexorably,0.8,NA,NA,adverb
 eminent,0.8,NA,NA,adjective
 prominent,0.8,NA,NA,adjective
-prominently,0.8,NA,NA,adverb
 preeminent,0.8,NA,NA,adjective
 pre-eminent,0.8,NA,NA,adjective
 relevant,0.7,-1.6,0.6,adjective
-promise to,0.7,-2.84,0.5,verb
-commit to,0.7,NA,NA,verb
-intend to,0.7,NA,NA,verb
-relevantly,0.7,NA,NA,adverb
 optimal,0.5,-0.28,0.7,adjective
 timely,0.5,-0.82,0.95,adjective
 better,0.5,-1.28,0.86,adjective
@@ -56,30 +74,13 @@ useful,0.5,-2.53,0.51,adjective
 great,0.5,-2.75,0.71,adjective
 optional,0.5,-3.28,1.06,adjective
 possible,0.5,-4.59,1.04,adjective
-let's,0.5,-1.8,0.52,imperative
-should,0.5,-2.49,0.52,verb
-want to,0.5,-2.58,0.47,verb
-would,0.5,-5.49,1.03,verb
-can,0.5,-5.64,0.94,verb
-might,0.5,-6.1,1.53,verb
-could,0.5,-7.04,1.05,verb
-may,0.5,-7.63,1.34,verb
-let us,0.5,NA,NA,imperative
-shall,0.5,NA,NA,verb
-plan to,0.5,NA,NA,verb
 tenable,0.5,NA,NA,adjective
 doable,0.5,NA,NA,adjective
 obvious,0.5,NA,NA,adjective
-ideally,0.5,NA,NA,adverb
-preferably,0.5,NA,NA,adverb
 useable,0.5,NA,NA,adjective
 marginal,0.5,NA,NA,adjective
-option,0.5,NA,NA,noun
 careful,0.5,NA,NA,adjective
-carefully,0.5,NA,NA,adverb
 plausible,0.5,NA,NA,adjective
-plausibly,0.5,NA,NA,adverb
-possibly,0.5,NA,NA,adverb
 trivial,0.2,-2.23,1.1,adjective
 ambiguous,0.2,-3.07,1.29,adjective
 ambivalent,0.2,-3.14,1.27,adjective
