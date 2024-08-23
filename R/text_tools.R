@@ -1,10 +1,11 @@
 #' Extract a list of possible names of individuals in texts
 #'
 #' @param v A text vector.
+#' @import spacyr
 #' @importFrom dplyr distinct filter %>% summarize group_by
 #' @importFrom stringr str_squish
 #' @importFrom stringdist stringsimmatrix
-#' @import spacyr
+#' @importFrom textstem lemmatize_strings
 #' @return A data frame of individual names and the number of times they appear.
 #' @details The function relies on named entity recognition from NLP models.
 #' @examples
@@ -15,7 +16,7 @@ extract_names <- function(v) {
   suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
   out <- suppressWarnings(spacyr::spacy_extract_entity(v, type = "named")) %>%
     dplyr::filter(ent_type == "PERSON") %>%
-    dplyr::mutate(names = .clean_token(text)) %>%
+    dplyr::mutate(names = textstem::lemmatize_strings(text)) %>%
     dplyr::group_by(names) %>%
     dplyr::count(name = "count")
   spacyr::spacy_finalize()
@@ -35,10 +36,12 @@ extract_names <- function(v) {
 #' Extract locations from strings
 #'
 #' @param v Text vector.
+#' @import spacyr
 #' @importFrom stringi stri_trans_general
 #' @importFrom stringr str_extract
 #' @importFrom purrr map_chr
 #' @importFrom stringdist stringsimmatrix
+#' @importFrom textstem lemmatize_strings
 #' @return A data frame of locations and the number of times they appear.
 #' @details The function relies on geographical entity detection from NLP models.
 #' @examples
@@ -51,7 +54,7 @@ extract_locations <- function(v) {
   suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
   out <- suppressWarnings(spacyr::spacy_extract_entity(v)) %>%
     dplyr::filter(ent_type == "GPE") %>%
-    dplyr::mutate(names = .clean_token(text)) %>%
+    dplyr::mutate(names = textstem::lemmatize_strings(text)) %>%
     dplyr::group_by(names) %>%
     dplyr::count(name = "count")
   spacyr::spacy_finalize()
