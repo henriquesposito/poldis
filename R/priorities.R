@@ -23,20 +23,18 @@ select_priorities <- function(.data, na.rm = TRUE) {
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
   } else .data <- suppressMessages(annotate_text(.data, level = "sentences"))
   out <- .data %>%
-    dplyr::mutate(lemmas = tolower(lemmas),
-                  priorities = ifelse(stringr::str_detect(tags, "PRP MD ")|
-                                      stringr::str_detect(lemmas,
-                                                          "going to|go to |need to|ready to|
-                                                          |is time to|commit to|promise to|have to|
-                                                          |plan to|intend to|let 's|let us|urge|
-                                                          |require|want to"),
+    dplyr::mutate(priorities = ifelse(stringr::str_detect(tags, "PRP MD ")|
+                                        stringr::str_detect(lemmas,
+                                        "going to|go to |need to|ready to|' ve to|
+                                        |time to|commit to|promise to|have to|
+                                        |plan to|intend to|let 's|let us|urge to|
+                                        |require to|want to|get to|' ve still get"),
                                       lemmas, NA), # detect priorities
                   priorities = ifelse(stringr::str_detect(priorities, " not | never ") |
-                                        stringr::str_detect(tags, "MD VB( RB)? VBN|
-                                        |VBD( RB)? VBN|VBZ( RB)? VBN|
+                                        stringr::str_detect(tags,
+                                        "MD VB( RB)? VBN|VBD( RB)? VBN|VBZ( RB)? VBN|
                                         |VBD( RB)? JJ|PRP( RB)? VBD TO|VBN( RB)? VBN"),
-                                    # Combinations of NLP tags not to select
-                                    NA, sentence)) %>%
+                  NA, sentence)) %>%
     dplyr::distinct()
   if (isTRUE(na.rm)) out <- filter(out, !is.na(priorities))
   class(out) <- c("priorities", class(out))
