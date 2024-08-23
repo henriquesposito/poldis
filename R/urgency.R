@@ -46,6 +46,7 @@
 #' scores can vary.
 #' @return A scored data frame for each dimension of urgency.
 #' @import dplyr
+#' @importFrom textstem lemmatize_strings
 #' @examples
 #' \donttest{
 #' get_urgency(US_News_Conferences_1960_1980[1:10, 3])
@@ -69,7 +70,7 @@ get_urgency <- function(.data, summarise = "sum") {
       text_clean <- textstem::lemmatize_strings(getElement(.data, "text"))
     priorities <- FALSE
   } else {
-    text_clean <- .textstem::lemmatize_strings(.data)
+    text_clean <- textstem::lemmatize_strings(.data)
     priorities <- FALSE
   }
   # assign urgency dimensions
