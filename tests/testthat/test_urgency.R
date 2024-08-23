@@ -43,7 +43,7 @@ test_that("Urgency is scored properly in more complex priorities", {
   skip_on_ci()
   skip_on_cran()
   urgency3 <- get_urgency(select_priorities(text2))
-  expect_true(urgency3$Urgency[1] == 0) # should this be a priority?
-  # expect_true(urgency3$Urgency[4] < urgency3$Urgency[2]) # should this not be more urgent?
+  expect_true(nrow(urgency3) == 2) # should this be a priority?
+  expect_true(urgency3$Urgency[1] < urgency3$Urgency[2]) # should this not be more urgent?
   # expect_true(all(order(urgency3$Urgency) == c(1, 3, 2, 4))) # should this be the order?
 })

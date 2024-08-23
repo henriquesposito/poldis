@@ -185,8 +185,8 @@ frequency <- read_csv("data_raw/freq.csv")
 # Persistently is a big outlier, so we will remove it for now
 #frequency[which(frequency$word=="persistently"),3] <- NA
 # # (another option would be to take the score from another term)
-frequency[which(frequency$word=="persistently"),4] <-
-  frequency[which(frequency$word=="relentlessly"),4]
+frequency[which(frequency$word=="persistently"),3] <-
+  frequency[which(frequency$word=="relentlessly"),3]
 
 # Standardise scores for synonyms/equivalents
 frequency[which(frequency$word=="frequent"),3] <- frequency[which(frequency$word=="frequently"),3]

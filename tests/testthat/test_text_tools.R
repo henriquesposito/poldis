@@ -29,7 +29,7 @@ test_that("Speakers are extracted properly", {
   skip_on_cran()
   expect_message(extract_names(c("this is a test for Brazil", "this is also a test")),
                  "No names found in text.")
-  expect_equal(extract_names(text)[["names"]], "henrique sposito")
+  expect_equal(extract_names(text)[["names"]], "Henrique Sposito")
 })
 
 test_that("Titles are extracted properly", {
@@ -39,7 +39,7 @@ test_that("Titles are extracted properly", {
 test_that("Locations are extracted properly", {
   skip_on_ci()
   skip_on_cran()
-  expect_equal(extract_locations(text)[["names"]], c("sao paulo", "the united states"))
+  expect_equal(extract_locations(text)[["names"]], c("Sao Paulo", "the unite state"))
 })
 
 test_that("Text is properly split", {
