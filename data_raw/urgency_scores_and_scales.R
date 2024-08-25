@@ -95,7 +95,7 @@ commitment[which(commitment$word=="obvious"),3] <- commitment[which(commitment$w
 commitment[which(commitment$word=="vague"),3] <- commitment[which(commitment$word=="ambiguous"),3]
 commitment[which(commitment$word=="option to"),3] <- commitment[which(commitment$word=="optional"),3]
 commitment[which(commitment$word=="preferably"),3] <- commitment[which(commitment$word=="preferable"),3]
-commitment[which(commitment$word=="get to"),3] <- commitment[which(commitment$word=="going to"),3]
+commitment[which(commitment$word=="get to"),3] <- commitment[which(commitment$word=="have to"),3]
 
 # Save/Move "commitment" adverbs to intensity as they are intensifiers
 comm_adv <- filter(commitment, grammar_function == "adverb") # separate adverbs
@@ -182,9 +182,9 @@ intensity <- full_join(intensity, comm_adv) %>%
 # Load original data
 frequency <- read_csv("data_raw/freq.csv")
 
-# Persistently is a big outlier, so we will remove it for now
+# Persistently is a big outlier, we can remove it for now ...
 #frequency[which(frequency$word=="persistently"),3] <- NA
-# # (another option would be to take the score from another term)
+# # Or take the score from another term ...
 frequency[which(frequency$word=="persistently"),3] <-
   frequency[which(frequency$word=="relentlessly"),3]
 
