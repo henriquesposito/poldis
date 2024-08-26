@@ -114,9 +114,6 @@ get_urgency <- function(.data, summarise = "sum") {
   # check if priorities and get correct scale and data
   if (isTRUE(priority)) { # for urgency in priorities
     out <- dplyr::rename(out, scale = rescaled) %>%
-      dplyr::mutate(word = ifelse(grammar_function == "verb",
-                                  stringr::str_remove_all(word, " to$"),
-                                  word)) %>% # to is not necessary because of how we select priorities
       dplyr::select(word, scale)
   } else out <- dplyr::rename(out, scale = scaled) %>% dplyr::select(word, scale)
   # remove missing and group words
