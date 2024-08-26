@@ -24,11 +24,10 @@ select_priorities <- function(.data, na.rm = TRUE) {
   } else .data <- suppressMessages(annotate_text(.data, level = "sentences"))
   out <- .data %>%
     dplyr::mutate(priorities = ifelse(stringr::str_detect(tags, "PRP MD ")|
-                                        stringr::str_detect(lemmas,
-                                        "going to|go to |need to|ready to|' ve to|
-                                        |time to|commit to|promise to|have to|
-                                        |plan to|intend to|let 's|let us|urge to|
-                                        |require to|want to|get to|' ve still get"),
+                                        stringr::str_detect(lemmas, paste0(
+                                          textstem::lemmatize_strings(
+                                            commitment$word[which(commitment$grammar_function != "adjective")]),
+                                          collapse = "|")),
                                       lemmas, NA), # detect priorities
                   priorities = ifelse(stringr::str_detect(priorities, " not | never ") |
                                         stringr::str_detect(tags,

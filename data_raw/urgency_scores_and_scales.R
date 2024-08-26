@@ -46,9 +46,8 @@ timing[timing$word=="afterwards",3] # centering word score = 4.19
 timing <- timing %>%
   mutate(centered_coefficient = coefficient + 4.19,
          scaled = scales::rescale(1-(coefficient/min(timing$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
-         rescaled = ifelse(grammar_function != "adjective",
+         rescaled = ifelse(grammar_function != "adjective" & grammar_function != "conjunction",
                            1+(centered_coefficient/max(timing$centered_coefficient, na.rm = TRUE)), NA))
-
 
 # # Commitment dictionary
 
@@ -56,53 +55,51 @@ timing <- timing %>%
 commitment <- read_csv("data_raw/comm.csv")
 
 # Standardise scores for synonyms/equivalents
-commitment[which(commitment$word=="necessarily"),3] <- commitment[which(commitment$word=="necessary"),3]
-commitment[which(commitment$word=="importantly"),3] <- commitment[which(commitment$word=="important"),3]
+commitment[which(commitment$word=="necessarily"),3] <- commitment[which(commitment$word=="it is necessary"),3]
+commitment[which(commitment$word=="importantly"),3] <- commitment[which(commitment$word=="it is important"),3]
 commitment[which(commitment$word=="obligatory"),3] <- commitment[which(commitment$word=="oblige to"),3]
 commitment[which(commitment$word=="require to"),3] <- commitment[which(commitment$word=="need to"),3]
 commitment[which(commitment$word=="commit to"),3] <- commitment[which(commitment$word=="promise to"),3]
 commitment[which(commitment$word=="intend to"),3] <- commitment[which(commitment$word=="promise to"),3]
 commitment[which(commitment$word=="urge to"),3] <- commitment[which(commitment$word=="going to"),3]
-commitment[which(commitment$word=="relevantly"),3] <- commitment[which(commitment$word=="relevant"),3]
-commitment[which(commitment$word=="eminent"),3] <- commitment[which(commitment$word=="important"),3]
-commitment[which(commitment$word=="prominent"),3] <- commitment[which(commitment$word=="important"),3]
-commitment[which(commitment$word=="prominently"),3] <- commitment[which(commitment$word=="important"),3]
-commitment[which(commitment$word=="preeminent"),3] <- commitment[which(commitment$word=="important"),3]
-commitment[which(commitment$word=="pre-eminent"),3] <- commitment[which(commitment$word=="important"),3]
-commitment[which(commitment$word=="momentous"),3] <- commitment[which(commitment$word=="important"),3]
-commitment[which(commitment$word=="worthy"),3] <- commitment[which(commitment$word=="invaluable"),3]
-commitment[which(commitment$word=="quintessential"),3] <- commitment[which(commitment$word=="essential"),3]
-commitment[which(commitment$word=="valuable"),3] <- commitment[which(commitment$word=="invaluable"),3]
-commitment[which(commitment$word=="unavoidably"),3] <- commitment[which(commitment$word=="unavoidable"),3]
-commitment[which(commitment$word=="inevitable"),3] <- commitment[which(commitment$word=="unavoidable"),3]
-commitment[which(commitment$word=="inevitably"),3] <- commitment[which(commitment$word=="unavoidable"),3]
-commitment[which(commitment$word=="inexorable"),3] <- commitment[which(commitment$word=="unavoidable"),3]
-commitment[which(commitment$word=="inexorably"),3] <- commitment[which(commitment$word=="unavoidable"),3]
+commitment[which(commitment$word=="relevantly"),3] <- commitment[which(commitment$word=="it is relevant"),3]
+commitment[which(commitment$word=="it is eminent"),3] <- commitment[which(commitment$word=="it is important"),3]
+commitment[which(commitment$word=="prominent"),3] <- commitment[which(commitment$word=="it is important"),3]
+commitment[which(commitment$word=="prominently"),3] <- commitment[which(commitment$word=="it is important"),3]
+commitment[which(commitment$word=="preeminent"),3] <- commitment[which(commitment$word=="it is important"),3]
+commitment[which(commitment$word=="pre-eminent"),3] <- commitment[which(commitment$word=="it is important"),3]
+commitment[which(commitment$word=="momentous"),3] <- commitment[which(commitment$word=="it is important"),3]
+commitment[which(commitment$word=="it is worthy"),3] <- commitment[which(commitment$word=="it is invaluable"),3]
+commitment[which(commitment$word=="it is quintessential"),3] <- commitment[which(commitment$word=="it is essential"),3]
+commitment[which(commitment$word=="it is valuable"),3] <- commitment[which(commitment$word=="it is invaluable"),3]
+commitment[which(commitment$word=="unavoidably"),3] <- commitment[which(commitment$word=="it is unavoidable"),3]
+commitment[which(commitment$word=="it is inevitable"),3] <- commitment[which(commitment$word=="it is unavoidable"),3]
+commitment[which(commitment$word=="inevitably"),3] <- commitment[which(commitment$word=="it is unavoidable"),3]
+commitment[which(commitment$word=="inexorable"),3] <- commitment[which(commitment$word=="it is unavoidable"),3]
+commitment[which(commitment$word=="inexorably"),3] <- commitment[which(commitment$word=="it is unavoidable"),3]
 commitment[which(commitment$word=="let us"),3] <- commitment[which(commitment$word=="let's"),3]
 commitment[which(commitment$word=="shall"),3] <- commitment[which(commitment$word=="should"),3]
 commitment[which(commitment$word=="plan to"),3] <- commitment[which(commitment$word=="intend to"),3]
-commitment[which(commitment$word=="marginal"),3] <- commitment[which(commitment$word=="optional"),3]
-commitment[which(commitment$word=="tenable"),3] <- commitment[which(commitment$word=="able"),3]
-commitment[which(commitment$word=="doable"),3] <- commitment[which(commitment$word=="able"),3]
-commitment[which(commitment$word=="plausible"),3] <- commitment[which(commitment$word=="possible"),3]
-commitment[which(commitment$word=="plausibly"),3] <- commitment[which(commitment$word=="possible"),3]
-commitment[which(commitment$word=="possibly"),3] <- commitment[which(commitment$word=="possible"),3]
-commitment[which(commitment$word=="useable"),3] <- commitment[which(commitment$word=="useful"),3]
-commitment[which(commitment$word=="ideally"),3] <- commitment[which(commitment$word=="ideal"),3]
-commitment[which(commitment$word=="careful"),3] <- commitment[which(commitment$word=="cautious"),3]
-commitment[which(commitment$word=="carefully"),3] <- commitment[which(commitment$word=="cautious"),3]
-commitment[which(commitment$word=="obvious"),3] <- commitment[which(commitment$word=="able"),3]
-commitment[which(commitment$word=="vague"),3] <- commitment[which(commitment$word=="ambiguous"),3]
-commitment[which(commitment$word=="option to"),3] <- commitment[which(commitment$word=="optional"),3]
-commitment[which(commitment$word=="preferably"),3] <- commitment[which(commitment$word=="preferable"),3]
+commitment[which(commitment$word=="marginal"),3] <- commitment[which(commitment$word=="it is optional"),3]
+commitment[which(commitment$word=="tenable"),3] <- commitment[which(commitment$word=="able to"),3]
+commitment[which(commitment$word=="it is doable"),3] <- commitment[which(commitment$word=="able to"),3]
+commitment[which(commitment$word=="it is plausible"),3] <- commitment[which(commitment$word=="it is possible"),3]
+commitment[which(commitment$word=="plausibly"),3] <- commitment[which(commitment$word=="it is possible"),3]
+commitment[which(commitment$word=="possibly"),3] <- commitment[which(commitment$word=="it is possible"),3]
+commitment[which(commitment$word=="useable"),3] <- commitment[which(commitment$word=="it is useful"),3]
+commitment[which(commitment$word=="ideally"),3] <- commitment[which(commitment$word=="it is ideal"),3]
+commitment[which(commitment$word=="are careful to"),3] <- commitment[which(commitment$word=="cautious to"),3]
+commitment[which(commitment$word=="carefully"),3] <- commitment[which(commitment$word=="cautious to"),3]
+commitment[which(commitment$word=="it is obvious"),3] <- commitment[which(commitment$word=="able to"),3]
+commitment[which(commitment$word=="vague"),3] <- commitment[which(commitment$word=="are ambiguous to"),3]
+commitment[which(commitment$word=="option to"),3] <- commitment[which(commitment$word=="it is optional"),3]
+commitment[which(commitment$word=="preferably"),3] <- commitment[which(commitment$word=="it is preferable"),3]
 commitment[which(commitment$word=="get to"),3] <- commitment[which(commitment$word=="have to"),3]
 
-# Save/Move "commitment" adverbs to intensity as they are intensifiers
-comm_adv <- filter(commitment, grammar_function == "adverb") # separate adverbs
-
 # Rescale coefficients
-commitment <- filter(commitment, grammar_function != "adverb") %>%
-  mutate(scaled = scales::rescale(1-(coefficient/min(commitment$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
+commitment <- commitment %>%
+  mutate(coefficient = ifelse(coefficient > 0.88, 1, coefficient), # Scale between must and may (bug?)
+         scaled = scales::rescale(1-(coefficient/min(commitment$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
          rescaled = scales::rescale(ifelse(grammar_function != "adjective",
                                            1-(coefficient/min(commitment$coefficient, na.rm = TRUE)),
                                            NA), to = c(0.05, 1)))
@@ -174,7 +171,7 @@ intensity[intensity$word=="simply",3] # centering word score = 0.75
 intensity <- full_join(intensity, comm_adv) %>%
   mutate(centered_coefficient = coefficient + 0.75,
          scaled = scales::rescale(1-(coefficient/min(intensity$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
-         rescaled = ifelse(grammar_function != "adjective",
+         rescaled = ifelse(grammar_function == "adverb", # What about quantifiers and determiners?
                            1+(centered_coefficient/max(intensity$centered_coefficient, na.rm = TRUE)), NA))
 
 # # Frequency dictionary

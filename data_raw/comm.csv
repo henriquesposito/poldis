@@ -37,52 +37,52 @@ preferably,0.5,NA,NA,adverb
 carefully,0.5,NA,NA,adverb
 plausibly,0.5,NA,NA,adverb
 possibly,0.5,NA,NA,adverb
-imperative,1,1.09,0.5,adjective
+it is imperative,1,1.09,0.5,verb and adjective
 serious,1,0.79,0.58,adjective
-essential,1,0.7,0.37,adjective
+it is essential,1,0.7,0.37,verb and adjective
 severe,1,0.57,0.87,adjective
-best,1,0.12,0.75,adjective
-important,1,-0.39,0.35,adjective
-significant,1,-1.03,0.5,adjective
+it is best to,1,0.12,0.75,verb and adjective
+it is important,1,-0.39,0.35,verb and adjective
+it is significant,1,-1.03,0.5,verb and adjective
 major,1,-1.88,1.24,adjective
-necessary,1,0,NA,adjective
+it is necessary,1,0,NA,verb and adjective
 obligatory,1,NA,NA,adjective
 momentous,1,NA,NA,adjective
-unavoidable,0.8,0.44,0.47,adjective
-invaluable,0.8,-0.8,0.4,adjective
-quintessential,0.8,NA,NA,adjective
-worthy,0.8,NA,NA,adjective
-valuable,0.8,NA,NA,adjective
-inevitable,0.8,NA,NA,adjective
+it is unavoidable,0.8,0.44,0.47,verb and adjective
+it is invaluable,0.8,-0.8,0.4,verb and adjective
+it is quintessential,0.8,NA,NA,verb and adjective
+it is worthy,0.8,NA,NA,verb and adjective
+it is valuable,0.8,NA,NA,verb and adjective
+it is inevitable,0.8,NA,NA,verb and adjective
 inexorable,0.8,NA,NA,adjective
-eminent,0.8,NA,NA,adjective
+it is eminent,0.8,NA,NA,verb and adjective
 prominent,0.8,NA,NA,adjective
 preeminent,0.8,NA,NA,adjective
 pre-eminent,0.8,NA,NA,adjective
-relevant,0.7,-1.6,0.6,adjective
-optimal,0.5,-0.28,0.7,adjective
-timely,0.5,-0.82,0.95,adjective
-better,0.5,-1.28,0.86,adjective
-willing,0.5,-1.53,0.72,adjective
-opportune,0.5,-1.57,1.05,adjective
-cautious,0.5,-1.69,1.04,adjective
-able,0.5,-2.55,0.9,adjective
-good,0.5,-2.04,0.52,adjective
-preferable,0.5,-2.06,0.75,adjective
-ideal,0.5,-2.06,0.49,adjective
-useful,0.5,-2.53,0.51,adjective
-great,0.5,-2.75,0.71,adjective
-optional,0.5,-3.28,1.06,adjective
-possible,0.5,-4.59,1.04,adjective
+it is relevant,0.7,-1.6,0.6,verb and adjective
+it is optimal,0.5,-0.28,0.7,verb and adjective
+it is timely,0.5,-0.82,0.95,verb and adjective
+it is better to,0.5,-1.28,0.86,verb and adjective
+are willing to,0.5,-1.53,0.72,verb and adjective
+it is opportune,0.5,-1.57,1.05,verb and adjective
+cautious to,0.5,-1.69,1.04,verb and adjective
+able to,0.5,-2.55,0.9,verb and adjective
+it is good to,0.5,-2.04,0.52,verb and adjective
+it is preferable,0.5,-2.06,0.75,verb and adjective
+it is ideal,0.5,-2.06,0.49,verb and adjective
+it is useful,0.5,-2.53,0.51,verb and adjective
+it is great to,0.5,-2.75,0.71,verb and adjective
+it is optional,0.5,-3.28,1.06,verb and adjective
+it is possible,0.5,-4.59,1.04,verb and adjective
 tenable,0.5,NA,NA,adjective
-doable,0.5,NA,NA,adjective
-obvious,0.5,NA,NA,adjective
+it is doable,0.5,NA,NA,verb and adjective
+it is obvious,0.5,NA,NA,verb and adjective
 useable,0.5,NA,NA,adjective
 marginal,0.5,NA,NA,adjective
-careful,0.5,NA,NA,adjective
-plausible,0.5,NA,NA,adjective
-trivial,0.2,-2.23,1.1,adjective
-ambiguous,0.2,-3.07,1.29,adjective
-ambivalent,0.2,-3.14,1.27,adjective
-insignificant,0.2,-3.69,1.08,adjective
+are careful to,0.5,NA,NA,verb and adjective
+it is plausible,0.5,NA,NA,verb and adjective
+it is trivial,0.2,-2.23,1.1,verb and adjective
+are ambiguous to,0.2,-3.07,1.29,verb and adjective
+are ambivalent to,0.2,-3.14,1.27,verb and adjective
+it is insignificant,0.2,-3.69,1.08,verb and adjective
 vague,0.2,NA,NA,adjective
