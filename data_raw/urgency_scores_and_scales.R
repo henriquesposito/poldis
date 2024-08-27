@@ -98,7 +98,7 @@ commitment[which(commitment$word=="get to"),3] <- commitment[which(commitment$wo
 
 # Rescale coefficients
 commitment <- commitment %>%
-  mutate(coefficient = ifelse(coefficient > 0.88, 1, coefficient), # Scale between must and may (bug?)
+  mutate(coefficient = ifelse(coefficient > 0, 0, coefficient), # Scale between must and may (bug?)
          scaled = scales::rescale(1-(coefficient/min(commitment$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
          rescaled = scales::rescale(ifelse(grammar_function != "adjective",
                                            1-(coefficient/min(commitment$coefficient, na.rm = TRUE)),
@@ -168,7 +168,7 @@ intensity[which(intensity$word=="intensely"),3] <- intensity[which(intensity$wor
 
 # Merge commitment adverbs and rescale coefficients
 intensity[intensity$word=="simply",3] # centering word score = 0.75
-intensity <- full_join(intensity, comm_adv) %>%
+intensity <- intensity %>%
   mutate(centered_coefficient = coefficient + 0.75,
          scaled = scales::rescale(1-(coefficient/min(intensity$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
          rescaled = ifelse(grammar_function == "adverb", # What about quantifiers and determiners?
