@@ -44,7 +44,8 @@ timing[which(timing$word=="slow"),3] <- timing[which(timing$word=="slowly"),3]
 # Rescale coefficients
 timing[timing$word=="afterwards",3] # centering word score = 4.19
 timing <- timing %>%
-  mutate(centered_coefficient = coefficient + 4.19,
+  mutate(centered_coefficient = ifelse(grammar_function != "adjective" & grammar_function != "conjunction",
+                                       coefficient + 4.19, NA),
          scaled = scales::rescale(1-(coefficient/min(timing$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
          rescaled = ifelse(grammar_function != "adjective" & grammar_function != "conjunction",
                            1+(centered_coefficient/max(timing$centered_coefficient, na.rm = TRUE)), NA))
@@ -98,7 +99,7 @@ commitment[which(commitment$word=="get to"),3] <- commitment[which(commitment$wo
 
 # Rescale coefficients
 commitment <- commitment %>%
-  mutate(coefficient = ifelse(coefficient > 0, 0, coefficient), # Scale between must and may (bug?)
+  mutate(coefficient = ifelse(coefficient > 0, 0, coefficient), # Scale between must and may - bug?
          scaled = scales::rescale(1-(coefficient/min(commitment$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
          rescaled = scales::rescale(ifelse(grammar_function != "adjective",
                                            1-(coefficient/min(commitment$coefficient, na.rm = TRUE)),
@@ -169,7 +170,8 @@ intensity[which(intensity$word=="intensely"),3] <- intensity[which(intensity$wor
 # Merge commitment adverbs and rescale coefficients
 intensity[intensity$word=="simply",3] # centering word score = 0.75
 intensity <- intensity %>%
-  mutate(centered_coefficient = coefficient + 0.75,
+  mutate(centered_coefficient = ifelse(grammar_function == "adverb",
+                                       coefficient + 0.75, NA),
          scaled = scales::rescale(1-(coefficient/min(intensity$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
          rescaled = ifelse(grammar_function == "adverb", # What about quantifiers and determiners?
                            1+(centered_coefficient/max(intensity$centered_coefficient, na.rm = TRUE)), NA))
@@ -223,7 +225,8 @@ frequency[which(frequency$word=="rare"),3] <- frequency[which(frequency$word=="r
 (unlist(frequency[frequency$word=="gradual",3]) + # between gradual and usually
     unlist(frequency[frequency$word=="usually",3]))/2 # centering word score = 4.51
 frequency <- frequency %>%
-  mutate(centered_coefficient = coefficient + 4.51,
+  mutate(centered_coefficient = ifelse(grammar_function != "adjective",
+                                       coefficient + 4.51, NA),
          scaled = scales::rescale(1-(coefficient/min(frequency$coefficient, na.rm = TRUE)), to = c(0.05, 1)),
          rescaled = ifelse(grammar_function != "adjective",
                            1+(centered_coefficient/max(frequency$centered_coefficient, na.rm = TRUE)), NA))
@@ -231,5 +234,5 @@ frequency <- frequency %>%
 # # Save the data as internal data
 # # Note that the CAP Topics is another type of internal data saved in package
 # # that should be (re)saved as well.
-# usethis::use_data(CAP_topics, commitment, frequency, intensity, timing,
-#                   internal = TRUE, overwrite = TRUE)
+usethis::use_data(CAP_topics, commitment, frequency, intensity, timing,
+                  internal = TRUE, overwrite = TRUE)
