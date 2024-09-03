@@ -231,8 +231,14 @@ frequency <- frequency %>%
          rescaled = ifelse(grammar_function != "adjective",
                            1+(centered_coefficient/max(frequency$centered_coefficient, na.rm = TRUE)), NA))
 
+# Update names to avoid overlap
+Commitment <- commitment
+Frequency <- frequency
+Intensity <- intensity
+Timing <- timing
+
 # # Save the data as internal data
 # # Note that the CAP Topics is another type of internal data saved in package
 # # that should be (re)saved as well.
-usethis::use_data(CAP_topics, commitment, frequency, intensity, timing,
+usethis::use_data(CAP_topics, Commitment, Frequency, Intensity, Timing,
                   internal = TRUE, overwrite = TRUE)

@@ -47,3 +47,12 @@ test_that("Urgency is scored properly in more complex priorities", {
   expect_true(urgency3$Urgency[1] < urgency3$Urgency[2]) # should this not be more urgent?
   # expect_true(all(order(urgency3$Urgency) == c(1, 3, 2, 4))) # should this be the order?
 })
+
+test_that("Urgency simulations work", {
+  expect_output(sim_urgency(), "Urgency score: 1")
+  expect_output(sim_urgency(urgency = 0.5), "Urgency score: 0.5")
+  expect_output(sim_urgency(commitment = 1, intensity = 1, timing = 1, frequency = 1),
+                "Urgency score: 1")
+  expect_output(sim_urgency(commitment = 0.5, intensity = 0.5, timing = 0.5, frequency = 0.5),
+                "Urgency score: 0.0625")
+})
