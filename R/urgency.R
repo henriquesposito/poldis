@@ -103,13 +103,13 @@ get_urgency <- function(.data, summarise = "sum") {
   scaled <- rescaled <- word <- grammar_function <- NULL
   # get dictionaries
   if (dimension == "frequency") {
-    out <- frequency
+    out <- Frequency
   } else if (dimension == "timing") {
-    out <- timing
+    out <- Timing
   } else if (dimension == "commitment") {
-    out <- commitment
+    out <- Commitment
   } else if (dimension == "intensity") {
-    out <- intensity
+    out <- Intensity
   }
   # check if priorities and get correct scale and data
   if (isTRUE(priority)) { # for urgency in priorities
@@ -137,4 +137,98 @@ get_urgency <- function(.data, summarise = "sum") {
     out <- out/(replace(rowcount, rowcount == 0, 1)) # get average value
   }
   out
+}
+
+#' Simulating urgency in priorities
+#'
+#' @param urgency Desired urgency score, optional.
+#' @param commitment Desired commitment score, optional.
+#' @param intensity Desired intensity score, optional.
+#' @param timing Desired timing score, optional.
+#' @param frequency Desired frequency score, optional.
+#' @param pronoun How would you like the simulated priorities to start?
+#' By default, priorities start with the pronoun "We".
+#' @details
+#' Users can declare a score for one or more of the
+#' urgency dimensions or an urgency score.
+#' This means, if users may not declare an urgency score and the
+#' score for one or more dimensions at once.
+#' In those cases, the urgency score is favored.
+#' @return A sentence that matches the urgency or urgency dimension scores.
+#' @examples
+#' \donttest{
+#' sim_urgency()
+#' sim_urgency(urgency = 0.5)
+#' sim_urgency(urgency = 2.5)
+#' sim_urgency(urgency = -2.5)
+#' sim_urgency(commitment = 0.6)
+#' sim_urgency(commitment = 0.6, intensity = 1.4)
+#' sim_urgency(commitment = 0.6, intensity = 1.4, timing = 1.4)
+#' sim_urgency(commitment = 0.6, intensity = 1.2, timing = 1.4, frequency = 1.8)
+#' }
+#' @export
+sim_urgency <- function(urgency,
+                        commitment, intensity, timing, frequency,
+                        pronoun = "We") {
+  grammar_function <- rescaled <- NULL
+  # Filter data to avoid using adverbs, for now
+  Commitment <- subset(Commitment, !is.na(rescaled) & grepl("^verb$", grammar_function))
+  # only "commitment" verbs for now
+  Intensity <- subset(Intensity, !is.na(rescaled))
+  Timing <- subset(Timing, !is.na(rescaled))
+  Frequency <- subset(Frequency, !is.na(rescaled))
+  if(!missing(urgency)){
+    # Either timing or frequency, for now
+    time_freq <- rbind(Timing, Frequency)
+    combins <- expand.grid(Intensity$word, Commitment$word, time_freq$word,
+                           stringsAsFactors = FALSE)
+    combins <- merge(combins, Intensity, by.x = "Var1", by.y = "word")
+    combins <- combins[,c("Var1", "Var2", "Var3", "rescaled")]
+    combins <- merge(combins, Commitment, by.x = "Var2", by.y = "word")
+    combins <- combins[,c("Var1", "Var2", "Var3", "rescaled.x", "rescaled.y")]
+    combins <- merge(combins, time_freq, by.x = "Var3", by.y = "word")
+    combins <- combins[,c("Var1", "Var2", "Var3", "rescaled.x",
+                          "rescaled.y", "rescaled")]
+    combins$combo <- as.numeric(combins$rescaled.x) *
+      as.numeric(combins$rescaled.y) * as.numeric(combins$rescaled)
+    selectd <- which.min.diff(abs(urgency), combins$combo)
+    formul <- combins[selectd,c("Var1", "Var2", "Var3")]
+    if(urgency < 0) intcom <- c(formul[1:2], sample(c("not", "never"), 1)) else
+      intcom <- formul[1:2]
+    out <- paste(pronoun, paste(intcom, collapse = " "), "do this", formul[3])
+    cat("Urgency score: ",
+        combins[selectd,"rescaled.x"] * combins[selectd, "rescaled.y"] *
+          combins[selectd,"rescaled"], "\n", sep = "")
+  } else {
+    if(!missing(commitment)){
+      commit <- Commitment$word[which.min.diff(abs(commitment), Commitment$rescaled)]
+      if(commitment < 0) commit <- paste(commit, sample(c("not","never"), 1))
+      if(!missing(intensity)){
+        intensifier <- Intensity$word[which.min.diff(intensity, Intensity$rescaled)]
+        out <- paste(pronoun, intensifier, commit, "do this")
+      } else out <- paste(pronoun, commit, "do this")
+    } else out <- paste(pronoun, "do this")
+    if(!missing(timing)){
+      timed <- Timing$word[which.min.diff(timing, Timing$rescaled)]
+      out <- paste(out, timed)
+    }
+    if(!missing(frequency)){
+      freq <- Frequency$word[which.min.diff(frequency, Frequency$rescaled)]
+      out <- paste(out, freq)
+    }
+    cat("Urgency score:",
+        ifelse(missing(commitment),1,commitment) * ifelse(missing(intensity),1,intensity) *
+          ifelse(missing(timing),1,timing) *ifelse(missing(frequency),1,frequency),
+        "\n")
+  }
+  out <- paste0(trimws(out), ".")
+  out
+}
+
+which.min.diff <- function(x, y){
+  diffs <- abs(x - y)
+  y <- which(diffs == min(diffs, na.rm = TRUE))
+  if (length(y) > 1L)
+    sample(y, 1L)
+  else y
 }
