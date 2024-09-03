@@ -13,7 +13,7 @@ thisRequires <- function(pkgname){
 # Helper function to get urgency or topics codebook.
 open_codebook <- function(codebook = "urgency") {
   thisRequires("cli")
-  url <- "https://github.com/henriquesposito/poldis/inst"
+  url <- "https://github.com/henriquesposito/poldis/tree/develop/inst"
   if (codebook == "urgency") {
     tryCatch({
       utils::browseURL(paste0(url, "/urgency_codebook.pdf"),
