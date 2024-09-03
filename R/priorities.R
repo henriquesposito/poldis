@@ -26,7 +26,7 @@ select_priorities <- function(.data, na.rm = TRUE) {
     dplyr::mutate(priorities = ifelse(stringr::str_detect(tags, "PRP MD ")|
                                         stringr::str_detect(lemmas, paste0(
                                           textstem::lemmatize_strings(
-                                            commitment$word[which(commitment$grammar_function != "adjective")]),
+                                            Commitment$word[which(Commitment$grammar_function != "adjective")]),
                                           collapse = "|")),
                                       lemmas, NA), # detect priorities
                   priorities = ifelse(stringr::str_detect(priorities, " not | never ") |
