@@ -1,10 +1,3 @@
-## Resubmission
-
-This is a resubmission. In this version I have:
-
-* Removed redundant terms from description
-* Removed commented out code lines and examples in documentation
-
 ## Test environments
 
 * local R installation, aarch64-apple-darwin20, R 4.4.0
