@@ -1,3 +1,19 @@
+# poldis 0.1.2
+
+2024-09-03
+
+## Package
+
+- Updated documentation for `get_urgency()` to include more details about urgency scores
+- Updated internal data and data raw files to increase transparency
+
+## Functions
+
+- Updated `get_urgency()` and `gather_topics()` to open codebooks for urgency or topic when no arguments are declared
+- Updated urgency scores in `get_urgency()` according to survey results. 
+- Added `sim_urgency()` function to simulate urgent priorities
+- Updated `select_priorities()` to be more strict and accurate about selection of priorities
+
 # poldis 0.1.1
 
 2024-07-17

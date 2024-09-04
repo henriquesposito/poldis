@@ -18,3 +18,6 @@ Extract a list of possible names of individuals in texts
 \details{
 The function relies on named entity recognition from NLP models.
 }
+\examples{
+#extract_names(US_News_Conferences_1960_1980[20, 3])
+}

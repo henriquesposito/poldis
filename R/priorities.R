@@ -13,6 +13,8 @@
 #' @importFrom dplyr mutate distinct %>%
 #' @return A data frame with syntax information by sentences and
 #' a variable identifying which of these sentences are priorities.
+#' @examples
+#' #select_priorities(US_News_Conferences_1960_1980[1:2,3])
 #' @export
 select_priorities <- function(.data, na.rm = TRUE) {
   tags <- sentence <- lemmas <- priorities <- NULL
@@ -21,27 +23,17 @@ select_priorities <- function(.data, na.rm = TRUE) {
       stop("Please declare a text vector or an annotated data frame at the sentence level.")
   } else .data <- suppressMessages(annotate_text(.data, level = "sentences"))
   out <- .data %>%
-    dplyr::mutate(lemmas = tolower(lemmas),
-                  priorities = ifelse(stringr::str_detect(tags, "PRP MD ")|
-                                      stringr::str_detect(lemmas,
-                                                          "going to|go to |need to|ready to|
-                                     |is time to|commit to|promise to|have to|
-                                     |plan to|intend to|let 's|let us|urge|
-                                     |require|want to"),
-                                    paste(sentence), NA), # detect priorities
-                  priorities = ifelse(stringr::str_detect(priorities, " not |
-                                                        |yesterday|last week|
-                                                        |last month|last year|
-                                                        |thank|honor|honour|
-                                                        |applause|greet|laugh|
-                                                        |privilege to|great to|
-                                                        |good to be|good to see") |
-                                      stringr::str_detect(tags, "MD VB( RB)? VBN|
-                                                         |VBD( RB)? VBN|VBZ( RB)? VBN|
-                                                         |VBD( RB)? JJ|PRP( RB)? VBD TO|
-                                                         |VBN( RB)? VBN"),
-                                    # Combinations of NLP tags to select
-                                    NA, priorities)) %>%
+    dplyr::mutate(priorities = ifelse(stringr::str_detect(tags, "PRP MD ")|
+                                        stringr::str_detect(lemmas, paste0(
+                                          textstem::lemmatize_strings(
+                                            Commitment$word[which(Commitment$grammar_function != "adjective")]),
+                                          collapse = "|")),
+                                      lemmas, NA), # detect priorities
+                  priorities = ifelse(stringr::str_detect(priorities, " not | never ") |
+                                        stringr::str_detect(tags,
+                                        "MD VB( RB)? VBN|VBD( RB)? VBN|VBZ( RB)? VBN|
+                                        |VBD( RB)? JJ|PRP( RB)? VBD TO|VBN( RB)? VBN"),
+                  NA, sentence)) %>%
     dplyr::distinct()
   if (isTRUE(na.rm)) out <- filter(out, !is.na(priorities))
   class(out) <- c("priorities", class(out))

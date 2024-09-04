@@ -1,0 +1,88 @@
+word,assigned_score,coefficient,se,grammar_function
+get to,0.7,,,verb
+oblige to,1,-1.01,0.49,verb
+need to,1,-1.04,0.43,verb
+must,1,0,NA,verb
+require to,1,NA,NA,verb
+time to,0.8,-0.85,0.47,verb
+have to,0.8,-0.92,0.41,verb
+going to,0.8,-1.64,0.58,verb
+ready to,0.8,-1.94,0.44,verb
+will,0.8,-2.65,0.54,verb
+urge to,0.8,NA,NA,verb
+promise to,0.7,-2.84,0.5,verb
+commit to,0.7,NA,NA,verb
+intend to,0.7,NA,NA,verb
+should,0.5,-2.49,0.52,verb
+want to,0.5,-2.58,0.47,verb
+would,0.5,-5.49,1.03,verb
+can,0.5,-5.64,0.94,verb
+might,0.5,-6.1,1.53,verb
+could,0.5,-7.04,1.05,verb
+may,0.5,-7.63,1.34,verb
+shall,0.5,NA,NA,verb
+plan to,0.5,NA,NA,verb
+option to,0.5,NA,NA,noun
+let's,0.5,-1.8,0.52,imperative
+let us,0.5,NA,NA,imperative
+necessarily,1,NA,NA,adverb
+importantly,1,NA,NA,adverb
+unavoidably,0.8,NA,NA,adverb
+inevitably,0.8,NA,NA,adverb
+inexorably,0.8,NA,NA,adverb
+prominently,0.8,NA,NA,adverb
+relevantly,0.7,NA,NA,adverb
+ideally,0.5,NA,NA,adverb
+preferably,0.5,NA,NA,adverb
+carefully,0.5,NA,NA,adverb
+plausibly,0.5,NA,NA,adverb
+possibly,0.5,NA,NA,adverb
+it is imperative,1,1.09,0.5,verb and adjective
+serious,1,0.79,0.58,adjective
+it is essential,1,0.7,0.37,verb and adjective
+severe,1,0.57,0.87,adjective
+it is best to,1,0.12,0.75,verb and adjective
+it is important,1,-0.39,0.35,verb and adjective
+it is significant,1,-1.03,0.5,verb and adjective
+major,1,-1.88,1.24,adjective
+it is necessary,1,0,NA,verb and adjective
+obligatory,1,NA,NA,adjective
+momentous,1,NA,NA,adjective
+it is unavoidable,0.8,0.44,0.47,verb and adjective
+it is invaluable,0.8,-0.8,0.4,verb and adjective
+it is quintessential,0.8,NA,NA,verb and adjective
+it is worthy,0.8,NA,NA,verb and adjective
+it is valuable,0.8,NA,NA,verb and adjective
+it is inevitable,0.8,NA,NA,verb and adjective
+inexorable,0.8,NA,NA,adjective
+it is eminent,0.8,NA,NA,verb and adjective
+prominent,0.8,NA,NA,adjective
+preeminent,0.8,NA,NA,adjective
+pre-eminent,0.8,NA,NA,adjective
+it is relevant,0.7,-1.6,0.6,verb and adjective
+it is optimal,0.5,-0.28,0.7,verb and adjective
+it is timely,0.5,-0.82,0.95,verb and adjective
+it is better to,0.5,-1.28,0.86,verb and adjective
+are willing to,0.5,-1.53,0.72,verb and adjective
+it is opportune,0.5,-1.57,1.05,verb and adjective
+cautious to,0.5,-1.69,1.04,verb and adjective
+able to,0.5,-2.55,0.9,verb and adjective
+it is good to,0.5,-2.04,0.52,verb and adjective
+it is preferable,0.5,-2.06,0.75,verb and adjective
+it is ideal,0.5,-2.06,0.49,verb and adjective
+it is useful,0.5,-2.53,0.51,verb and adjective
+it is great to,0.5,-2.75,0.71,verb and adjective
+it is optional,0.5,-3.28,1.06,verb and adjective
+it is possible,0.5,-4.59,1.04,verb and adjective
+tenable,0.5,NA,NA,adjective
+it is doable,0.5,NA,NA,verb and adjective
+it is obvious,0.5,NA,NA,verb and adjective
+useable,0.5,NA,NA,adjective
+marginal,0.5,NA,NA,adjective
+are careful to,0.5,NA,NA,verb and adjective
+it is plausible,0.5,NA,NA,verb and adjective
+it is trivial,0.2,-2.23,1.1,verb and adjective
+are ambiguous to,0.2,-3.07,1.29,verb and adjective
+are ambivalent to,0.2,-3.14,1.27,verb and adjective
+it is insignificant,0.2,-3.69,1.08,verb and adjective
+vague,0.2,NA,NA,adjective

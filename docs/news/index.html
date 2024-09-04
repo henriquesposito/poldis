@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">poldis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,29 +47,38 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Changelog</h1>
-      
+      <small>Source: <a href="https://github.com/henriquesposito/poldis/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.1" id="poldis-011">poldis 0.1.1<a class="anchor" aria-label="anchor" href="#poldis-011"></a></h2>
+<p>2024-07-17</p>
+<div class="section level3">
+<h3 id="package-0-1-1">Package<a class="anchor" aria-label="anchor" href="#package-0-1-1"></a></h3>
+<ul><li>Removed redundant terms from description for CRAN submission</li>
+<li>Removed commented out code lines and examples in documentation for CRAN submission</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="poldis-010">poldis 0.1.0<a class="anchor" aria-label="anchor" href="#poldis-010"></a></h2>
 <p>2024-07-15</p>
 <div class="section level3">
 <h3 id="package-0-1-0">Package<a class="anchor" aria-label="anchor" href="#package-0-1-0"></a></h3>
-<ul><li>Closed #3 by adding code coverage and code factor (and badges) to package</li>
-<li>Closed #7 by adding a getting started section in README</li>
-<li>Closed #8 by adding a <a href="https://pkgdown.r-lib.org" class="external-link">pkgdown</a> website</li>
+<ul><li>Closed <a href="https://github.com/henriquesposito/poldis/issues/3" class="external-link">#3</a> by adding code coverage and code factor (and badges) to package</li>
+<li>Closed <a href="https://github.com/henriquesposito/poldis/issues/7" class="external-link">#7</a> by adding a getting started section in README</li>
+<li>Closed <a href="https://github.com/henriquesposito/poldis/issues/8" class="external-link">#8</a> by adding a <a href="https://pkgdown.r-lib.org" class="external-link">pkgdown</a> website</li>
 <li>Added GitHub workflow actions</li>
 </ul></div>
 <div class="section level3">
 <h3 id="functions-0-1-0">Functions<a class="anchor" aria-label="anchor" href="#functions-0-1-0"></a></h3>
 <ul><li>Updated text tools
 <ul><li>Renamed text tools functions to start with “extract_” (<code><a href="../reference/extract_names.html">extract_names()</a></code>, <code><a href="../reference/extract_title.html">extract_title()</a></code>, <code><a href="../reference/extract_context.html">extract_context()</a></code>, <code><a href="../reference/extract_date.html">extract_date()</a></code>, <code><a href="../reference/extract_locations.html">extract_locations()</a></code>, <code><a href="../reference/extract_match.html">extract_match()</a></code>)</li>
-<li>Closed #11 by adding <code>extract_similarities()</code> function to fuzzy match texts</li>
+<li>Closed <a href="https://github.com/henriquesposito/poldis/issues/11" class="external-link">#11</a> by adding <code>extract_similarities()</code> function to fuzzy match texts</li>
 <li>Added <code><a href="../reference/annotate_text.html">annotate_text()</a></code> function to parse words or sentences using NLP</li>
 <li>Added <code><a href="../reference/read_pdf.html">read_pdf()</a></code> function to load readable and non-readable text files from PDFs</li>
 </ul></li>
-<li>Closed #14 by adding <code>select_promises()</code> function to extract future promises in text<br></li>
-<li>Closed #15 by adding <code><a href="../reference/gather_topics.html">gather_topics()</a></code> and <code><a href="../reference/gather_related_terms.html">gather_related_terms()</a></code> for assigning topics to texts</li>
+<li>Closed <a href="https://github.com/henriquesposito/poldis/issues/14" class="external-link">#14</a> by adding <code>select_promises()</code> function to extract future promises in text<br></li>
+<li>Closed <a href="https://github.com/henriquesposito/poldis/issues/15" class="external-link">#15</a> by adding <code><a href="../reference/gather_topics.html">gather_topics()</a></code> and <code><a href="../reference/gather_related_terms.html">gather_related_terms()</a></code> for assigning topics to texts</li>
 <li>Added <code><a href="../reference/get_urgency.html">get_urgency()</a></code> function for coding urgency from text</li>
 <li>Added summary and plotting methods for “urgency” and “topics” classes</li>
 </ul></div>
@@ -82,9 +91,9 @@
 <ul><li>Renamed all functions to consistently start with <code>extract_*</code>
 </li>
 <li>Made the package smaller and more concise by removing <code>extract_dates()</code> and additional commented codes</li>
-<li>Closed #6 by updating <code><a href="../reference/extract_context.html">extract_context()</a></code> function to make it more flexible for users</li>
+<li>Closed <a href="https://github.com/henriquesposito/poldis/issues/6" class="external-link">#6</a> by updating <code><a href="../reference/extract_context.html">extract_context()</a></code> function to make it more flexible for users</li>
 <li>Updated <code>extract_speaker()</code> to only return a list of speakers for texts</li>
-<li>Closed #4 and #5 by removing <code>str_translate()</code> function for translating strings</li>
+<li>Closed <a href="https://github.com/henriquesposito/poldis/issues/4" class="external-link">#4</a> and <a href="https://github.com/henriquesposito/poldis/issues/5" class="external-link">#5</a> by removing <code>str_translate()</code> function for translating strings</li>
 </ul></div>
 </div>
     <div class="section level2">

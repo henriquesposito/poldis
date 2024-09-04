@@ -1,19 +1,22 @@
 #' Extract a list of possible names of individuals in texts
 #'
 #' @param v A text vector.
+#' @import spacyr
 #' @importFrom dplyr distinct filter %>% summarize group_by
 #' @importFrom stringr str_squish
 #' @importFrom stringdist stringsimmatrix
-#' @import spacyr
+#' @importFrom textstem lemmatize_strings
 #' @return A data frame of individual names and the number of times they appear.
 #' @details The function relies on named entity recognition from NLP models.
+#' @examples
+#' #extract_names(US_News_Conferences_1960_1980[20, 3])
 #' @export
 extract_names <- function(v) {
   ent_type <- text <- s <- NULL
   suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
   out <- suppressWarnings(spacyr::spacy_extract_entity(v, type = "named")) %>%
     dplyr::filter(ent_type == "PERSON") %>%
-    dplyr::mutate(names = .clean_token(text)) %>%
+    dplyr::mutate(names = textstem::lemmatize_strings(text)) %>%
     dplyr::group_by(names) %>%
     dplyr::count(name = "count")
   spacyr::spacy_finalize()
@@ -33,12 +36,17 @@ extract_names <- function(v) {
 #' Extract locations from strings
 #'
 #' @param v Text vector.
+#' @import spacyr
 #' @importFrom stringi stri_trans_general
 #' @importFrom stringr str_extract
 #' @importFrom purrr map_chr
 #' @importFrom stringdist stringsimmatrix
+#' @importFrom textstem lemmatize_strings
 #' @return A data frame of locations and the number of times they appear.
 #' @details The function relies on geographical entity detection from NLP models.
+#' @examples
+#' #extract_locations(c("This is the United States", "This is Sao Paulo",
+#' #"I was in Rio de Janeiro and Sao Paulo, then back to the United States"))
 #' @export
 extract_locations <- function(v) {
   v <- stringi::stri_trans_general(v, id = "Latin-ASCII")
@@ -46,7 +54,7 @@ extract_locations <- function(v) {
   suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
   out <- suppressWarnings(spacyr::spacy_extract_entity(v)) %>%
     dplyr::filter(ent_type == "GPE") %>%
-    dplyr::mutate(names = .clean_token(text)) %>%
+    dplyr::mutate(names = textstem::lemmatize_strings(text)) %>%
     dplyr::group_by(names) %>%
     dplyr::count(name = "count")
   spacyr::spacy_finalize()
@@ -83,6 +91,8 @@ extract_title <- function(v) {
 #' Wrapper function for `messydates::as_messydates`.
 #' @param v Text vector.
 #' @return A vector of the dates in text.
+#' @examples
+#' #extract_date("Today is the twenty six of February of two thousand and twenty four")
 #' @export
 extract_date <- function(v) {
   thisRequires("messydates")
@@ -213,6 +223,8 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' in selecting a method, please see `?quanteda.textstats::textstat_simil()`.
 #' @importFrom dplyr group_by summarise select %>%
 #' @return A matrix of similarity scores between texts.
+#' @examples
+#' #extract_text_similarities(US_News_Conferences_1960_1980[1:2,3])
 #' @export
 extract_text_similarities <- function(v, comparison = "similarities", method) {
   thisRequires("quanteda.textstats")
@@ -307,12 +319,16 @@ read_pdf <- function(path) {
 #' Defaults to "words".
 #' @import spacyr
 #' @importFrom dplyr group_by summarise ungroup %>%
-#' @importFrom stringr str_squish
+#' @importFrom stringr str_squish str_replace_all
 #' @return A data frame with syntax information by words or sentences in text.
+#' @examples
+#' #annotate_text(US_News_Conferences_1960_1980[1:2, 3])
+#' #annotate_text(US_News_Conferences_1960_1980[1:2, 3], level = "sentence")
 #' @export
 annotate_text <- function(v, level = "words") {
   doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- entity <- NULL
   suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
+  v <- stringr::str_replace_all(v, "\\.\\,|\\. \\,|\\,\\.|\\, \\.|\\.\\\n\\,", ".")
   parse <- spacyr::spacy_parse(v, tag = TRUE)
   suppressWarnings(spacyr::spacy_finalize())
   if (level == "sentences" | level == "sentence") {
