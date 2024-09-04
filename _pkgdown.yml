@@ -38,6 +38,7 @@ reference:
     desc: "Conduct urgency analysis in political discourses."
     contents:
     - get_urgency
+    - sim_urgency
   - title: "Data"
     desc: "Text data for news coferences of US presidents from 1960 to 1980."
     contents:
