@@ -298,7 +298,7 @@ split_text <- function(v, splitsign = "\\.") {
 read_pdf <- function(path) {
   thisRequires("pdftools")
   thisRequires("tesseract")
-  if (grepl(".pdf", path)) {
+  if (grepl(".pdf", path, ignore.case = TRUE)) {
     out <- paste(pdftools::pdf_ocr_text(x), collapse = " ")
   } else {
     out <- list()
