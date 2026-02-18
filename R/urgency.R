@@ -135,6 +135,13 @@ get_urgency <- function(.data, summarise = "sum") {
       stringr::str_count(as.character(v), paste0("\\b", out$terms[i], "\\b"))*
         out$scale[i]))) # get added scores
     out <- out/(replace(rowcount, rowcount == 0, 1)) # get average value
+  } else if (summarise == "max") {
+    rowcount <- rowSums(do.call("cbind", lapply(seq_len(nrow(out)), function(i)
+      stringr::str_count(as.character(v), paste0("\\b", out$terms[i], "\\b"))))) # get count
+    out <- rowSums(do.call("cbind", lapply(seq_len(nrow(out)), function(i)
+      stringr::str_count(as.character(v), paste0("\\b", out$terms[i], "\\b"))*
+        out$scale[i]))) # get added scores
+    out <- out/(replace(rowcount, rowcount == 0, 1)) # get average value
   }
   out
 }
