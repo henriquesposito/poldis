@@ -20,543 +20,63 @@ library(messydates)
 # load data
 load("~/GitHub/poldis/inst/US_presidential_speeches_1993_2025.rda")
 US_speeches <- US_speeches |>
-  filter(grepl("climate change|global warming", text, ignore.case = TRUE))
-# select priorities
-priorities <- select_priorities(US_speeches$text) # takes a few minutes
+  filter(grepl("climate change|global warming",
+               text, ignore.case = TRUE)) |>
+  mutate(doc_id = paste0("text", row_number()))
+# get priorities
+priorities <- select_priorities(US_speeches$text)
 # assign urgency scores
-urgency <- get_urgency(priorities, summarise = "mean") # takes a few minutes
-# filter for climate change priorities
+urgency <- get_urgency(priorities, summarise = "mean")
+# filter for climate change, health, migration, and employment priorities
 clim_urgency <- filter(urgency,
-                       grepl("climate change|climate|global warming",
-                             nouns, ignore.case = TRUE) &
-                        Commitment > 0) |> # Remove non urgent priorities
-  left_join(US_UK_speeches, by = "doc_id") |>
-  distinct(priorities, .keep_all = TRUE)
-
-nrow(clim_urgency)
-
-## plot ####
+                       grepl("climate change|global warming",
+                             priorities, ignore.case = TRUE) &
+                        Commitment > 0) |> # Remove non-priorities
+  left_join(US_speeches, by = "doc_id") |>
+  mutate(cat = "CC")
+hth_urgency <- filter(urgency, grepl("health|pandemic|infection", 
+                                     priorities, ignore.case = TRUE) &
+                        Commitment > 0) |> # Remove non-priorities
+  left_join(US_speeches, by = "doc_id") |>
+  mutate(cat = "Health")
+mig_urgency <- filter(urgency, grepl("migration|migrant",
+  priorities, ignore.case = TRUE) & Commitment > 0) |> # Remove non-priorities
+  left_join(US_speeches, by = "doc_id") |>
+  mutate(cat = "Migration")
+emp_urgency <- filter(urgency, grepl("employment|job|wage",
+  priorities, ignore.case = TRUE) & Commitment > 0) |> # Remove non-priorities
+  left_join(US_speeches, by = "doc_id") |>
+  mutate(cat = "Employment")
+# plot CC by speaker
 clim_urgency |>
-  # filter(Urgency < 20) |>
-  group_by(date, country, speaker) |>
+  group_by(date, speaker) |>
   summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
   ggplot(aes(x = date, y = max_urgency)) +
   geom_point(aes(color = speaker), alpha = 0.4) +
-  geom_smooth(aes(color = speaker), alpha = 0.25, method = "glm", se = TRUE, size = 2) +
-  # facet_wrap(~ forcats::fct_relevel(country,'United States','United Kingdom'), nrow = 2) +
-  scale_x_date(date_breaks = "1 years", date_labels = "%Y") +
-  # scale_color_grey() +
-  scale_color_manual(values = c("Brown" = "#E4003B", "Cameron" = "skyblue", "May" = "skyblue",
-                                "Obama" = "#0055A4")) +
+  geom_smooth(aes(color = speaker), alpha = 0.25,
+              method = "glm", se = TRUE, size = 2) +
+  scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
   scale_y_continuous(breaks = c(0,0.5,1,2,10)) + 
-  theme_clean(base_size = 12#, base_family = "times"
-              ) +
-  labs(x = "Year", y = "Max Urgency Scores", color = "",
-       # title = "Urgency of Climate Change Over Time",
-       # subtitle = "US and UK speeches from 2009-2019",
-       # caption = "Trend lines based on general linear model"
-       ) +
+  theme_clean(base_size = 12, base_family = "times") +
+  labs(x = "Year", y = "Max Urgency Scores", color = "") +
   theme(legend.position = "bottom", 
         plot.caption = element_text(hjust = 0.5),
         plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
-
-## table of outliers ####
-filter(clim_urgency, Urgency > 9.99) %>%
-  select(priorities, Urgency, speaker, date) %>%
-  arrange(-Urgency)
-filter(clim_urgency, Urgency < 0.3) %>%
-  select(priorities, Urgency, speaker, date) %>%
-  arrange(-Urgency)
-
-# filter for air pollution related sentences ####
-air_urgency <- filter(urgency, grepl("air|pollution", nouns, ignore.case = TRUE) &
-                        Commitment > 0) |> # Remove non urgent priorities and 3 "null" priorities (bugs)
-  left_join(US_UK_speeches, by = "doc_id") |>
-  distinct(priorities, .keep_all = TRUE)
-nrow(air_urgency)
-
-## plot ####
-air_urgency |>
-  # filter(Urgency < 20) |>
-  group_by(date, country, speaker) |>
+# plot comparison of priorities
+rbind(clim_urgency, emp_urgency, hth_urgency, mig_urgency) |>
+  group_by(date, cat) |>
   summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
   ggplot(aes(x = date, y = max_urgency)) +
-  geom_point(aes(color = speaker), alpha = 0.4) +
-  geom_smooth(aes(color = speaker), alpha = 0.25, method = "glm", se = TRUE) +
-  facet_wrap(~ forcats::fct_relevel(country,'United States','United Kingdom'), nrow = 2) +
-  scale_x_date(date_breaks = "1 years", date_labels = "%Y") +
-  scale_color_manual(values = c("Brown" = "#E4003B", "Cameron" = "skyblue", "May" = "skyblue", "Johnson" = "skyblue",
-                                "Obama" = "#0055A4", "Trump" = "#E81B23")) +
-  scale_y_continuous(trans="log10", breaks = c(0,0.25,0.5,1,2,10)) + 
+  geom_smooth(aes(color = cat), alpha = 0.6, 
+              method = "loess", se = FALSE) +
+  scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+  scale_y_continuous(breaks = c(0,0.5,1,2,10)) + 
   theme_clean(base_size = 12, base_family = "times") +
-  labs(x = "Year", y = "Max Urgency Scores", color = "",
-       title = "Urgency of Air/Pollution Over Time",
-       subtitle = "US and UK speeches from 2009-2019",
-       caption = "Trend lines based on general linear model") +
-  theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5),
+  labs(x = "Year", y = "Max Urgency Scores", color = "") +
+  theme(legend.position = "bottom", 
+        plot.caption = element_text(hjust = 0.5),
         plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
-
-## table of outliers ####
-filter(air_urgency, Urgency > 9.99) %>%
-  select(priorities, Urgency, speaker, date) %>%
-  arrange(-Urgency)
-filter(air_urgency, Urgency < 0.3) %>%
-  select(priorities, Urgency, speaker, date) %>%
-  arrange(-Urgency)
-
-
-# filter for health related sentences ####
-hth_urgency <- filter(urgency, grepl("health|pandemic|infection", nouns, ignore.case = TRUE) &
-                        Commitment > 0) |> # Remove non urgent priorities and 3 "null" priorities (bugs)
-  left_join(US_UK_speeches, by = "doc_id") |>
-  distinct(priorities, .keep_all = TRUE)
-nrow(hth_urgency)
-
-## plot ####
-hth_urgency |>
-  # filter(Urgency < 20) |>
-  group_by(date, country, speaker) |>
-  summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
-  ggplot(aes(x = date, y = max_urgency)) +
-  geom_point(aes(color = speaker), alpha = 0.4) +
-  geom_smooth(aes(color = speaker), alpha = 0.25, method = "glm", se = TRUE) +
-  facet_wrap(~ forcats::fct_relevel(country,'United States','United Kingdom'), nrow = 2) +
-  scale_x_date(date_breaks = "1 years", date_labels = "%Y") +
-  scale_color_manual(values = c("Brown" = "#E4003B", "Cameron" = "skyblue", "May" = "skyblue", "Johnson" = "skyblue",
-                                "Obama" = "#0055A4", "Trump" = "#E81B23")) +
-  scale_y_continuous(trans="log10", breaks = c(0,0.25,0.5,1,2,10)) + 
-  theme_clean(base_size = 12, base_family = "times") +
-  labs(x = "Year", y = "Max Urgency Scores", color = "",
-       title = "Urgency of Health Over Time",
-       subtitle = "US and UK speeches from 2009-2019",
-       caption = "Trend lines based on general linear model") +
-  theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5),
-        plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5))
-
-## table of outliers ####
-filter(hth_urgency, Urgency > 9.99) %>%
-  select(priorities, Urgency, speaker, date) %>%
-  arrange(-Urgency)
-filter(hth_urgency, Urgency < 0.3) %>%
-  select(priorities, Urgency, speaker, date) %>%
-  arrange(-Urgency)
-
-# filter for immigration related sentences ####
-mig_urgency <- filter(urgency, grepl("migration|immigration|immigrant|immigrants|migrants|migrant", nouns, ignore.case = TRUE) &
-                        Commitment > 0) |> # Remove non urgent priorities and 3 "null" priorities (bugs)
-  left_join(US_UK_speeches, by = "doc_id") |>
-  distinct(priorities, .keep_all = TRUE)
-nrow(mig_urgency)
-
-## plot ####
-mig_urgency |>
-  # filter(Urgency < 20) |>
-  group_by(date, country, speaker) |>
-  summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
-  ggplot(aes(x = date, y = max_urgency)) +
-  geom_point(aes(color = speaker), alpha = 0.4) +
-  geom_smooth(aes(color = speaker), alpha = 0.25, method = "glm", se = TRUE) +
-  facet_wrap(~ forcats::fct_relevel(country,'United States','United Kingdom'), nrow = 2) +
-  scale_x_date(date_breaks = "1 years", date_labels = "%Y") +
-  scale_color_manual(values = c("Brown" = "#E4003B", "Cameron" = "skyblue", "May" = "skyblue", "Johnson" = "skyblue",
-                                "Obama" = "#0055A4", "Trump" = "#E81B23")) +
-  scale_y_continuous(trans="log10", breaks = c(0,0.25,0.5,1,2,10)) + 
-  theme_clean(base_size = 12, base_family = "times") +
-  labs(x = "Year", y = "Max Urgency Scores", color = "",
-       title = "Urgency of Immigration Over Time",
-       subtitle = "US and UK speeches from 2009-2019",
-       caption = "Trend lines based on general linear model") +
-  theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5),
-        plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5))
-
-## table of outliers ####
-filter(mig_urgency, Urgency > 9.99) %>%
-  select(priorities, Urgency, speaker, date) %>%
-  arrange(-Urgency)
-filter(mig_urgency, Urgency < 0.3) %>%
-  select(priorities, Urgency, speaker, date) %>%
-  arrange(-Urgency)
-
-# filter for employment related sentences ####
-emp_urgency <- filter(urgency, grepl("employment|job|jobs|economy|wage|wages", nouns, ignore.case = TRUE) &
-                        Commitment > 0) |> # Remove non urgent priorities and 3 "null" priorities (bugs)
-  left_join(US_UK_speeches, by = "doc_id") |>
-  distinct(priorities, .keep_all = TRUE)
-nrow(emp_urgency)
-
-## plot ####
-emp_urgency |>
-  # filter(Urgency < 20) |>
-  group_by(date, country, speaker) |>
-  summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
-  ggplot(aes(x = date, y = max_urgency)) +
-  geom_point(aes(color = speaker), alpha = 0.4) +
-  geom_smooth(aes(color = speaker), alpha = 0.25, method = "glm", se = TRUE) +
-  facet_wrap(~ forcats::fct_relevel(country,'United States','United Kingdom'), nrow = 2) +
-  scale_x_date(date_breaks = "1 years", date_labels = "%Y") +
-  scale_color_manual(values = c("Brown" = "#E4003B", "Cameron" = "skyblue", "May" = "skyblue", "Johnson" = "skyblue",
-                                "Obama" = "#0055A4", "Trump" = "#E81B23")) +
-  scale_y_continuous(trans="log10", breaks = c(0,0.25,0.5,1,2,10)) + 
-  theme_clean(base_size = 12, base_family = "times") +
-  labs(x = "Year", y = "Max Urgency Scores", color = "",
-       title = "Urgency of Employment Over Time",
-       subtitle = "US and UK speeches from 2009-2019",
-       caption = "Trend lines based on general linear model") +
-  theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5),
-        plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5))
-
-## table of outliers ####
-filter(emp_urgency, Urgency > 9.99) %>%
-  select(priorities, Urgency, speaker, date) %>%
-  arrange(-Urgency)
-filter(emp_urgency, Urgency < 0.3) %>%
-  select(priorities, Urgency, speaker, date) %>%
-  arrange(-Urgency)
-
-# Sankey diagram ####
-# library(ggsankeyfier)
-all_data <- rbind(mutate(clim_urgency, issue = "climate"), 
-                   mutate(air_urgency, issue = "air"), 
-                   mutate(hth_urgency, issue = "health"), 
-                   mutate(emp_urgency, issue = "employment"), 
-                   mutate(mig_urgency, issue = "immigration"))
-sank_data <- all_data %>% 
-  group_by(date, country, speaker, issue) %>% 
-  summarise(max_urgency = max(Urgency, na.rm = TRUE))
-sank_data |>
-  ggplot(aes(x = date, y = max_urgency)) +
-  geom_point(aes(color = issue), alpha = 0.4) +
-  # geom_smooth(aes(color = issue), alpha = 0.6, method = "glm", se = FALSE, 
-              # span = 0.4, size = 2, position = "jitter") +
-  facet_wrap(~ forcats::fct_relevel(country,'United States','United Kingdom'), nrow = 2) +
-  scale_x_date(date_breaks = "1 years", date_labels = "%Y") +
-  scale_color_manual(values = c("climate" = "#3F7E44", 
-                                "air" = "#26BDE2", 
-                                "health" = "#DD1367", 
-                                "employment" = "#A21942",
-                                "immigration" = "#FD9D24")) +
-  scale_y_continuous(breaks = c(0,0.25,0.5,1,2,10)) + 
-  theme_clean(base_size = 12, base_family = "times") +
-  labs(x = "Year", y = "Max Urgency Scores", color = "",
-       title = "Relative Urgency Over Time",
-       subtitle = "US and UK speeches from 2009-2019",
-       caption = "Trend lines based on mean urgency score per issue per year") +
-  theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5),
-        plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5)) +
-  geom_smooth(data = filter(sank_data, year(date) == 2009), aes(color = issue), 
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ y, size = 2) +
-  geom_smooth(data = filter(sank_data, year(date) == 2010), aes(color = issue), 
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ y, size = 2) +
-  geom_smooth(data = filter(sank_data, year(date) == 2011), aes(color = issue), 
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ y, size = 2) +
-  geom_smooth(data = filter(sank_data, year(date) == 2012), aes(color = issue), 
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ y, size = 2) +
-  geom_smooth(data = filter(sank_data, year(date) == 2013), aes(color = issue), 
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ y, size = 2) +
-  geom_smooth(data = filter(sank_data, year(date) == 2014), aes(color = issue), 
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ y, size = 2) +
-  geom_smooth(data = filter(sank_data, year(date) == 2015), aes(color = issue), 
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ y, size = 2) +
-  geom_smooth(data = filter(sank_data, year(date) == 2016), aes(color = issue), 
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ y, size = 2) +
-  geom_smooth(data = filter(sank_data, year(date) == 2017), aes(color = issue), 
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ y, size = 2) +
-  geom_smooth(data = filter(sank_data, year(date) == 2018), aes(color = issue), 
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ y, size = 2) +
-  geom_smooth(data = filter(sank_data, year(date) == 2019), aes(color = issue), 
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ y, size = 2)
-
-## Relative tracing ####
-
-
-relv_data <- sank_data %>% 
-  filter(issue != "air") %>% 
-  ungroup() %>% select(-speaker)
-extr_data <- relv_data %>% 
-  mutate(datecountry = paste(date,country, sep = "_")) %>% 
-  expand(datecountry, issue) %>% 
-  mutate(date = stringr::str_replace_all(datecountry, "_.+", ""),
-         country = stringr::str_replace_all(datecountry, ".+_", "")) %>% 
-  select(-datecountry) %>% select(date, country, issue) %>% 
-  mutate(date = as.Date(date),
-         max_urgency = 0)
-impt_data <- bind_rows(relv_data,extr_data) %>% 
-  distinct(date, country, issue, .keep_all = TRUE) %>% 
-  arrange(date, country, issue)
-impt_data <- impt_data %>% group_by(date, country) %>%
-  mutate(topics = sum(max_urgency > 0)) %>% ungroup() %>%
-  filter(!(max_urgency==0 & topics == 1))
-spn <- 0.4
-impt_data %>% 
-  ggplot(aes(x = date, y = max_urgency)) +
-  # geom_point(aes(color = issue), alpha = 0.4) +
-  geom_smooth(aes(color = issue), alpha = 0.6, 
-              method = "loess", se = FALSE,
-  span = spn, size = 2, position = "jitter") +
-  # facet_wrap("country", nrow = 2) +
-  facet_wrap(~ forcats::fct_relevel(country,'United States','United Kingdom'), nrow = 2) +
-  scale_x_date(date_breaks = "1 years", date_labels = "%Y") +
-  # scale_color_grey() +
-  scale_color_manual(values = c("climate" = "#3F7E44",
-                                "air" = "#26BDE2",
-                                "health" = "#DD1367",
-                                "employment" = "#A21942",
-                                "immigration" = "#FD9D24")) +
-  scale_y_continuous(breaks = c(0,0.25,0.5,1,2,10)) + 
-  theme_minimal(base_size = 12#, base_family = "times") +
-  )+
-  labs(x = "Year", y = "Max Urgency Scores", color = "Issue")#,
-       # title = "Comparing Priorities",
-       # subtitle = "US and UK speeches from 2009-2019",
-       # caption = paste0("Loess lines smoothing max urgency scores per issue (span = ",
-       #                  spn, ")\n including zeros where issues not mentioned in multi-issue speeches")) +
-       #   theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5),
-        # plot.title = element_text(hjust = 0.5),
-        # plot.subtitle = element_text(hjust = 0.5))
-
-
-# Rhetorical diagram ####
-rhet_data <- all_data %>% 
-  group_by(date, speaker) %>% 
-  summarise(Commitment = mean(Commitment, na.rm = TRUE),
-            Intensity = mean(Intensity, na.rm = TRUE),
-            Timing = mean(Timing, na.rm = TRUE),
-            Frequency = mean(Frequency, na.rm = TRUE)) %>% 
-  pivot_longer(!(date | speaker), names_to = "type", values_to = "score") %>% 
-  mutate(days = as.numeric(date - case_when(speaker == 'Brown' ~ as.Date("2007-06-27"),
-                                 speaker == 'Obama' ~ as.Date("2009-01-20"),
-                                 speaker == 'Trump' ~ as.Date("2017-01-20"),
-                                 speaker == 'Cameron' ~ as.Date("2010-05-11"),
-                                 speaker == 'May' ~ as.Date("2016-07-13"),
-                                 speaker == 'Johnson' ~ as.Date("2019-07-24"),
-                                 .default = NA)))
-rhet_data |>
-  ggplot(aes(x = days, y = score)) +
-  geom_abline(aes(color = type)) +
-  # geom_point(aes(color = type), alpha = 0.2) +
-  # geom_smooth(aes(color = issue), alpha = 0.6, method = "glm", se = FALSE, 
-  # span = 0.4, size = 2, position = "jitter") +
-  facet_wrap(~ forcats::fct_relevel(speaker,'Obama','Trump','Brown','Cameron','May','Johnson'), nrow = 3) +
-# scale_x_date(date_breaks = "1 months", date_labels = "%Y") +
-  scale_color_manual(values = c("Frequency" = "#3F7E44", 
-                                "Timing" = "#26BDE2", 
-                                "Intensity" = "#DD1367", 
-                                "Commitment" = "#FD9D24")) +
-  scale_y_continuous(breaks = c(0,0.25,0.5,1,2,10)) + 
-  theme_clean(base_size = 12, base_family = "times") +
-  labs(x = "Days in Office", y = "Mean Urgency Scores", color = "",
-       # title = "Rhetorical Urgency Composition Over Time",
-       # subtitle = "US and UK speeches from 2009-2019",
-       caption = "Trend lines based on mean urgency score per component per year") +
-  theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5),
-        plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5)) +
-  geom_smooth(data = filter(rhet_data, speaker == "Brown"), aes(color = type), 
-              alpha = 0.6, method = "loess", se = FALSE, formula = y ~ x, size = 2) +
-  geom_smooth(data = filter(rhet_data, speaker == "Cameron"), aes(color = type), 
-              alpha = 0.6, method = "loess", se = FALSE, formula = y ~ x, size = 2) +
-  geom_smooth(data = filter(rhet_data, speaker == "May"), aes(color = type), 
-              alpha = 0.6, method = "loess", se = FALSE, formula = y ~ x, size = 2) +
-  geom_smooth(data = filter(rhet_data, speaker == "Johnson"), aes(color = type),
-              alpha = 0.6, method = "lm", se = FALSE, formula = y ~ x, size = 2) +
-  geom_smooth(data = filter(rhet_data, speaker == "Obama"), aes(color = type), 
-              alpha = 0.6, method = "loess", se = FALSE, formula = y ~ x, size = 2) +
-  geom_smooth(data = filter(rhet_data, speaker == "Trump"), aes(color = type), 
-              alpha = 0.6, method = "loess", se = FALSE, formula = y ~ x, size = 2)
-
-## Rhetorical results ####
-
-rhtl_data <- rhet_data  %>% mutate(days = days/365) %>% filter(score != 0)
-rhtl_data %>% filter(type == "Commitment") %>% 
-  pull(score) %>% range()
-rhtl_data %>% filter(type == "Commitment") %>% 
-  lm(score ~ days + speaker, data = .) %>% summary()
-rhtl_data %>% filter(type == "Intensity") %>% 
-  pull(score) %>% range()
-rhtl_data %>% filter(type == "Intensity") %>% 
-  lm(score ~ days + speaker, data = .) %>% summary()
-rhtl_data %>% filter(type == "Frequency") %>% 
-  pull(score) %>% range()
-rhtl_data %>% filter(type == "Frequency") %>% 
-  lm(score ~ days + speaker, data = .) %>% summary()
-rhtl_data %>% filter(type == "Timing") %>% 
-  pull(score) %>% range()
-rhtl_data %>% filter(type == "Timing") %>% 
-  lm(score ~ days + speaker, data = .) %>% summary()
-
-# Survey results ####
-
-## Timing ####
-
-resT_rel <- resT |>
-  dplyr::filter(word1 != "today" & word1 != "tonight" & word1 != "tomorrow" & word1 != "next week" &
-                  word1 != "this year" & word1 != "this week" & word2 != "today" &
-                  word2 != "tonight" & word2 != "tomorrow" & word2 != "next week" &
-                  word2 != "this year" & word2 != "this week")
-lvls <- resT_rel[1:2] |> unlist() |> as.character() |> unique()
-resT_rel[1:2] <- lapply(resT_rel[1:2], factor, levels = lvls)
-modelT2_rel <- BTm(cbind(count1, count2), word1, word2,
-                   formula = ~ word + diff, id = "word", data = resT_rel,
-                   br = TRUE,
-                   refcat = "now")
-# summary(modelT2_rel)
-# compatible with tidy
-sumT2rel <- broom::tidy(x = modelT2_rel) # create data.frame of results
-sumT2rel <- sumT2rel |>
-  mutate(stat.sig = ifelse(p.value <=0.001, "***",
-                           ifelse(p.value <= 0.01, "**",
-                                  ifelse(p.value <= 0.05, "*",
-                                         ifelse(p.value <= 0.1, ".", ""))))) |>
-  dplyr::filter(!is.na(estimate)) |>
-  dplyr::mutate(term = stringr::str_remove_all(term, "word"))
-# kable(sumT2rel, digits = 3, align = "l", longtable = T) |> kable_minimal()
-sumT2rel <- sumT2rel |> # create new columns for upper and lower bounds
-  dplyr::mutate(
-    conf.low = estimate - std.error,
-    conf.high = estimate + std.error
-  ) %>% arrange(-estimate)
-# creating the dot and whisker plot
-# note that whiskers correspond to standard error and not 95% CI
-dotwhisker::dwplot(sumT2rel, style = "distribution") + 
-  xlab("Coefficient") + ylab("Term") + ggtitle("Relative urgency of timing terms") + 
-  theme_clean(base_size = 18, base_family = "Bodoni 72") +
-  theme(legend.position = "none") + 
-  scale_colour_manual(values = "#26BDE2") + 
-  scale_fill_manual(values = "#26BDE2") +
-  geom_vline(xintercept=0) +
-  annotate("text", x=-0.1, y=25, label="now", angle=90)
-
-
-## Frequency ####
-
-resF_rel <- resF |>
-  filter(word1 != "hourly" & word1 != "daily" & word1 != "weekly" & word1 != "monthly" &
-           word1 != "quarterly" & word1 != "annually" & word2 != "hourly" &
-           word2 != "daily" & word2 != "weekly" & word2 != "monthly" &
-           word2 != "quarterly" & word2 != "annually")
-lvls <- resF_rel[1:2] |> unlist() |> as.character() |> unique()
-resF_rel[1:2] <- lapply(resF_rel[1:2], factor, levels = lvls)
-modelF2_rel <- BTm(cbind(count1, count2), word1, word2,
-                   formula = ~ word + diff, id = "word",
-                   data = resF_rel, refcat = "always")
-# compatible with tidy
-sumF2rel <- broom::tidy(x = modelF2_rel) # create data.frame of results
-sumF2rel <- sumF2rel |>
-  mutate(stat.sig = ifelse(p.value <=0.001, "***",
-                           ifelse(p.value <= 0.01, "**",
-                                  ifelse(p.value <= 0.05, "*",
-                                         ifelse(p.value <= 0.1, ".", ""))))) |>
-  dplyr::filter(!is.na(estimate)) |>
-  dplyr::mutate(term = stringr::str_remove_all(term, "word"))
-kable(sumF2rel, digits = 3, align = "l", longtable = T) |> kable_minimal()
-sumF2rel <- sumF2rel |> # create new columns for upper and lower bounds
-  dplyr::mutate(
-    conf.low = estimate - std.error,
-    conf.high = estimate + std.error
-  ) %>% filter(term != "persistently") %>% arrange(-estimate)
-# creating the dot and whisker plot
-# note that whiskers correspond to standard error and not 95% CI
-dotwhisker::dwplot(sumF2rel, style = "distribution") + 
-  xlab("Coefficient") + ylab("Term") + ggtitle("Relative urgency of frequency terms") + 
-  scale_colour_manual(values = "#3F7E44") + 
-  scale_fill_manual(values = "#3F7E44") +
-  geom_vline(xintercept=0) +
-  annotate("text", x=-0.1, y=25, label="always", angle=90) + 
-  theme_clean(base_size = 18, base_family = "Bodoni 72") +
-  theme(legend.position = "none")
-
-## Commitment ####
-
-resC_mod <- resC |>
-  subset(word1 == "must"|word1 == "will"|word1 == "have to"|word1 == "need to"|
-           word1 == "going to"|word1 == "ready to"|word1 == "intend to"|
-           word1 == "is time to"|word1 == "commit to"|word1 == "promise to"|
-           word1 == "urge"|word1 == "should"|word1 == "want to"|
-           word1 == "might"|word1 == "shall"|word1 == "would"| word1 == "could"|
-           word1 == "can"|word1 == "may"|word1 == "let's"|word2 == "must"|
-           word2 == "will"|word2 == "have to"|word2 == "need to"|
-           word2 == "going to"|word2 == "ready to"|word2 == "intend to"|
-           word2 == "is time to"|word2 == "commit to"|word2 == "promise to"|
-           word2 == "urge"|word2 == "should"|word2 == "want to"|
-           word2 == "might"|word2 == "shall"|word2 == "would"| word2 == "could"|
-           word2 == "can"|word2 == "may"|word2 == "let's")
-lvls <- resC_mod[1:2] |> unlist() |> as.character() |> unique()
-resC_mod[1:2] <- lapply(resC_mod[1:2], factor, levels = lvls)
-modelC_mod <- BTm(cbind(count1, count2), word1, word2,
-                  formula = ~ word + diff, id = "word",
-                  data = resC_mod, br = TRUE, refcat = "must")
-# summary(modelC_mod)
-# compatible with tidy
-sumCmod <- broom::tidy(x = modelC_mod) # create data.frame of results
-sumCmod <- sumCmod |>
-  mutate(stat.sig = ifelse(p.value <=0.001, "***",
-                           ifelse(p.value <= 0.01, "**",
-                                  ifelse(p.value <= 0.05, "*",
-                                         ifelse(p.value <= 0.1, ".", ""))))) |>
-  dplyr::filter(!is.na(estimate)) |>
-  dplyr::mutate(term = stringr::str_remove_all(term, "word")) |>
-  dplyr::filter(term != "essential")
-kable(sumCmod, digits = 3, align = "l", longtable = T) |> kable_minimal()
-sumCmod <- sumCmod |> # create new columns for upper and lower bounds
-  dplyr::mutate(
-    conf.low = estimate - std.error,
-    conf.high = estimate + std.error
-  ) %>% arrange(-estimate)
-# creating the dot and whisker plot
-# note that whiskers correspond to standard error and not 95% CI
-dotwhisker::dwplot(sumCmod, style = "distribution") + # reference word: must
-  xlab("Coefficient") + ylab("Term") + ggtitle("Relative urgency of commitment terms") + 
-  scale_colour_manual(values = "#FD9D24") + 
-  scale_fill_manual(values = "#FD9D24") +
-  geom_vline(xintercept=0) +
-  annotate("text", x=-0.1, y=18, label="must", angle=90) + 
-  theme_clean(base_size = 18, base_family = "Bodoni 72") +
-  theme(legend.position = "none")
-
-## Intensity ####
-
-# resI <- readRDS(file.choose())
-strrm <- "low|pervasive|unmatched|enormous|intensively|extensive|above|exceptional|enough|maximum|insufficient|everywhere|most|limited|modest|ambitious|more|remarkable|realistic|minimal|little"
-resI_mod <- resI |> filter(!stringr::str_detect(word1, strrm)) |> 
-  filter(!stringr::str_detect(word2, strrm))
-lvls <- resI_mod[1:2] |> unlist() |> as.character() |> unique()
-resI[1:2] <- lapply(resI[1:2], factor, levels = lvls) # fix error with different factor levels
-
-modelI <- BTm(cbind(count1, count2), word1, word2,
-              formula = ~ word + diff, id = "word", data = resI,
-              br = TRUE, refcat = "strongly")
-# summary(modelI)
-# compatible with tidy
-sumI <- broom::tidy(x = modelI) # create data.frame of results
-sumI <- sumI |>
-  mutate(stat.sig = ifelse(p.value <=0.001, "***",
-                           ifelse(p.value <= 0.01, "**",
-                                  ifelse(p.value <= 0.05, "*",
-                                         ifelse(p.value <= 0.1, ".", ""))))) |>
-  dplyr::filter(!is.na(estimate)) |>
-  dplyr::mutate(term = stringr::str_remove_all(term, "word"))
-kable(sumI, digits = 3, align = "l", longtable = T) |> kable_minimal()
-sumI <- sumI |> # create new columns for upper and lower bounds
-  dplyr::mutate(
-    conf.low = estimate - std.error,
-    conf.high = estimate + std.error
-  ) %>% arrange(-estimate)
-# creating the dot and whisker plot
-# note that whiskers correspond to standard error and not 95% CI
-dotwhisker::dwplot(sumI, style = "distribution") + # reference word: especially
-  xlab("Coefficient") + ylab("Term") + ggtitle("Relative urgency of intensity terms") + 
-  scale_colour_manual(values = "#DD1367") + 
-  scale_fill_manual(values = "#DD1367") +
-  geom_vline(xintercept=0) +
-  annotate("text", x=-0.2, y=23, label="strongly", angle=90) + 
-  theme_clean(base_size = 18, base_family = "Bodoni 72") +
-  theme(legend.position = "none")
-
 ```
 
