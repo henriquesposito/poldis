@@ -12,3 +12,4 @@
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
 ^data_raw$
+^survey_analysis$
