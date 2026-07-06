@@ -13,7 +13,7 @@ library(usethis)
 ### Data -----------------------------------------------------------------------
 
 # Load survey
-survey <- readRDS("Urgency_survey_2_anonymous.rds")
+survey <- readRDS("~/GitHub/poldis/data_raw/survey_analysis/Urgency_survey_2_anonymous.rds")
 survey <- survey |>
   # Remove screened out participants, those that failed attention check,
   # or that completed the survey extremely fast.
@@ -31,7 +31,7 @@ rm(list = c("about_urgency")) # Remove data items to avoid confusion
 # number of times term is chosen over others matters.
 survey[survey=="Click to write Choice 3"] <- NA
 # Load world pairs dfata to code words if needed.
-wordpairs <- read_csv("wordpairs.csv") |>
+wordpairs <- read_csv("data_raw/survey_analysis/wordpairs.csv") |>
   unite("question_ID", section:qn, sep = "-") |>
   select(question_ID, word) |>
   group_by(question_ID) |>
@@ -400,8 +400,7 @@ comp_sent$new_urgency <- unlist(lapply(comp_sent$sentences, function(x)
 comp_sent |>
   select(sentences, urgency_score_S1, expected_order, survey_order, new_urgency) |>
   mutate(new_urgency_order = with_order(order_by = new_urgency*-1, fun = row_number,
-                          x = new_urgency*-1))
-# Ok, kind of works, but as "imprecise" as before ...
+                          x = new_urgency*-1)) # Ok, kind of works reasonably!
 BT_models <- rbind(select(pairs, termA, word1) |> rename(terms = termA, word = word1),
       select(pairs, termB, word2) |> rename(terms = termB, word = word2)) |>
   distinct() |> # Merge words and terms
@@ -500,13 +499,13 @@ l_synonym <- list("hasty" = "with haste", "hastily" = "with haste",
                 "realistically" = "realistic",
                 "moderate" = "moderately", "substantial" = "substantially",
                 "lots" = "substantially", "plenty" = "substantially",
-                "much" = "substantially", "totally" = "fully",
+                "totally" = "fully",
                 "entirely" = "fully", "far" = "substantially",
                 "clearly" = "clear", "least" = "almost",
                 "marginally" = "limited", "minimum" = "minimal",
                 "weakly" = "slightly", "adequate" = "adequately",
                 "sufficient" = "enough", "near" = "nearly",
-                "slight" = "slightly",
+                "slight" = "slightly", "much" = "more",
                 "reasonable" = "reasonably", "wide" = "extensive",
                 "widely" = "extensive", "widespread" = "extensive",
                 "plenti of" = "average", "lot of" = "nearly",
@@ -524,8 +523,10 @@ BT_models <- BT_models |>
   ungroup() |>
   distinct() |>
   separate_rows(terms, sep = "\\|") |>
-  select(-alt_synonyms) |>
   mutate(synonym = ifelse(stem_strings(terms) != word, 1, 0)) |>
-  relocate(terms, word, coefficients, dimension) |>
+  select(-c(alt_synonyms)) |>
+  rename(word_stem = word) |>
+  relocate(terms, coefficients, dimension) |>
   mutate(across(se:prob_z, ~ ifelse(synonym == 1, NA, .x)))
+
 saveRDS(BT_models, "BT_models.rds") # save data for later
