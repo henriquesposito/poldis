@@ -68,7 +68,7 @@ get_urgency <- function(v, summarise = "sum") {
 }
 
 .assign_urgency_dimensions <- function(v, udimension, summarise) {
-  coefficients <- stem_word <- NULL
+  coefficients <- stem_word <- word_stem <- dimension <- NULL
   # get dictionaries
   out <- dplyr::filter(BT_models, dimension == udimension) %>%
     dplyr::select(word_stem, coefficients) %>%
@@ -76,17 +76,27 @@ get_urgency <- function(v, summarise = "sum") {
   matrix_count <- do.call("cbind", lapply(seq_len(nrow(out)), function(i)
     stringr::str_count(as.character(v), paste0("\\b", out$word_stem[i], "\\b"))))
   colnames(matrix_count) <- unlist(out$word_stem)
-  matrix_count <- data.frame(matrix_count[, colSums(matrix_count != 0) > 0])
-  values <- out$coefficients[out$word_stem %in% colnames(matrix_count)]
-  if (summarise == "sum" | summarise == "mean") {
-    out <- rowSums(as.data.frame(mapply(`*`, matrix_count, values)))
-    if (summarise == "mean") out <- out/rowSums(matrix_count)
-  } else if (summarise == "max") {
-    matrix_count[matrix_count > 0] <- 1
-    out <- apply(as.data.frame(mapply(`*`, matrix_count, values)), 1, max)
-  } else if (summarise == "min") {
-    matrix_count[matrix_count > 0] <- 1
-    out <- apply(as.data.frame(mapply(`*`, matrix_count, values)), 1, min)
+  if (sum(colSums(matrix_count != 0) > 0) == 0) {
+    out <- rep(0, length(v))
+  } else {
+    if (sum(colSums(matrix_count != 0) > 0) == 1) {
+      cname <- names(colSums(matrix_count != 0) > 0)[which(colSums(matrix_count != 0) > 0)]
+      matrix_count <- data.frame(matrix_count[, colSums(matrix_count != 0) > 0])
+      colnames(matrix_count) <- cname
+    } else {
+      matrix_count <- data.frame(matrix_count[, colSums(matrix_count != 0) > 0])
+    }
+    values <- out$coefficients[out$word_stem %in% colnames(matrix_count)]
+    if (summarise == "sum" | summarise == "mean") {
+      out <- rowSums(as.data.frame(mapply(`*`, matrix_count, values)))
+      if (summarise == "mean") out <- out/rowSums(matrix_count)
+    } else if (summarise == "max") {
+      matrix_count[matrix_count > 0] <- 1
+      out <- apply(as.data.frame(mapply(`*`, matrix_count, values)), 1, max)
+    } else if (summarise == "min") {
+      matrix_count[matrix_count > 0] <- 1
+      out <- apply(as.data.frame(mapply(`*`, matrix_count, values)), 1, min)
+    }
   }
   out
 }

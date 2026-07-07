@@ -37,11 +37,12 @@ gather_topics <- function(v, dictionary = "CAP") {
     subjects <- dictionary$Words
     names(subjects) <- dictionary$Topic
     } else if (is.vector(dictionary) && is.atomic(dictionary)) {
-      subjects <- dictionary
-      names(subjects) <- subjects
+      subjects <- textstem::stem_strings(dictionary)
+      names(subjects) <- dictionary
     } else {
       subjects <- unlist(lapply(dictionary, function(x)
-        paste0(x, collapse = "\\b|\\b")))
+        paste(textstem::stem_strings(x), collapse = "|")))
+      names(subjects) <- names(dictionary)
     }
   # match terms
   out <- lapply(names(subjects), function(i) stringr::str_count(text, subjects[[i]]))

@@ -21,7 +21,7 @@ select_priorities <- function(v, na.rm = TRUE) {
   comm_lemmas <- unique(textstem::lemmatize_strings(BT_models$terms[which(
     BT_models$dimension != "Commitment")]))
   out <- v %>%
-    dplyr::mutate(priorities = ifelse(stringr::str_detect(tags, "PRP MD ")|
+    dplyr::mutate(priorities = ifelse(stringr::str_detect(tags, "PRP MD ") |
                                         stringr::str_detect(lemmas, paste0(
                                           comm_lemmas, collapse = "|")),
                                       lemmas, NA), # detect priorities

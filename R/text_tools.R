@@ -150,8 +150,8 @@ extract_match <- function(v, match, invert = FALSE, ignore.case = TRUE) {
 #' @importFrom dplyr group_by summarise select %>%
 #' @examples
 #' \donttest{
-#' extract_context(match = "war|weapons of mass destruction|conflict|NATO|peace",
-#'                 v = US_inaugural_addresses_1993_2025$text,
+#' extract_context(match = " war ",
+#'                 v = US_inaugural_addresses_1993_2025$text[1],
 #'                 level = "sentences", n = 2)
 #' }
 #' @return A list of string matches and their context.
@@ -308,7 +308,7 @@ read_pdf <- function(path) {
 #' @importFrom stringr str_squish str_replace_all
 #' @return A data frame with syntax information by words or sentences in text.
 #' @examples
-#' #annotate_text(US_inaugural_addresses_1993_2025$text)
+#' #annotate_text(US_inaugural_addresses_1993_2025$text[2])
 #' @export
 annotate_text <- function(v, level = "words") {
   doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- entity <- NULL

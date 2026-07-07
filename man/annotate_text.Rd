@@ -20,5 +20,5 @@ A data frame with syntax information by words or sentences in text.
 This function relies on `\{spacyr\}` NLP parsing to annotate texts.
 }
 \examples{
-#annotate_text(US_inaugural_addresses_1993_2025$text)
+#annotate_text(US_inaugural_addresses_1993_2025$text[2])
 }
