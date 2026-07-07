@@ -4,23 +4,18 @@
 \alias{get_urgency}
 \title{Urgency Analysis}
 \usage{
-get_urgency(.data, summarise = "sum")
+get_urgency(v, summarise = "sum")
 }
 \arguments{
-\item{.data}{A data frame, priorities data frame coded using
-`select_priorities()`, or text vector.
-For data frames, function will search for "text" variable.
-For priorities data frame function will search for "priorities" variable.
-If missing, opens the webpage containing the urgency codebook.}
+\item{v}{Text vector or annotated data frame.}
 
-\item{summarise}{How to handle multiple matches for the same dimension
+\item{summarise}{How to handle multiple matches for the same dictionary
 in the same text observation?
 By default, multiple matches are added together and
 their "sum" per text observation is returned.
-Users can, instead, choose the "mean" which returns the average
-score per dimension per text observation when there are multiple matches.
-The "mean" can also be used as a form of normalization per
-dimension and text observation in certain cases.}
+Users can, instead, choose the "mean", which returns the average
+score per dictionary per text observation, the "max" or the "min",
+when there are multiple matches.}
 }
 \value{
 A scored data frame for each dimension of urgency.
@@ -31,42 +26,27 @@ Urgency Analysis
 \details{
 Urgency in political discourses is an expression of how necessary and/or
 how soon an action should be undertaken or completed.
-This is measured along four dimensions,
-two related to necessity and two related to timing.
-The first two dimensions, degree of intensity and degree of commitment,
-relate to the necessity of taking the action, while the next two dimensions,
-frequency of action and timing of action,
-relate to the timing in which action is taken.
-Our dictionary includes terms in each of these dimensions.
-The terms included in each of these dimensions were validated and adjusted
-through an online survey that took place between July and August of 2024.
-The survey results were recorded as counts of the number of participants
-who selected an urgency-related word as more urgent than its pair.
+This is measured along four dictionaries,
+two related to necessity (e.g., degree of intensity and of commitment)
+and two related to timing (e.g., frequency and timing of action).
+The dictionaries include terms for each of these dimensions of urgency.
+Their scores were developed through an online survey that took place
+in June 2026. The survey results were recorded as counts of the number of
+participants who selected an urgency-related word as more urgent than its pair.
 To analyze the survey results, we employed Bradley-Terry models for
-paired comparisons.
-A rank of the words for each dimension of urgency was obtained from the analysis,
-which were then used to create the urgency word scores in the dictionaries.
-For more information on the dimensions, scores, or the survey on urgency,
-please run `get_urgency()` to access the urgency codebook.
-For priorities (i.e. coded using the `select_priorities()`),
-urgency scores are calculated by multiplying the commitment scores by all
-other dimensions.
-This is done because commitment words are indicative of political priorities,
-For more information please refer to the `select_priorities()` function.
-For vectors or data frames urgency scores are calculated by
-adding commitment and intensity dimension scores (i.e. how necessary)
-and multiplying these by the sum of timing and frequency dimension
-scores (i.e. how soon).
-In both cases, zero urgency scores are indicative of no urgency but maximum
-scores can vary.
+paired comparisons. We use raw log odds coefficients to calculate urgency.
+Urgency scores for each disctionary are returned.
+The aggregated urgency scores is calculated by adding these scores and
+then divided by the coefficient for the word "must", to ensure
+interpretability (i.e., an aggregated score of 1 in equivalent to "we must do").
+Users are welcome to change how urgency scores are aggregated and transform these
+scores into probabilities or odds ratios as necessary.
 }
 \examples{
 \donttest{
-get_urgency(US_News_Conferences_1960_1980[1:10, 3])
-get_urgency(US_News_Conferences_1960_1980[1:10,])
-#get_urgency(select_priorities(US_News_Conferences_1960_1980[1:2, 3]))
-#summary(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
-#plot(get_urgency(US_News_Conferences_1960_1980[1:10, 3]))
-#get_urgency()
+get_urgency(US_inaugural_addresses_1993_2025$text)
+#a = get_urgency(select_priorities(US_inaugural_addresses_1993_2025$text))
+#summary(get_urgency(US_inaugural_addresses_1993_2025$text))
+#plot(get_urgency(US_inaugural_addresses_1993_2025$text))
 }
 }

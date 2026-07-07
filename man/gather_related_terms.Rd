@@ -4,13 +4,10 @@
 \alias{gather_related_terms}
 \title{Gather terms related to subjects}
 \usage{
-gather_related_terms(.data, dictionary)
+gather_related_terms(v, dictionary)
 }
 \arguments{
-\item{.data}{A data frame, priorities data frame coded using
-`select_priorities()`, or text vector.
-For data frames, function will search for "text" variable.
-For priorities data frame function will search for "priorities" variable.}
+\item{v}{Text vector or annotated data frame.}
 
 \item{dictionary}{The dictionary of 20 major political topics from the
 Comparative Agendas Project (Jones et al., 2023) is used by default.
@@ -31,10 +28,8 @@ in the `\{keyATM\}` package to find related words based on the topics
 provided and texts in which they appear.
 }
 \examples{
-#gather_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
-#gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
-#                     dictionary = c("military", "development"))
-#gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
+#gather_related_terms(US_inaugural_addresses_1993_2025$text, dictionary = "CAP")
+#gather_related_terms(US_inaugural_addresses_1993_2025$text,
 #                     dictionary = list("military" = c("military", "gun", "war"),
 #                                       "development" = c("development", "interest rate", "banks")))
 }
