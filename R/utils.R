@@ -14,16 +14,17 @@ thisRequires <- function(pkgname){
 open_codebook <- function(codebook = "urgency") {
   thisRequires("cli")
   url <- "https://github.com/henriquesposito/poldis/tree/develop/inst"
-  if (codebook == "urgency") {
-    tryCatch({
-      utils::browseURL(paste0(url, "/urgency_codebook.pdf"),
-                       browser = getOption("browser"), encodeIfNeeded = FALSE)
-    }, error = function(e) {
-      message(paste0("Unable to open codebook, please visit: ",
-                     cli::style_hyperlink(paste0(url, "/urgency_codebook.pdf"),
-                                          paste0(url, "/urgency_codebook.pdf"))))
-    })
-  } else if (codebook == "topic") {
+  # if (codebook == "urgency") {
+  #   tryCatch({
+  #     utils::browseURL(paste0(url, "/urgency_codebook.pdf"),
+  #                      browser = getOption("browser"), encodeIfNeeded = FALSE)
+  #   }, error = function(e) {
+  #     message(paste0("Unable to open codebook, please visit: ",
+  #                    cli::style_hyperlink(paste0(url, "/urgency_codebook.pdf"),
+  #                                         paste0(url, "/urgency_codebook.pdf"))))
+  #   })
+  # }
+  if (codebook == "topic") {
     tryCatch({
       utils::browseURL(paste0(url, "/topic.pdf"), browser = getOption("browser"), encodeIfNeeded = FALSE)
     }, error = function(e) {
