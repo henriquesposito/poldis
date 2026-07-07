@@ -30,7 +30,7 @@ A function for getting string matches and the context in which they occur.
 \examples{
 \donttest{
 extract_context(match = "war|weapons of mass destruction|conflict|NATO|peace",
-                v = US_News_Conferences_1960_1980$text[100],
+                v = US_inaugural_addresses_1993_2025$text,
                 level = "sentences", n = 2)
 }
 }

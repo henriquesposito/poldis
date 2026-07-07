@@ -19,5 +19,5 @@ Extract a list of possible names of individuals in texts
 The function relies on named entity recognition from NLP models.
 }
 \examples{
-#extract_names(US_News_Conferences_1960_1980[20, 3])
+#extract_names("This package was created by Jael, James, and I.")
 }
