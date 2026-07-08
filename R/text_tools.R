@@ -317,10 +317,16 @@ annotate_text <- function(v, level = "words") {
   }
   v <- stringr::str_replace_all(v, "\\.\\,|\\. \\,|\\,\\.|\\, \\.|\\.\\\n\\,", ".")
   if (as.numeric(stringr::str_remove(object.size(v), " bytes")) > 1000000) {
-    message("This is a large dataset, parsing texts in chunks.")
-    v  <- split(v, ceiling(seq_len(length(v))/100))
-    v <- lapply(v, function(x) spacyr::spacy_parse(x, tag = TRUE))
-    parse <- do.call(rbind, v)
+    message("This is a large vector, parsing texts in chunks.")
+    chunck <- ceiling(seq_len(length(v))/100)
+    process_chunk <- split(v, chunck)
+    processed_chunk <- lapply(process_chunk, function(x) spacyr::spacy_parse(x, tag = TRUE))
+    for (i in seq_len(length(processed_chunk))) {
+      processed_chunk[[i]]$doc_id <-
+        paste0("text", as.numeric(stringr::str_remove_all(processed_chunk[[i]]$doc_id, "text")) +
+                 (100*(i-1)))
+    }
+    parse <- do.call(rbind, processed_chunk)
   } else parse <- spacyr::spacy_parse(v, tag = TRUE)
   #suppressWarnings(spacyr::spacy_finalize())
   if (level == "sentences" | level == "sentence") {
