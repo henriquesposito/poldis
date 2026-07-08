@@ -12,207 +12,152 @@ library(dplyr)
 library(ggplot2)
 library(scales)
 library(tidyr)
-library(ggthemes)
+library(stringr)
 library(messydates)
+library(ggthemes)
 library(modelsummary)
+```
+```{r, include=FALSE, eval=FALSE}
+# plot BT model results
+BT_models <- readRDS("~/GitHub/poldis/data_raw/survey_analysis/BT_models.rds")
+bt_results <- BT_models |>
+  drop_na() |>
+  filter(dimension == "commitment" & grepl(paste0(c("should", "must", "may", "going to",
+                                                    "want to", "have to",
+                                                    "could", "can", "would"), collapse = "$|^"),
+                                           terms) | # might
+           dimension == "frequency" & grepl(paste0(c("weekly", "every hour", "generally",
+                                                     "progressively", "always", "everyday",
+                                                     "sometimes", "occasionally", "rarely"),
+                                                   collapse = "$|^"),  terms) | # every year
+           dimension == "timing" & grepl(paste0(c("immediately", "promptly", "later",
+                                                  "now", "soon", "next",
+                                                  "afterwards", "early", "at some stage"),
+                                                collapse = "$|^"),  terms) | # eventually
+           dimension == "intensity" & grepl(paste0(c("vigorously" , "definitely", "realistically",
+                                                     "certainly", "moderately", "really", 
+                                                     "reasonably", "adequately", "nearly"), 
+                                                   collapse = "$|^"),  terms)) |> 
+  # everywhere
+  mutate(lower = coefficients - 1.96*se, upper = coefficients + 1.96*se,
+         dimension = factor(stringr::str_to_title(dimension),
+                            c("Timing", "Commitment", "Frequency", "Intensity")))
+ggplot(bt_results, aes(x = coefficients, y = reorder(terms, coefficients))) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey75") +
+  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0.2, linewidth = 0.6) +
+  geom_point(size = 3, colour = "#446677") +
+  facet_wrap("dimension", scales = "free") +
+  scale_x_continuous(limits = c(-11, 11.5)) +
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 12)
+ggsave("urgency_words_plot.png", width = 12, height = 12, units = "cm", dpi = 500)
 ```
 
 # Data and methods
 
 ```{r}
-# load and filter data
-load("US_presidential_speeches_1993_2025.rda")
-# get CC speeches only
-US_clim_speeches <- US_speeches |>
+# # load and filter data
+# US_presidential_speeches_1993_2025 <- readRDS("~/GitHub/poldis/data_raw/presidential_speeches/US_presidential_speeches_1993_2025.rds")
+# # get priorities by president
+# priorities <- select_priorities(US_presidential_speeches_1993_2025$text)
+# urgency <- get_urgency(priorities, summarise = "mean")
+# urgent_priorities <- urgency |>
+#   select(doc_id, priorities, Frequency, Timing, Commitment, Intensity, Urgency) |>
+#   mutate(priorities = stringr::str_squish(stringr::str_to_lower(
+#     tm::removePunctuation(priorities)))) |>
+#   left_join(US_presidential_speeches_1993_2025 |>
+#               select(-c(text, title)) |>
+#               mutate(doc_id = paste0("text", row_number())))
+# # saveRDS(urgent_priorities, "urgent_priorities_US_presidential_speeches_1993_2025.rds") # save data
+urgent_priorities_US_presidential_speeches_1993_2025 <-
+  readRDS("~/GitHub/poldis/inst/urgent_priorities_US_presidential_speeches_1993_2025.rds") |>
+  mutate(president = factor(president, levels = 
+                              c("Clinton", "Bush", "Obama", "Trump", "Biden")))
+# get CC priorities only
+clim_urgency  <- urgent_priorities_US_presidential_speeches_1993_2025 |>
   filter(grepl("climate change|global warming|paris agreement",
-               text, ignore.case = TRUE)) |>
-  mutate(doc_id = paste0("text", row_number()),
-         speaker = factor(case_when(speaker == 'William J. Clinton' ~
-                                          'Clinton',
-                              speaker == 'George W. Bush' ~ 'Bush',
-                              speaker == 'Barack Obama' ~ 'Obama',
-                              speaker == 'Donald J. Trump' ~ 'Trump',
-                              speaker == 'Joseph R. Biden, Jr.' ~ 'Biden'),
-                              levels = c('Clinton', 'Bush', 'Obama',
-                                         'Trump', 'Biden')))
-# get priorities
-cc_priorities <- select_priorities(US_clim_speeches$text)
-#saveRDS(cc_priorities, file = "cc_priorities.rds")
-# assign urgency scores
-cc_urgency <- get_urgency(cc_priorities, summarise = "mean")
-# filter for climate change, health, migration, and employment priorities
-clim_urgency <- filter(cc_urgency,
-                       grepl("climate change|global warming|paris agreement",
-                             priorities, ignore.case = TRUE) &
-                        Commitment > 0) |> # Remove non-priorities
-  left_join(US_clim_speeches, by = "doc_id") |>
-  mutate(cat = "Climate change")
+               priorities, ignore.case = TRUE)) 
+```
+
+# Presdiential patterns in expressing urgency of climate change
+
+```{r}
+cc_data <- clim_urgency |>
+  mutate(Year = as.numeric(messydates::year(date))) |>
+  pivot_longer(cols = Frequency:Intensity,
+               names_to = "type", values_to = "score")
+modelsummary(list("Commitment" = lm(score ~ president + Year,
+                     data = subset(cc_data, type == "Commitment")),
+            "Timing" = lm(score ~ president + Year,
+               data = subset(cc_data, type == "Timing")),
+            "Frequency" = lm(score ~ president + Year,
+               data = subset(cc_data, type == "Frequency")),
+            "Intensity" = lm(score ~ president + Year,
+               data = subset(cc_data, type == "Intensity"))),
+            estimate = "{estimate}{stars}",
+            coef_omit = "Intercept",
+            coef_rename = c("presidentClinton" = "Clinton",
+                            "presidentBush" = "Bush",
+                            "presidentObama" = "Obama",
+                            "presidentTrump" = "Trump",
+                            "presidentBiden" = "Biden"))
 ```
 
 # Urgency of climate change in American presidential speeches since 1993
 
 ```{r}
-# plot CC by speaker
+# plot CC by president
 clim_urgency |>
-  group_by(date, speaker) |>
+  group_by(date, president) |>
   summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
   ggplot(aes(x = date, y = max_urgency)) +
-  geom_point(aes(color = speaker), alpha = 0.4) +
-  geom_smooth(aes(color = speaker), alpha = 0.25,
+  geom_point(aes(color = president), alpha = 0.4) +
+  geom_smooth(aes(color = president), alpha = 0.25,
               method = "glm", se = TRUE, size = 2) +
   scale_x_date(date_breaks = "2 years", date_labels = "%Y",
                limits = c(as.Date("1993/01/20"), as.Date("2025/01/20"))) +
-  scale_y_continuous(breaks = c(0,0.5,1,2,10)) + 
-  theme_clean(base_size = 12, base_family = "serif") +
+  scale_color_brewer(palette = "Dark2", direction = "1") +
+  theme_minimal(base_size = 12, base_family = "serif") +
   labs(x = "Year", y = "Max Urgency Scores", color = "") +
   theme(legend.position = "bottom", 
         plot.caption = element_text(hjust = 0.5),
         plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
+ggsave("clim_urgency_presid.png", width = 14, height = 12, units = "cm", dpi = 500)
 ```
-
-# Personal patterns in expressing urgency
-
-It is also interesting to see how US presidents express climate change priorities. Rhetorical patterns or strategies differ in, for example, use of intensity or timing. This can be informative as a baseline. Or it can help better understand how urgency is expressed differently by individuals or over the course of a politician’s terms in office.
-
-```{r}
-hth_cc_urgency <- filter(cc_urgency, grepl("health|pandemic|infection", 
-                                     priorities, ignore.case = TRUE) &
-                        Commitment > 0) |> # Remove non-priorities
-  left_join(US_clim_speeches, by = "doc_id") |>
-  mutate(cat = "Health")
-mig_cc_urgency <- filter(cc_urgency, grepl("migration|migrant",
-  priorities, ignore.case = TRUE) & Commitment > 0) |> # Remove non-priorities
-  left_join(US_clim_speeches, by = "doc_id") |>
-  mutate(cat = "Migration")
-emp_cc_urgency <- filter(cc_urgency, grepl("employment|job|wage",
-  priorities, ignore.case = TRUE) & Commitment > 0) |> # Remove non-priorities
-  left_join(US_clim_speeches, by = "doc_id") |>
-  mutate(cat = "Employment")
-tdata <- rbind(clim_urgency, emp_cc_urgency, hth_cc_urgency, mig_cc_urgency) |>
-  group_by(date, cat, speaker) |>
-  summarise(Commitment = max(Commitment, na.rm = TRUE),
-            Intensity = max(Intensity, na.rm = TRUE),
-            Timing = max(Timing, na.rm = TRUE),
-            Frequency = max(Frequency, na.rm = TRUE)) |> 
-  pivot_longer(cols = Commitment:Frequency,
-               names_to = "type", values_to = "score") |>
-  mutate(speaker = factor(speaker, levels = c(
-           'Clinton', 'Bush', 'Obama', 'Trump', 'Biden'))) |>
-  filter(score != 0)
-modelsummary(list("Commitment" = lm(score ~ speaker,
-                     data = subset(tdata, type == "Commitment")),
-            "Timing" = lm(score ~ speaker,
-               data = subset(tdata, type == "Timing")),
-            "Frequency" = lm(score ~ speaker,
-               data = subset(tdata, type == "Frequency")),
-            "Intensity" = lm(score ~ speaker,
-               data = subset(tdata, type == "Intensity"))),
-            estimate = "{estimate}{stars}",
-            coef_omit = "Intercept",
-            coef_rename = c("speakerClinton" = "Clinton",
-                            "speakerBush" = "Bush",
-                            "speakerObama" = "Obama",
-                            "speakerTrump" = "Trump",
-                            "speakerBiden" = "Biden"))
-```
-
-The table above presents estimates obtained by fitting linear models to commitment, intensity, frequency, and timing scores for presidents (using Clinton as the reference category). In comparison to Clinton, we that both Bush commits less to climate change action. However, intensity, frequency, and timing scores do not seem correlated to president in statistically significant ways. That is, there appears to be no significant difference in the frequency in which presidents employ different urgency dimensions in their speech. \footnote{Future work using urgency analysis should investigate further differences in "oral styles" and how these can be used to set baselines by speaker and for how the usage of different urgency terms could be weighted according to these baselines.} 
 
 # Comparing climate change priorities to employment, health, and migration in speeches that mention climate change
 
 ```{r}
-rbind(clim_urgency, emp_cc_urgency, hth_cc_urgency, mig_cc_urgency) |>
+comp_priorities <- urgent_priorities_US_presidential_speeches_1993_2025 |>
+  mutate(cat = case_when(grepl("climate change|global warming|paris agreement",
+                               priorities, ignore.case = TRUE) ~ "Climate Change",
+                         grepl("health|pandemic|infection", 
+                               priorities, ignore.case = TRUE) ~ "Health",
+                         grepl("migration|migrant", priorities,
+                               ignore.case = TRUE) ~ "Migration",
+                         grepl("employment|job|wage", priorities,
+                               ignore.case = TRUE) ~ "Employment",
+                         .default = NA)) |>
+  drop_na(cat)
+#comp_priorities |> group_by(cat) |> count()
+comp_priorities |>
   group_by(date, cat) |>
   summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
   ggplot(aes(x = date, y = max_urgency)) +
-  geom_smooth(aes(color = cat), alpha = 0.6, 
-              method = "loess", se = FALSE) +
+  geom_smooth(aes(color = cat), se = FALSE) +
   scale_x_date(date_breaks = "2 years", date_labels = "%Y",
                 limits = c(as.Date("1993/01/20"), as.Date("2025/01/20"))) +
-  scale_y_continuous(breaks = c(0,0.5,1,2,10)) + 
   annotate("rect", xmin = as.Date("2020/01/20"), xmax = as.Date("2023/05/01"),
-           ymin = 0.1, ymax = 1.1, alpha=0.2, color="plum3", fill="plum1") +
+           ymin = 0.9, ymax = 1.5, alpha=0.2, color="plum4", fill="plum") +
   theme_clean(base_size = 12, base_family = "serif") +
   labs(x = "Year", y = "Max Urgency Scores", color = "") +
   theme(legend.position = "bottom", 
         plot.caption = element_text(hjust = 0.5),
         plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
-```
 
 COVID sensitivity of the measurement approach and the sensibleness of the measures produced regarding their time pressure components 
-
-# Comparing climate change priorities to employment, health, and migration in all speeches
-
-```{r}
-# health
-US_h_speeches <- US_speeches |> # get priorities
-  filter(grepl("health|pandemic|infection",
-               text, ignore.case = TRUE)) |>
-  mutate(doc_id = paste0("text", row_number()),
-         speaker = factor(case_when(speaker == 'William J. Clinton' ~
-                                          'Clinton',
-                              speaker == 'George W. Bush' ~ 'Bush',
-                              speaker == 'Barack Obama' ~ 'Obama',
-                              speaker == 'Donald J. Trump' ~ 'Trump',
-                              speaker == 'Joseph R. Biden, Jr.' ~ 'Biden'),
-                              levels = c('Clinton', 'Bush', 'Obama',
-                                         'Trump', 'Biden')))
-# get priorities
-h_priorities <- select_priorities(US_h_speeches$text)
-# assign urgency scores
-h_urgency <- get_urgency(h_priorities, summarise = "mean")
-# filter for health only priorities
-h_urgency <- filter(h_urgency, grepl("health|pandemic|infection", 
-                                     h_priorities, ignore.case = TRUE) &
-                        Commitment > 0) |> # Remove non-priorities
-  left_join(US_h_speeches, by = "doc_id") |>
-  mutate(cat = "Health")
-# migration
-US_m_speeches <- US_speeches |>
-  filter(grepl("migration|migrant",
-               text, ignore.case = TRUE)) |>
-  mutate(doc_id = paste0("text", row_number()),
-         speaker = factor(case_when(speaker == 'William J. Clinton' ~
-                                          'Clinton',
-                              speaker == 'George W. Bush' ~ 'Bush',
-                              speaker == 'Barack Obama' ~ 'Obama',
-                              speaker == 'Donald J. Trump' ~ 'Trump',
-                              speaker == 'Joseph R. Biden, Jr.' ~ 'Biden'),
-                              levels = c('Clinton', 'Bush', 'Obama',
-                                         'Trump', 'Biden')))
-# get priorities
-m_priorities <- select_priorities(US_m_speeches$text)
-# assign urgency scores
-m_urgency <- get_urgency(m_priorities, summarise = "mean")
-# filter for migration only priorities
-mig_urgency <- filter(m_urgency, grepl("migration|migrant",
-  priorities, ignore.case = TRUE) & Commitment > 0) |> # Remove non-priorities
-  left_join(US_clim_speeches, by = "doc_id") |>
-  mutate(cat = "Migration")
-# employment
-US_e_speeches <- US_speeches |>
-  filter(grepl("employment|job|wage",
-               text, ignore.case = TRUE)) |>
-  mutate(doc_id = paste0("text", row_number()),
-         speaker = factor(case_when(speaker == 'William J. Clinton' ~
-                                          'Clinton',
-                              speaker == 'George W. Bush' ~ 'Bush',
-                              speaker == 'Barack Obama' ~ 'Obama',
-                              speaker == 'Donald J. Trump' ~ 'Trump',
-                              speaker == 'Joseph R. Biden, Jr.' ~ 'Biden'),
-                              levels = c('Clinton', 'Bush', 'Obama',
-                                         'Trump', 'Biden')))
-# get priorities
-e_priorities <- select_priorities(US_e_speeches$text)
-# assign urgency scores
-e_urgency <- get_urgency(e_priorities, summarise = "mean")
-# filter for migration only priorities
-e_urgency <- filter(e_urgency, grepl("employment|job|wage",
-  priorities, ignore.case = TRUE) & Commitment > 0) |> # Remove non-priorities
-  left_join(US_clim_speeches, by = "doc_id") |>
-  mutate(cat = "Employment")
 ```
 
-COVID sensitivity of the measurement approach and the sensibleness of the measures produced regarding their time pressure components 
+

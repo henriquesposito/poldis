@@ -60,7 +60,8 @@ US_presidential_speeches_1993_2025 <-
                                date < as.Date("2001-01-21") ~ "Clinton",
                              .default = NA)) |>
   filter(!is.na(president)) |>
-  select(-speaker)
+  select(-speaker) |>
+  distinct()
 # Check dates
 filter(US_presidential_speeches_1993_2025, !is.na(president)) |>
   group_by(president) |>
