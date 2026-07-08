@@ -86,7 +86,8 @@ get_urgency <- function(v, summarise = "sum") {
     } else {
       matrix_count <- data.frame(matrix_count[, colSums(matrix_count != 0) > 0])
     }
-    values <- out$coefficients[out$word_stem %in% colnames(matrix_count)]
+    values <- out$coefficients[out$word_stem %in% stringr::str_replace_all(
+      colnames(matrix_count), "\\.", " ")]
     if (summarise == "sum" | summarise == "mean") {
       out <- rowSums(as.data.frame(mapply(`*`, matrix_count, values)))
       if (summarise == "mean") out <- out/rowSums(matrix_count)

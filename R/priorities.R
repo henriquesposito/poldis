@@ -18,7 +18,7 @@ select_priorities <- function(v, na.rm = TRUE) {
   if (inherits(v, "data.frame") & !"token_id" %in% names(v)) {
     stop("Please declare a text vector or an annotated data frame at the sentence level.")
   } else if (!"token_id" %in% names(v)) {
-    v <- suppressMessages(annotate_text(v, level = "sentences"))
+    v <- annotate_text(v, level = "sentences")
   }
   comm_lemmas <- unique(textstem::lemmatize_strings(BT_models$terms[which(
     BT_models$dimension == "commitment")]))
