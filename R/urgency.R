@@ -86,11 +86,12 @@ get_urgency <- function(v, summarise = "sum") {
     } else {
       matrix_count <- data.frame(matrix_count[, colSums(matrix_count != 0) > 0])
     }
-    values <- out$coefficients[out$word_stem %in% stringr::str_replace_all(
-      colnames(matrix_count), "\\.", " ")]
+    values <- out$coefficients[out$word_stem %in% stringr::str_squish(
+      stringr::str_replace_all(colnames(matrix_count), "\\.", " "))]
     if (summarise == "sum" | summarise == "mean") {
       out <- rowSums(as.data.frame(mapply(`*`, matrix_count, values)))
-      if (summarise == "mean") out <- out/rowSums(matrix_count)
+      if (summarise == "mean") out <- out/ifelse(rowSums(matrix_count) == 0, 1,
+                                                 rowSums(matrix_count))
     } else if (summarise == "max") {
       matrix_count[matrix_count > 0] <- 1
       out <- apply(as.data.frame(mapply(`*`, matrix_count, values)), 1, max)
