@@ -311,11 +311,18 @@ read_pdf <- function(path) {
 #' #annotate_text(US_inaugural_addresses_1993_2025$text[2])
 #' @export
 annotate_text <- function(v, level = "words") {
-  doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- entity <- NULL
-  suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
+  doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- object.size <- entity <- NULL
+  if (is.null(options("spacy_initialized")$spacy_initialized)) {
+    suppressMessages(suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm")))
+  }
   v <- stringr::str_replace_all(v, "\\.\\,|\\. \\,|\\,\\.|\\, \\.|\\.\\\n\\,", ".")
-  parse <- spacyr::spacy_parse(v, tag = TRUE)
-  suppressWarnings(spacyr::spacy_finalize())
+  if (as.numeric(stringr::str_remove(object.size(v), " bytes")) > 1000000) {
+    message("This is a large dataset, parsing texts in chunks.")
+    v  <- split(v, ceiling(seq_len(length(v))/100))
+    v <- lapply(v, function(x) spacyr::spacy_parse(x, tag = TRUE))
+    parse <- do.call(rbind, v)
+  } else parse <- spacyr::spacy_parse(v, tag = TRUE)
+  #suppressWarnings(spacyr::spacy_finalize())
   if (level == "sentences" | level == "sentence") {
     entity <- spacyr::entity_extract(parse) %>%
       dplyr::group_by(sentence_id, doc_id) %>%
