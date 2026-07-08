@@ -1,6 +1,6 @@
 text <- c("We must do this.",
           "My government's first priority will be this.",
-          "My government's first is this.",
+          "My government's first priority is this.",
           "Our country is confronted with water shortages, unprecedented levels of crime, high inflation, and empty state coffers.",
           "This government will do all to set the country back on a better course.",
           "I do not want to do this.",
@@ -16,5 +16,5 @@ text <- c("We must do this.",
 test_that("Topics are extracted properly", {
   skip_on_ci()
   skip_on_cran()
-  expect_length(select_priorities(text)$priorities, 10)
+  expect_length(select_priorities(text)$priorities, 9)
 })

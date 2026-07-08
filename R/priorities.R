@@ -17,9 +17,11 @@ select_priorities <- function(v, na.rm = TRUE) {
   tags <- sentence <- lemmas <- priorities <- comm_lemmas <- NULL
   if (inherits(v, "data.frame") & !"token_id" %in% names(v)) {
     stop("Please declare a text vector or an annotated data frame at the sentence level.")
-  } else v <- suppressMessages(annotate_text(v, level = "sentences"))
+  } else if (!"token_id" %in% names(v)) {
+    v <- suppressMessages(annotate_text(v, level = "sentences"))
+  }
   comm_lemmas <- unique(textstem::lemmatize_strings(BT_models$terms[which(
-    BT_models$dimension != "Commitment")]))
+    BT_models$dimension == "commitment")]))
   out <- v %>%
     dplyr::mutate(priorities = ifelse(stringr::str_detect(tags, "PRP MD ") |
                                         stringr::str_detect(lemmas, paste0(
