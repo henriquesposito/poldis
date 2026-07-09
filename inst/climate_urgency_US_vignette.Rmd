@@ -44,13 +44,18 @@ bt_results <- BT_models |>
                             c("Timing", "Commitment", "Frequency", "Intensity")))
 ggplot(bt_results, aes(x = coefficients, y = reorder(terms, coefficients))) +
   geom_vline(xintercept = 0, linetype = "dashed", colour = "grey75") +
-  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0.2, linewidth = 0.6) +
-  geom_point(size = 3, colour = "#446677") +
+  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0.3, linewidth = 0.8) +
+  geom_point(size = 2, colour = "#446677") +
   facet_wrap("dimension", scales = "free") +
   scale_x_continuous(limits = c(-11, 11.5)) +
   labs(x = NULL, y = NULL) +
-  theme_minimal(base_size = 12)
-ggsave("urgency_words_plot.png", width = 12, height = 12, units = "cm", dpi = 500)
+  theme_clean(base_size = 12, base_family = "serif") +
+  theme(legend.position = "bottom", 
+        plot.background = element_blank(), legend.background = element_blank(),
+        plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+ggsave("urgency_words_plot.png", width = 14, height = 14, units = "cm", dpi = 500)
 ```
 
 # Data and methods
@@ -73,17 +78,29 @@ urgent_priorities_US_presidential_speeches_1993_2025 <-
   readRDS("~/GitHub/poldis/inst/urgent_priorities_US_presidential_speeches_1993_2025.rds") |>
   mutate(president = factor(president, levels = 
                               c("Clinton", "Bush", "Obama", "Trump", "Biden")))
-# get CC priorities only
-clim_urgency  <- urgent_priorities_US_presidential_speeches_1993_2025 |>
-  filter(grepl("climate change|global warming|paris agreement",
-               priorities, ignore.case = TRUE)) 
+comp_priorities <- urgent_priorities_US_presidential_speeches_1993_2025 |>
+  mutate(cat = case_when(grepl("climate change|global warming|paris agreement|climate breakdown|global heating|planetary emergency|greenhouse gases|carbon emissions|fossil fuels|sustainability|climate adaptation|renewable energ|extreme weather event|carbon footprint|sea-level ris|greenhouse effect|deforestation|environmental damage|ecosystem degradation|biodiversity loss|species extinction|climate justice|sustainable practices|decarboniz|net-zero emission|clean energ|solar energ|green polic|green industrial polic",
+                               priorities, ignore.case = TRUE) ~ "Climate Change",
+                         grepl("healthcare|affordable care|medicaid|medicare|public health|mental health|preventative care|medical costs|health costs|vaccination|pandemic|infection|epidemic", 
+                               priorities, ignore.case = TRUE) ~ "Public Health",
+                         grepl("migrat|migrant|asylum seeker|refugee|border control|border security|deportation|repatriation", priorities,
+                               ignore.case = TRUE) ~ "Migration",
+                         grepl("employment| job | jobs | wage|workforce|labor market| worker|employed", priorities,
+                               ignore.case = TRUE) ~ "Employment",
+                         .default = NA),
+         Year = as.numeric(messydates::year(date))) |>
+  drop_na(cat)
+# comp_priorities |> group_by(cat) |> count() |> rename(Category = cat, Priorities = n) |> cbind("Search Terms" = c("climate change|global warming|paris agreement|climate breakdown|global heating|planetary emergency|greenhouse gases|carbon emissions|fossil fuels|sustainability|climate adaptation|renewable energ|extreme weather event|carbon footprint|sea-level ris|greenhouse effect|deforestation|environmental damage|ecosystem degradation|biodiversity loss|species extinction|climate justice|sustainable practices|decarboniz|net-zero emission|clean energ|solar energ|green polic|green industrial polic",
+#                                                                         "employment| job | jobs | wage|workforce|labor market| worker|employed",
+#                                                                         "migrat|migrant|asylum seeker|refugee|border control|border security|deportation|repatriation",
+#                                                                         "healthcare|affordable care|medicaid|medicare|public health|mental health|preventative care|medical costs|health costs|vaccination|pandemic|infection|epidemic"))
 ```
 
 # Presdiential patterns in expressing urgency of climate change
 
 ```{r}
-cc_data <- clim_urgency |>
-  mutate(Year = as.numeric(messydates::year(date))) |>
+cc_data <- comp_priorities |>
+  filter(cat == "Climate Change") |>
   pivot_longer(cols = Frequency:Intensity,
                names_to = "type", values_to = "score")
 modelsummary(list("Commitment" = lm(score ~ president + Year,
@@ -101,13 +118,28 @@ modelsummary(list("Commitment" = lm(score ~ president + Year,
                             "presidentObama" = "Obama",
                             "presidentTrump" = "Trump",
                             "presidentBiden" = "Biden"))
+# modelsummary(list("Climate Change" = lm(Urgency ~ president + Year,
+#                      data = subset(comp_priorities, cat == "Climate Change")),
+#                   "Employment" = lm(Urgency ~ president + Year,
+#                      data = subset(comp_priorities, cat == "Employment")),
+#                   "Public Health" = lm(Urgency ~ president + Year,
+#                      data = subset(comp_priorities, cat == "Public Health")),
+#                   "Migration" = lm(Urgency ~ president + Year,
+#                      data = subset(comp_priorities, cat == "Migration"))),
+#             estimate = "{estimate}{stars}",
+#             coef_omit = "Intercept",
+#             coef_rename = c("presidentClinton" = "Clinton",
+#                             "presidentBush" = "Bush",
+#                             "presidentObama" = "Obama",
+#                             "presidentTrump" = "Trump",
+#                             "presidentBiden" = "Biden"))
 ```
 
 # Urgency of climate change in American presidential speeches since 1993
 
 ```{r}
-# plot CC by president
-clim_urgency |>
+comp_priorities |>
+  filter(cat == "Climate Change") |>
   group_by(date, president) |>
   summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
   ggplot(aes(x = date, y = max_urgency)) +
@@ -117,47 +149,49 @@ clim_urgency |>
   scale_x_date(date_breaks = "2 years", date_labels = "%Y",
                limits = c(as.Date("1993/01/20"), as.Date("2025/01/20"))) +
   scale_color_brewer(palette = "Dark2", direction = "1") +
-  theme_minimal(base_size = 12, base_family = "serif") +
   labs(x = "Year", y = "Max Urgency Scores", color = "") +
+  theme_clean(base_size = 12, base_family = "serif") +
   theme(legend.position = "bottom", 
+        plot.background = element_blank(), legend.background = element_blank(),
         plot.caption = element_text(hjust = 0.5),
         plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
-ggsave("clim_urgency_presid.png", width = 14, height = 12, units = "cm", dpi = 500)
+ggsave("clim_urgency_presid.png", width = 12, height = 10, units = "cm", dpi = 500)
 ```
 
-# Comparing climate change priorities to employment, health, and migration in speeches that mention climate change
+# Comparing climate change priorities to employment, health, and migration ones
 
 ```{r}
-comp_priorities <- urgent_priorities_US_presidential_speeches_1993_2025 |>
-  mutate(cat = case_when(grepl("climate change|global warming|paris agreement",
-                               priorities, ignore.case = TRUE) ~ "Climate Change",
-                         grepl("health|pandemic|infection", 
-                               priorities, ignore.case = TRUE) ~ "Health",
-                         grepl("migration|migrant", priorities,
-                               ignore.case = TRUE) ~ "Migration",
-                         grepl("employment|job|wage", priorities,
-                               ignore.case = TRUE) ~ "Employment",
-                         .default = NA)) |>
-  drop_na(cat)
-#comp_priorities |> group_by(cat) |> count()
 comp_priorities |>
   group_by(date, cat) |>
   summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
   ggplot(aes(x = date, y = max_urgency)) +
-  geom_smooth(aes(color = cat), se = FALSE) +
+  geom_smooth(aes(color = cat), se = FALSE, method = "gam", formula = y ~ splines::ns(x, 3)) +
   scale_x_date(date_breaks = "2 years", date_labels = "%Y",
                 limits = c(as.Date("1993/01/20"), as.Date("2025/01/20"))) +
-  annotate("rect", xmin = as.Date("2020/01/20"), xmax = as.Date("2023/05/01"),
-           ymin = 0.9, ymax = 1.5, alpha=0.2, color="plum4", fill="plum") +
-  theme_clean(base_size = 12, base_family = "serif") +
+  scale_color_manual(breaks = c("Climate Change", "Employment", "Public Health", "Migration"),
+                     values = c("#66A61E", "#A6761D", "#7570B3", "#D95F02")) +
+  annotate("rect", xmin = as.Date("2019/12/01"), xmax = as.Date("2023/08/01"),
+           ymin = 0.9, ymax = 1.4, alpha=0.2, color="plum4", fill="plum") +
+  annotate("text", x = as.Date("2021/10/01"), y = 0.95, label = "COVID") +
+  geom_vline(xintercept =  as.Date("2001/01/20"), linetype="dotted", 
+             color = "#446677", size = 0.5) +
+  geom_vline(xintercept =  as.Date("2009/01/20"), linetype="dotted", 
+             color = "#446677", size = 0.5) +
+  geom_vline(xintercept =  as.Date("2017/01/20"), linetype="dotted", 
+             color = "#446677", size = 0.5) +
+  geom_vline(xintercept =  as.Date("2021/01/20"), linetype="dotted", 
+             color = "#446677", size = 0.5) +
+  annotate("text", x = as.Date("1997/01/20"), y = 1.5, label = "Clinton") +
+  annotate("text", x = as.Date("2005/01/20"), y = 1.5, label = "Bush") +
+  annotate("text", x = as.Date("2013/01/20"), y = 1.5, label = "Obama") +
+  annotate("text", x = as.Date("2019/01/20"), y = 1.5, label = "Trump") +
+  annotate("text", x = as.Date("2023/01/20"), y = 1.5, label = "Biden") +
   labs(x = "Year", y = "Max Urgency Scores", color = "") +
-  theme(legend.position = "bottom", 
-        plot.caption = element_text(hjust = 0.5),
-        plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5))
-
-COVID sensitivity of the measurement approach and the sensibleness of the measures produced regarding their time pressure components 
+  theme_clean(base_size = 11, base_family = "serif") +
+  theme(legend.position = "bottom", plot.background = element_blank(),
+        legend.text = element_text(size = 8.8),
+        legend.background = element_blank(), plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
+ggsave("urgency_presid_priorities.png", width = 12, height = 10, units = "cm", dpi = 500)
 ```
-
-
