@@ -147,6 +147,7 @@ comp_priorities |>
   geom_point(aes(color = president), alpha = 0.3) +
   geom_smooth(aes(color = president), alpha = 0.25,
               method = "glm", se = TRUE, size = 2) +
+  geom_density_2d(linewidth = 0.2, colour = "black", alpha = 0.2) +
   scale_x_date(date_breaks = "2 years", date_labels = "%y",
                limits = c(as.Date("1993/01/20"), as.Date("2025/01/20"))) +
   scale_color_brewer(palette = "Dark2", direction = "1") +
@@ -156,26 +157,25 @@ comp_priorities |>
         legend.text = element_text(size = 9.5),
         legend.background = element_blank(), plot.caption = element_text(hjust = 0.5),
         plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
-ggsave("clim_urgency_presid.png", width = 12, height = 10, units = "cm", dpi = 500)
+#ggsave("clim_urgency_presid.png", width = 12, height = 10, units = "cm", dpi = 500)
 ```
 
 # Comparing climate change priorities to employment, health, and immigration ones
 
 ```{r}
 comp_priorities |>
-  group_by(date, cat, president) |>
+  group_by(date, cat) |>
   summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
-  group_by(president, cat) |> summarise(mean = mean(max_urgency, na.rm = TRUE)) 
-  
   ggplot(aes(x = date, y = max_urgency)) +
-  geom_smooth(aes(color = cat), se = FALSE, method = "gam", formula = y ~ splines::ns(x, 3)) +
+  geom_smooth(aes(color = cat), se = FALSE, method = "gam", formula = y ~ s(x),
+              method.args = list(method = "REML")) +
   scale_x_date(date_breaks = "2 years", date_labels = "%y",
                 limits = c(as.Date("1993/01/20"), as.Date("2025/01/20"))) +
   scale_color_manual(breaks = c("Climate Change", "Employment", "Health", "Immigration"),
                      values = c("#66A61E", "#A6761D", "#7570B3", "#D95F02")) +
   annotate("rect", xmin = as.Date("2019/12/01"), xmax = as.Date("2023/08/01"),
-           ymin = 0.9, ymax = 1.4, alpha=0.2, color="plum4", fill="plum") +
-  annotate("text", x = as.Date("2021/10/01"), y = 0.95, label = "COVID") +
+           ymin = 0.96, ymax = 1.48, alpha=0.2, color="plum4", fill="plum") +
+  annotate("text", x = as.Date("2021/10/01"), y = 0.94, label = "COVID-19", color="plum4") +
   geom_vline(xintercept =  as.Date("2001/01/20"), linetype="dotted", 
              color = "#446677", size = 0.5) +
   geom_vline(xintercept =  as.Date("2009/01/20"), linetype="dotted", 
@@ -184,16 +184,16 @@ comp_priorities |>
              color = "#446677", size = 0.5) +
   geom_vline(xintercept =  as.Date("2021/01/20"), linetype="dotted", 
              color = "#446677", size = 0.5) +
-  annotate("text", x = as.Date("1997/01/20"), y = 1.5, label = "Clinton") +
-  annotate("text", x = as.Date("2005/01/20"), y = 1.5, label = "Bush") +
-  annotate("text", x = as.Date("2013/01/20"), y = 1.5, label = "Obama") +
-  annotate("text", x = as.Date("2019/01/20"), y = 1.5, label = "Trump") +
-  annotate("text", x = as.Date("2023/01/20"), y = 1.5, label = "Biden") +
+  annotate("text", x = as.Date("1997/01/20"), y = 1.52, label = "Clinton") +
+  annotate("text", x = as.Date("2005/01/20"), y = 1.52, label = "Bush") +
+  annotate("text", x = as.Date("2013/01/20"), y = 1.52, label = "Obama") +
+  annotate("text", x = as.Date("2019/01/20"), y = 1.52, label = "Trump") +
+  annotate("text", x = as.Date("2023/01/20"), y = 1.52, label = "Biden") +
   labs(x = "Year", y = "Max Urgency Scores", color = "") +
   theme_clean(base_size = 11, base_family = "serif") +
   theme(legend.position = "bottom", plot.background = element_blank(),
         legend.text = element_text(size = 9.5),
         legend.background = element_blank(), plot.caption = element_text(hjust = 0.5),
         plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
-ggsave("urgency_presid_priorities.png", width = 12, height = 10, units = "cm", dpi = 500)
+#ggsave("urgency_presid_priorities.png", width = 12, height = 10, units = "cm", dpi = 500)
 ```
