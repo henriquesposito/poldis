@@ -31,5 +31,5 @@ A matrix of similarity scores between texts.
 Extract similarities and differences in texts/segments
 }
 \examples{
-#extract_text_similarities(US_News_Conferences_1960_1980[1:2,3])
+#extract_text_similarities(US_inaugural_addresses_1993_2025$text)
 }

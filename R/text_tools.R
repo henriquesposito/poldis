@@ -9,7 +9,7 @@
 #' @return A data frame of individual names and the number of times they appear.
 #' @details The function relies on named entity recognition from NLP models.
 #' @examples
-#' #extract_names(US_News_Conferences_1960_1980[20, 3])
+#' #extract_names("This package was created by Jael, James, and I.")
 #' @export
 extract_names <- function(v) {
   ent_type <- text <- s <- NULL
@@ -79,24 +79,11 @@ extract_locations <- function(v) {
 #' @param v Text vector.
 #' @return A list of the first sentences in text.
 #' @examples
-#' extract_title("This is the first sentence. This is the second sentence.")
+#' extract_first_sentence("This is the first sentence. This is the second sentence.")
 #' @export
-extract_title <- function(v) {
+extract_first_sentence <- function(v) {
   out <- gsub("([a-z0-9][?!.])\\s.*", "\\1", v)
   out
-}
-
-#' Extract dates from text
-#'
-#' Wrapper function for `messydates::as_messydates`.
-#' @param v Text vector.
-#' @return A vector of the dates in text.
-#' @examples
-#' #extract_date("Today is the twenty six of February of two thousand and twenty four")
-#' @export
-extract_date <- function(v) {
-  thisRequires("messydates")
-  messydates::as_messydate(v)
 }
 
 #' Extract text matches
@@ -118,8 +105,7 @@ extract_date <- function(v) {
 #' "Today is October 12, 2021"), "October")
 #' }
 #' @export
-extract_match <- function(v, match, invert = FALSE,
-                          ignore.case = TRUE) {
+extract_match <- function(v, match, invert = FALSE, ignore.case = TRUE) {
   doc_id <- token <- text <- NULL
   if (inherits(v, "data.frame")) {
     if (!"doc_id" %in% names(v)) {
@@ -164,8 +150,8 @@ extract_match <- function(v, match, invert = FALSE,
 #' @importFrom dplyr group_by summarise select %>%
 #' @examples
 #' \donttest{
-#' extract_context(match = "war|weapons of mass destruction|conflict|NATO|peace",
-#'                 v = US_News_Conferences_1960_1980$text[100],
+#' extract_context(match = " war ",
+#'                 v = US_inaugural_addresses_1993_2025$text[1],
 #'                 level = "sentences", n = 2)
 #' }
 #' @return A list of string matches and their context.
@@ -224,7 +210,7 @@ extract_context <- function(match, v, level = "sentences", n = 1) {
 #' @importFrom dplyr group_by summarise select %>%
 #' @return A matrix of similarity scores between texts.
 #' @examples
-#' #extract_text_similarities(US_News_Conferences_1960_1980[1:2,3])
+#' #extract_text_similarities(US_inaugural_addresses_1993_2025$text)
 #' @export
 extract_text_similarities <- function(v, comparison = "similarities", method) {
   thisRequires("quanteda.textstats")
@@ -298,7 +284,7 @@ split_text <- function(v, splitsign = "\\.") {
 read_pdf <- function(path) {
   thisRequires("pdftools")
   thisRequires("tesseract")
-  if (grepl(".pdf", path)) {
+  if (grepl(".pdf", path, ignore.case = TRUE)) {
     out <- paste(pdftools::pdf_ocr_text(x), collapse = " ")
   } else {
     out <- list()
@@ -322,15 +308,27 @@ read_pdf <- function(path) {
 #' @importFrom stringr str_squish str_replace_all
 #' @return A data frame with syntax information by words or sentences in text.
 #' @examples
-#' #annotate_text(US_News_Conferences_1960_1980[1:2, 3])
-#' #annotate_text(US_News_Conferences_1960_1980[1:2, 3], level = "sentence")
+#' #annotate_text(US_inaugural_addresses_1993_2025$text[2])
 #' @export
 annotate_text <- function(v, level = "words") {
-  doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- entity <- NULL
-  suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm"))
+  doc_id <- sentence_id <- token_id <- token <- pos <- tag <- lemma <- object.size <- entity <- NULL
+  if (is.null(options("spacy_initialized")$spacy_initialized)) {
+    suppressMessages(suppressWarnings(spacyr::spacy_initialize(model = "en_core_web_sm")))
+  }
   v <- stringr::str_replace_all(v, "\\.\\,|\\. \\,|\\,\\.|\\, \\.|\\.\\\n\\,", ".")
-  parse <- spacyr::spacy_parse(v, tag = TRUE)
-  suppressWarnings(spacyr::spacy_finalize())
+  if (as.numeric(stringr::str_remove(object.size(v), " bytes")) > 1000000) {
+    message("This is a large vector, parsing texts in chunks.")
+    chunck <- ceiling(seq_len(length(v))/100)
+    process_chunk <- split(v, chunck)
+    processed_chunk <- lapply(process_chunk, function(x) spacyr::spacy_parse(x, tag = TRUE))
+    for (i in seq_len(length(processed_chunk))) {
+      processed_chunk[[i]]$doc_id <-
+        paste0("text", as.numeric(stringr::str_remove_all(processed_chunk[[i]]$doc_id, "text")) +
+                 (100*(i-1)))
+    }
+    parse <- do.call(rbind, processed_chunk)
+  } else parse <- spacyr::spacy_parse(v, tag = TRUE)
+  #suppressWarnings(spacyr::spacy_finalize())
   if (level == "sentences" | level == "sentence") {
     entity <- spacyr::entity_extract(parse) %>%
       dplyr::group_by(sentence_id, doc_id) %>%

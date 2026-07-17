@@ -1,10 +1,7 @@
 #' Gather topic from political discourses
 #'
-#' @param .data A data frame, priorities data frame coded using
-#' `select_priorities()`, or text vector.
-#' For data frames, function will search for "text" variable.
-#' For priorities data frame function will search for "priorities" variable.
-#' If missing, opens the webpage containing the political topics codebook.
+#' @param v Text vector or annotated data frame.
+#' If missing, opens the political topics codebook.
 #' @param dictionary The dictionary of 20 major political topics from the
 #' Comparative Agendas Project (Jones et al., 2023) is used by default.
 #' Users can also declare a custom dictionary as a vector or a list.
@@ -15,44 +12,37 @@
 #' `gather_topics()` to access the political topics codebook.
 #' @import dplyr
 #' @importFrom tidyr unite
-#' @importFrom textstem lemmatize_strings
+#' @importFrom textstem stem_strings
 #' @return A list of topics present in each text separated by comma.
 #' @examples
 #' \donttest{
-#' gather_topics(US_News_Conferences_1960_1980[1:5, 3])
-#' gather_topics(US_News_Conferences_1960_1980[1:5, 3],
-#'               dictionary = c("military", "development"))
-#' gather_topics(US_News_Conferences_1960_1980[1:5, 3],
-#'               dictionary = list("military" = c("military", "gun", "war"),
-#'                                 "development" = c("development", "interest rate", "banks")))
-#' #summary(gather_topics(US_News_Conferences_1960_1980[1:5, 3]))
-#' #plot(gather_topics(US_News_Conferences_1960_1980[1:5, 3],
-#' #                   dictionary = c("military", "development")))
+#' summary(gather_topics(US_inaugural_addresses_1993_2025$text))
 #' }
 #' @export
-gather_topics <- function(.data, dictionary = "CAP") {
+gather_topics <- function(v, dictionary = "CAP") {
   Words <- topics <- NULL
   # tries to open topic codebook if no argument is declared
-  if (missing(.data)) open_codebook(codebook = "topic")
+  if (missing(v)) open_codebook(codebook = "topic")
   # get text variable
-  if (inherits(.data, "priorities")) {
-    text <- stats::na.omit(textstem::lemmatize_strings(getElement(.data, "priorities")))
-  } else if (inherits(.data, "data.frame")) {
-    text <- textstem::lemmatize_strings(getElement(.data, "text"))
-  } else text <- textstem::lemmatize_strings(.data)
+  if (inherits(v, "priorities")) {
+    text <- stats::na.omit(textstem::stem_strings(getElement(v, "priorities")))
+  } else if (inherits(v, "data.frame")) {
+    text <- textstem::stem_strings(getElement(v, "text"))
+  } else text <- textstem::stem_strings(v)
   # get dictionary
   if (any(dictionary ==  "CAP")) {
     dictionary <- CAP_topics %>%
-      dplyr::mutate(Words = stringr::str_replace_all(textstem::lemmatize_strings(Words),
+      dplyr::mutate(Words = stringr::str_replace_all(textstem::stem_strings(Words),
                                                      ", ", "\\\\b|\\\\b"))
     subjects <- dictionary$Words
     names(subjects) <- dictionary$Topic
     } else if (is.vector(dictionary) && is.atomic(dictionary)) {
-      subjects <- dictionary
-      names(subjects) <- subjects
+      subjects <- textstem::stem_strings(dictionary)
+      names(subjects) <- dictionary
     } else {
       subjects <- unlist(lapply(dictionary, function(x)
-        paste0(x, collapse = "\\b|\\b")))
+        paste(textstem::stem_strings(x), collapse = "|")))
+      names(subjects) <- names(dictionary)
     }
   # match terms
   out <- lapply(names(subjects), function(i) stringr::str_count(text, subjects[[i]]))
@@ -68,10 +58,7 @@ gather_topics <- function(.data, dictionary = "CAP") {
 
 #' Gather terms related to subjects
 #'
-#' @param .data A data frame, priorities data frame coded using
-#' `select_priorities()`, or text vector.
-#' For data frames, function will search for "text" variable.
-#' For priorities data frame function will search for "priorities" variable.
+#' @param v Text vector or annotated data frame.
 #' @param dictionary The dictionary of 20 major political topics from the
 #' Comparative Agendas Project (Jones et al., 2023) is used by default.
 #' Users can also declare a custom dictionary as a vector or a list.
@@ -81,7 +68,7 @@ gather_topics <- function(.data, dictionary = "CAP") {
 #' @import quanteda
 #' @import dplyr
 #' @importFrom stringr str_detect str_remove_all
-#' @importFrom textstem lemmatize_strings
+#' @importFrom textstem stem_strings
 #' @return A list of related terms to each of the topics declared in dictionary.
 #' @details This function relies on keyword assisted topic models implemented
 #' in the `\{keyATM\}` package to find related words based on the topics
@@ -92,22 +79,20 @@ gather_topics <- function(.data, dictionary = "CAP") {
 #' _American Journal of Political Science_, 68(2): 730-750.
 #' \doi{10.1111/ajps.12779}
 #' @examples
-#' #gather_related_terms(US_News_Conferences_1960_1980[1:5, 3], dictionary = "CAP")
-#' #gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
-#' #                     dictionary = c("military", "development"))
-#' #gather_related_terms(US_News_Conferences_1960_1980[1:5, 3],
+#' #gather_related_terms(US_inaugural_addresses_1993_2025$text, dictionary = "CAP")
+#' #gather_related_terms(US_inaugural_addresses_1993_2025$text,
 #' #                     dictionary = list("military" = c("military", "gun", "war"),
 #' #                                       "development" = c("development", "interest rate", "banks")))
 #' @export
-gather_related_terms <- function(.data, dictionary) {
+gather_related_terms <- function(v, dictionary) {
   Words <- NULL
   thisRequires("keyATM")
   # get text variable
-  if (inherits(.data, "priorities")) {
-    text <- stats::na.omit(textstem::lemmatize_strings(getElement(.data, "priorities")))
-  } else if (inherits(.data, "data.frame")) {
-    text <- textstem::lemmatize_strings(getElement(.data, "text"))
-  } else text <- textstem::lemmatize_strings(.data)
+  if (inherits(v, "priorities")) {
+    text <- stats::na.omit(textstem::stem_strings(getElement(v, "priorities")))
+  } else if (inherits(v, "data.frame")) {
+    text <- textstem::stem_strings(getElement(v, "text"))
+  } else text <- textstem::stem_strings(v)
   # check dictionary
   if (any(dictionary ==  "CAP")) {
     subjects <- CAP_topics %>%

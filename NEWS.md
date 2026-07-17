@@ -1,3 +1,38 @@
+# poldis 0.2.0
+
+2026-07-17
+
+## Package
+
+- Added a US presidential speeches vignette presenting a case study with plots
+- Improved documentation and examples across exported functions
+- Improved README to be shorter and clearer
+- Fixed tests to skip gracefully when spaCy (Python) is unavailable, rather than erroring
+- Removed ORCID field from DESCRIPTION to avoid CRAN submission issues
+
+## Functions
+
+- Renamed `extract_title()` to `extract_first_sentence()` to be more descriptive
+- Removed `extract_date()`
+- Removed `sim_urgency()` for now, as it does not work well with the updated `get_urgency()`
+- Improved `annotate_text()` to parse large text vectors in chunks, avoiding memory issues and R crashes
+- Improved `annotate_text()` to initialise the spaCy backend only once, increasing efficiency
+- Improved `get_urgency()` to score from word stems instead of lemmas, increasing accuracy and speed
+- Improved `get_urgency()` scoring so that the urgency score is the sum of the other dimensions divided by the "must" score
+- Added a "min" option to the `summarise` argument of `get_urgency()`
+- Fixed `get_urgency()` to return 0s, rather than NAs, when scores are genuinely zero
+- Fixed `get_urgency()` where spacing was being replaced by dots
+- Improved `gather_topics()` to match on word stems instead of lemmas, increasing accuracy and speed
+- Fixed a bug in priority identification in `select_priorities()`
+- Improved `read_pdf()` detection of non-readable PDFs
+
+## Data
+
+- Renamed and replaced `US_News_Conferences_1960_1980` with `US_inaugural_addresses_1993_2025`
+- Improved internal data to a single dataset with scores from the second urgency survey
+- Removed the urgency codebook (please refer to the paper for details)
+- Moved raw replication data to a separate `data` branch to reduce package size
+
 # poldis 0.1.2
 
 2024-09-03
