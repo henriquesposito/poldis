@@ -23,8 +23,7 @@ text <- c("This function was created on the 2021 September 9. I am Henrique Spos
           "This is Sao Paulo")
 
 test_that("Speakers are extracted properly", {
-  skip_on_ci()
-  skip_on_cran()
+  skip_if_no_spacy()
   expect_message(extract_names(c("this is a test for Brazil", "this is also a test")),
                  "No names found in text.")
   expect_equal(extract_names(text)[["names"]], "Henrique Sposito")
@@ -35,8 +34,7 @@ test_that("Titles are extracted properly", {
 })
 
 test_that("Locations are extracted properly", {
-  skip_on_ci()
-  skip_on_cran()
+  skip_if_no_spacy()
   expect_equal(extract_locations(text)[["names"]], c("Sao Paulo", "the unite state"))
 })
 

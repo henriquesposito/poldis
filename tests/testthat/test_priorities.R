@@ -14,7 +14,6 @@ text <- c("We must do this.",
           "We have a climate - change crisis every year that grows more urgent as we look at the challenges that climate change poses for us .")
 
 test_that("Topics are extracted properly", {
-  skip_on_ci()
-  skip_on_cran()
+  skip_if_no_spacy()
   expect_length(select_priorities(text)$priorities, 9)
 })

@@ -32,8 +32,7 @@ test_that("summarise argument in urgency works properly", {
 })
 
 test_that("Urgency in priorities is scored properly", {
-  skip_on_ci()
-  skip_on_cran()
+  skip_if_no_spacy()
   urgency2 <- get_urgency(select_priorities(text))
   expect_true(urgency$Commitment[2] < urgency$Commitment[3])
   expect_true(all(order(urgency2$Urgency) == c(3, 5, 2, 4, 1)))
@@ -47,8 +46,7 @@ text2 <- c("We must do this",
            "We have a climate - change crisis every year that grows more urgent as we look at the challenges that climate change poses for us .")
 
 test_that("Urgency is scored properly in more complex priorities", {
-  skip_on_ci()
-  skip_on_cran()
+  skip_if_no_spacy()
   urgency3 <- get_urgency(select_priorities(text2))
   expect_true(nrow(urgency3) == 5)
   expect_true(urgency3$Urgency[1] < urgency3$Urgency[2])
