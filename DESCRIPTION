@@ -18,7 +18,7 @@ Maintainer: Henrique Sposito <henrique.sposito@graduateinstitute.ch>
 Description: Wrangle and annotate different types of political texts.
     It also introduces Urgency Analysis,
     a new method for the analysis of urgency in political texts.
-URL: http://henriquesposito.com/poldis/
+URL: https://henriquesposito.github.io/poldis
 BugReports: https://github.com/henriquesposito/poldis/issues
 License: MIT + file LICENSE
 Imports:
@@ -42,9 +42,14 @@ Suggests:
     fmsb,
     ggplot2,
     tm,
-    cli
+    cli,
+    knitr,
+    ggthemes,
+    modelsummary,
+    scales
 Encoding: UTF-8
 LazyData: True
 Depends: 
     R (>= 3.5.0)
 Config/roxygen2/version: 8.0.0
+VignetteBuilder: knitr
