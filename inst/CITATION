@@ -1,11 +1,12 @@
 citHeader("To cite poldis in publications use:")
 
 citEntry(
-  entry    = "Manual",
-  title    = "poldis: Tools for analyzing political discourse",
-  author   = "Henrique Sposito",
-  year     = "2021",
-  url      = "https://github.com/henriquesposito/poldis",
-  textVersion = paste("H. Sposito. poldis: Tools for analyzing political discourse. 2021."
+  entry    = "Article",
+  title    = "How urgent are priorities? Comparing political priorities in discourse",
+  author   = "Henrique Sposito, Jael Tan, and James Hollway.",
+  year     = "2026",
+  journal = "European Jopurnal of Political Reserach",
+  url      = "",
+  textVersion = paste("Sposito, Henrique, Jael Tan, James Hollway. 2026 [Forthcoming]. How urgent are priorities? Comparing political priorities in discourse. European Jopurnal of Political Reserach."
   )
 )
