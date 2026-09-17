@@ -5,8 +5,8 @@ citEntry(
   title    = "How urgent are priorities? Comparing political priorities in discourse",
   author   = "Henrique Sposito, Jael Tan, and James Hollway.",
   year     = "2026",
-  journal = "European Jopurnal of Political Reserach",
+  journal = "European Journal of Political Research",
   url      = "",
-  textVersion = paste("Sposito, Henrique, Jael Tan, James Hollway. 2026 [Forthcoming]. How urgent are priorities? Comparing political priorities in discourse. European Jopurnal of Political Reserach."
+  textVersion = paste("Sposito, Henrique, Jael Tan, James Hollway. 2026 [Forthcoming]. How urgent are priorities? Comparing political priorities in discourse. European Journal of Political Research."
   )
 )
