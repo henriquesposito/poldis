@@ -41,6 +41,6 @@ reference:
     contents:
     - get_urgency
   - title: "Data"
-    desc: "Text data for innaugural adresses from US presidents since 1993."
+    desc: "Text data for innaugural addresses from US presidents since 1993."
     contents:
     - US_inaugural_addresses_1993_2025
