@@ -38,7 +38,7 @@ Beyond these basic tools for text analysis,
 `{poldis}` also introduces tools for Urgency Analysis (UA),
 a new method for the analysis of urgency in political texts.
 Urgency is an expression of how critical or immediate problems or solutions are in political discourse.
-UA rests upon a multidimensional, weighted, and survey-validated conception of how urgency can be expressed in political discourses. It combines Natural Language Processes (NLP) and dictionary approaches to provide a contextualized, comparable, and scalable new method for the analysis of political texts.
+UA rests upon a multidimensional and survey-validated conception of how urgency can be expressed in political discourses. It combines Natural Language Processes (NLP) and dictionary approaches to provide a contextualized and interpretable new method for the analysis of political texts.
 
 # Installing the package
 
@@ -67,9 +67,8 @@ library(poldis)
 For example, users can extract the context surrounding a specific string in the text.
 
 ```{r context}
-set.seed(1234)
-text <- sample(US_News_Conferences_1960_1980$text, 2, replace = TRUE)
-extract_context(" war ", text, level = "sentences", n = 1)
+extract_context(" war ", US_inaugural_addresses_1993_2025$text,
+                level = "sentences", n = 1)
 ```
 
 Other text functions in the 'extract' family of functions include
@@ -83,8 +82,7 @@ The annotated syntax metadata helps to code words or sentences (e.g. code adverb
 Please see the help page (`?annotate_text`) for details on the algorithm used to annotate texts.
 
 ```{r, eval=FALSE}
-annotate_text(text, level = "words")
-annotate_text(text, level = "sentences")
+annotate_text(US_inaugural_addresses_1993_2025$text)
 ```
 
 # Selecting political priorities
@@ -93,7 +91,7 @@ annotate_text(text, level = "sentences")
 priorities are captured by identifying sentences containing modal verbs (e.g. must) and other indications of future-oriented sentences with our custom-built dictionaries (e.g. need to, going to).
 
 ```{r priorities, eval= FALSE}
-select_priorities(text)
+select_priorities(US_inaugural_addresses_1993_2025$text)
 ```
 
 # Gathering topics
@@ -103,18 +101,18 @@ Topics are assigned when words related to subjects appear in texts.
 Alternatively, users can also declare their own dictionary for topics.
 
 ```{r topics}
-gather_topics(text)
+summary(gather_topics(US_inaugural_addresses_1993_2025$text))
 ```
 
 # Measuring urgency
 
 Urgency is an expression of how necessary and/or how soon a political action should be undertaken.
-We code four dimensions of urgency in political discourses using purpose-built dictionaries of terms:
+Using four purpose-built dictionaries of terms, we code different aspects of urgency in political discourses:
 frequency, timing, intensity, and commitment.
 For more details on conceptualising and measuring urgency, please contact us for the working paper introducing Urgency Analysis.
 
 ```{r urgency}
-get_urgency(text)
+get_urgency(US_inaugural_addresses_1993_2025$text, summarise = "mean")
 ```
 
 # Using `{poldis}` beyond political texts

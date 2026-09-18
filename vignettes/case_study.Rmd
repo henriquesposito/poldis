@@ -1,0 +1,158 @@
+---
+title: "Is climate change a priority for US presidents?"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Is climate change a priority for US presidents?}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo=FALSE, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", echo = FALSE,
+                      warning = FALSE, message = FALSE)
+library(poldis)
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(tidyr)
+library(stringr)
+library(messydates)
+library(ggthemes)
+library(modelsummary)
+```
+
+```{r raw data, include=FALSE}
+# For the raw data on speeches, survey results, and model scores, please go to:
+# https://github.com/henriquesposito/poldis/tree/data.
+# # Load and filter data
+# US_presidential_speeches_1993_2025 <- readRDS("US_presidential_speeches_1993_2025.rds")
+# # get priorities by president
+# priorities <- select_priorities(US_presidential_speeches_1993_2025$text)
+# urgency <- get_urgency(priorities, summarise = "mean")
+# urgent_priorities <- urgency |>
+#   select(doc_id, priorities, Frequency, Timing, Commitment, Intensity, Urgency) |>
+#   mutate(priorities = stringr::str_squish(stringr::str_to_lower(
+#     tm::removePunctuation(priorities)))) |>
+#   left_join(US_presidential_speeches_1993_2025 |>
+#               select(-c(text, title)) |>
+#               mutate(doc_id = paste0("text", row_number())))
+# # saveRDS(urgent_priorities, "urgent_priorities_US_presidential_speeches_1993_2025.rds") # save data
+# urgent_priorities_US_presidential_speeches_1993_2025 <-
+#   readRDS("urgent_priorities_US_presidential_speeches_1993_2025.rds") |>
+#   mutate(president = factor(president, levels =
+#                               c("Clinton", "Bush", "Obama", "Trump", "Biden")))
+# comp_priorities <- urgent_priorities_US_presidential_speeches_1993_2025 |>
+#   mutate(cat = case_when(grepl("climate change|global warming|paris agreement|climate breakdown|global heating|planetary emergency|greenhouse gases|carbon emissions|fossil fuels|sustainability|climate adaptation|renewable energ|extreme weather event|carbon footprint|sea-level ris|greenhouse effect|deforestation|environmental damage|ecosystem degradation|biodiversity loss|species extinction|climate justice|sustainable practices|decarboniz|net-zero emission|clean energ|solar energ|green polic|green industrial polic",
+#                                priorities, ignore.case = TRUE) ~ "Climate Change",
+#                          grepl("healthcare|affordable care|medicaid|medicare|public health|mental health|preventative care|medical costs|health costs|vaccination|pandemic|infection|epidemic",
+#                                priorities, ignore.case = TRUE) ~ "Health",
+#                          grepl("migrat|migrant|asylum seeker|refugee|border control|border security|deportation|repatriation", priorities,
+#                                ignore.case = TRUE) ~ "Immigration",
+#                          grepl("employment| job | jobs | wage|workforce|labor market| worker|employed", priorities,
+#                                ignore.case = TRUE) ~ "Employment",
+#                          .default = NA),
+#          Year = as.numeric(messydates::year(date))) |>
+#   drop_na(cat)
+# saveRDS(comp_priorities, file = "comp_priorities.rds")
+```
+
+We investigate how urgently US presidents speak about climate change-related priorities in 3720 speeches from 1993 to 2025 for Bill Clinton, George W. Bush, Barack Obama, Donald Trump, and Joe Biden during the periods they were in office. The period captures the entrance of climate change into public political discourse and other relevant external events that might change how climate change priorities are expressed, such as the 2008 recession, the Paris Agreement signing in 2015, and the COVID pandemic. The texts were collected from the American Presidency Project and include official speeches and remarks at domestic and international press conferences. We identify 867 climate change-related priorities in these texts where terms such as climate change, global warming, carbon emissions, and clean energy were mentioned.
+
+## Do we see different patterns in how presidents express the urgency of climate change?
+
+Presidents' rhetorical styles might affect how they communicate the urgency of climate change. For example, one president might favour emphasising urgency through terms from one dictionary while others might use a broader vocabulary. Below, we fit ordinary least squares models to different urgency dimensions by president and over time. The models suggest that presidents do not differ much in their use of urgency dimensions. Countering a general trend to offering less commitment over time, Obama and Biden exhibit significantly higher levels of commitment than Clinton. Bush and Trump use intensity significantly less than Clinton.
+
+```{r}
+comp_priorities <- readRDS("comp_priorities.rds")
+cc_data <- comp_priorities |>
+  filter(cat == "Climate Change") |>
+  pivot_longer(cols = Frequency:Intensity,
+               names_to = "type", values_to = "score")
+modelsummary(list("Commitment" = lm(score ~ president + Year,
+                     data = subset(cc_data, type == "Commitment")),
+            "Timing" = lm(score ~ president + Year,
+               data = subset(cc_data, type == "Timing")),
+            "Frequency" = lm(score ~ president + Year,
+               data = subset(cc_data, type == "Frequency")),
+            "Intensity" = lm(score ~ president + Year,
+               data = subset(cc_data, type == "Intensity"))),
+            estimate = "{estimate}{stars}",
+            coef_omit = "Intercept",
+            coef_rename = c("presidentClinton" = "Clinton",
+                            "presidentBush" = "Bush",
+                            "presidentObama" = "Obama",
+                            "presidentTrump" = "Trump",
+                            "presidentBiden" = "Biden"))
+```
+
+## How has the overall urgency climate change-related priorities evolved in American presidential speeches since 1993?
+
+The maximum urgency that presidents spoke of climate change when they spoke of climate change while in office is shown below. Climate change appears more often in presidential speeches during Obama and especially Biden's presidencies, but interestingly Clinton spoke of climate change consistently with higher urgency. Whereas Democratic presidents spoke of climate change as though it were something that `must' be addressed, or more, Republican presidents rarely talked about climate change as a political priority while in office, except towards the end of their terms in office. Bush and, especially, Trump talked about climate change as something considerably less urgent.
+
+```{r, fig.width=8, fig.height=5}
+comp_priorities |>
+  filter(cat == "Climate Change") |>
+  group_by(date, president) |>
+  summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
+  ggplot(aes(x = date, y = max_urgency)) +
+  geom_point(aes(color = president), alpha = 0.3) +
+  geom_smooth(aes(color = president), alpha = 0.25,
+              method = "glm", se = TRUE, size = 2) +
+  geom_density_2d(linewidth = 0.2, colour = "black", alpha = 0.2) +
+  scale_x_date(date_breaks = "2 years", date_labels = "%y",
+               limits = c(as.Date("1993/01/20"), as.Date("2025/01/20"))) +
+  scale_color_brewer(palette = "Dark2", direction = "1") +
+  labs(x = "Year", y = "Max Urgency Scores", color = "") +
+  theme_clean(base_size = 11, base_family = "serif") +
+  theme(legend.position = "bottom", plot.background = element_blank(),
+        legend.text = element_text(size = 9.5),
+        legend.background = element_blank(), plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
+```
+
+## How does the urgency in which American presidents speak of climate change-related priorities compare to priorities across other relevant issue-domains in politics?
+
+The urgency of the 867 climate change-related priorities over time by US presidents compared to 5950 employment, 2520 health, and 724 immigration ones since 1993 is presented below. Climate change-related priorities have gradually become less urgent over time. By contrast, trends for employment, health, and immigration exhibit greater temporal variation. The urgency of employment-related priorities generally decreased under Clinton. Although employment remains a high priority for Bush and Obama, we do not see a big spike in urgency around the 2008 recession. The urgency of employment priorities spike under Trump, becoming his most important priority even amidst the beginning of the COVID-19 pandemic. Once Biden takes office, however, we see a significant decline in the urgency of employment. When it comes to health-related priorities, we see an unprecedented increase in their urgency from the mid-2010s onward. The urgency of health priorities peaked during the pandemic. Immigration follows a different pattern, appearing almost counter-cyclical to employment and health priorities. Although migration was at the center of Trump's political agenda during his campaign, while in office he often refereed to these policies in the past tense and not as a future priority.
+
+```{r, fig.width=8, fig.height=5}
+comp_priorities |>
+  group_by(date, cat) |>
+  summarise(max_urgency = max(Urgency, na.rm = TRUE)) |>
+  ggplot(aes(x = date, y = max_urgency)) +
+  geom_smooth(aes(color = cat), se = FALSE, method = "gam", formula = y ~ s(x),
+              method.args = list(method = "REML")) +
+  scale_x_date(date_breaks = "2 years", date_labels = "%y",
+                limits = c(as.Date("1993/01/20"), as.Date("2025/01/20"))) +
+  scale_color_manual(breaks = c("Climate Change", "Employment", "Health", "Immigration"),
+                     values = c("#66A61E", "#A6761D", "#7570B3", "#D95F02")) +
+  annotate("rect", xmin = as.Date("2019/12/01"), xmax = as.Date("2023/08/01"),
+           ymin = 0.96, ymax = 1.48, alpha=0.2, color="plum4", fill="plum") +
+  annotate("text", x = as.Date("2021/10/01"), y = 0.94, label = "COVID-19", color="plum4") +
+  geom_vline(xintercept =  as.Date("2001/01/20"), linetype="dotted", 
+             color = "#446677", size = 0.5) +
+  geom_vline(xintercept =  as.Date("2009/01/20"), linetype="dotted", 
+             color = "#446677", size = 0.5) +
+  geom_vline(xintercept =  as.Date("2017/01/20"), linetype="dotted", 
+             color = "#446677", size = 0.5) +
+  geom_vline(xintercept =  as.Date("2021/01/20"), linetype="dotted", 
+             color = "#446677", size = 0.5) +
+  annotate("text", x = as.Date("1997/01/20"), y = 1.52, label = "Clinton") +
+  annotate("text", x = as.Date("2005/01/20"), y = 1.52, label = "Bush") +
+  annotate("text", x = as.Date("2013/01/20"), y = 1.52, label = "Obama") +
+  annotate("text", x = as.Date("2019/01/20"), y = 1.52, label = "Trump") +
+  annotate("text", x = as.Date("2023/01/20"), y = 1.52, label = "Biden") +
+  labs(x = "Year", y = "Max Urgency Scores", color = "") +
+  theme_clean(base_size = 11, base_family = "serif") +
+  theme(legend.position = "bottom", plot.background = element_blank(),
+        legend.text = element_text(size = 9.5),
+        legend.background = element_blank(), plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
+```
+
+For more on details on this case study please see:
+
+    "Sposito, Henrique, Jael Tan, James Hollway. 2026 [Forthcoming]. How urgent are
+    priorities? Comparing political priorities in discourse. European Journal of
+    Political Research."
+
+Please do not forget to cite us if you are using poldis ;)

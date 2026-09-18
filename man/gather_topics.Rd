@@ -4,14 +4,11 @@
 \alias{gather_topics}
 \title{Gather topic from political discourses}
 \usage{
-gather_topics(.data, dictionary = "CAP")
+gather_topics(v, dictionary = "CAP")
 }
 \arguments{
-\item{.data}{A data frame, priorities data frame coded using
-`select_priorities()`, or text vector.
-For data frames, function will search for "text" variable.
-For priorities data frame function will search for "priorities" variable.
-If missing, opens the webpage containing the political topics codebook.}
+\item{v}{Text vector or annotated data frame.
+If missing, opens the political topics codebook.}
 
 \item{dictionary}{The dictionary of 20 major political topics from the
 Comparative Agendas Project (Jones et al., 2023) is used by default.
@@ -30,14 +27,6 @@ Gather topic from political discourses
 }
 \examples{
 \donttest{
-gather_topics(US_News_Conferences_1960_1980[1:5, 3])
-gather_topics(US_News_Conferences_1960_1980[1:5, 3],
-              dictionary = c("military", "development"))
-gather_topics(US_News_Conferences_1960_1980[1:5, 3],
-              dictionary = list("military" = c("military", "gun", "war"),
-                                "development" = c("development", "interest rate", "banks")))
-#summary(gather_topics(US_News_Conferences_1960_1980[1:5, 3]))
-#plot(gather_topics(US_News_Conferences_1960_1980[1:5, 3],
-#                   dictionary = c("military", "development")))
+summary(gather_topics(US_inaugural_addresses_1993_2025$text))
 }
 }

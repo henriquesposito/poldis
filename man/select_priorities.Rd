@@ -4,13 +4,10 @@
 \alias{select_priorities}
 \title{Select future priorities from political discourses}
 \usage{
-select_priorities(.data, na.rm = TRUE)
+select_priorities(v, na.rm = TRUE)
 }
 \arguments{
-\item{.data}{A (annotated) data frame or text vector.
-For data frames, function will search for "text" variable.
-For annotated data frames, please declare an annotated data frame
-at the sentence level.}
+\item{v}{Text vector or annotated data frame.}
 
 \item{na.rm}{Would you like political statements that do not contain a
 political action to be removed?
@@ -25,5 +22,5 @@ Political priorities are statements in which actors express their
 intent or commitment to take political action in the future.
 }
 \examples{
-#select_priorities(US_News_Conferences_1960_1980[1:2,3])
+#select_priorities(US_inaugural_addresses_1993_2025$text)
 }

@@ -4,7 +4,6 @@
 ^README\.Rmd$
 ^.github$
 ^.gitignore$
-^inst$
 .DS_Store
 ^_pkgdown\.yml$
 ^docs$
@@ -12,3 +11,6 @@
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
 ^data_raw$
+^survey_analysis$
+^Meta$
+^doc$

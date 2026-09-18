@@ -1,10 +1,16 @@
-## Test environments
-
-* local R installation, aarch64-apple-darwin20, R 4.4.0
-* macOS 14.5 (on Github), R 4.4.1
-* Microsoft Windows Server 2022 10.0.20348 (on Github), R 4.4.1
-* Ubuntu 22.04.4 (on Github), R 4.4.1
-
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 note
+
+* This is a new release.
+
+## Test environments
+
+* Windows 11, R 4.6.0
+* GitHub Actions: macOS-latest, R-release
+* GitHub Actions: windows-latest, R-release
+* GitHub Actions: ubuntu-latest, R-release
+
+## Downstream dependencies
+
+There are currently no downstream dependencies for this package.
